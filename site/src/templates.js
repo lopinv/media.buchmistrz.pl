@@ -17,6 +17,8 @@ import {
   CONTACT,
   STATS,
   flavorAngle,
+  recommendProductsFor,
+  relatedArticlesFor,
 } from './content.js';
 
 // ---------- 基础工具 ----------
@@ -404,9 +406,11 @@ export function reviewsBlock() {
   </section>`;
 }
 
-export function productCard(product, rank) {
+export function productCard(product, rank, target = null) {
   const pct = discountPct(product);
-  const cardUrl = `/produkt/${product.slug}/`;
+  // target: { url, buyUrl } — 文章推荐位覆盖内部链接（口味页）与外跳购买链接
+  const cardUrl = target?.url ?? `/produkt/${product.slug}/`;
+  const buyUrl = target?.buyUrl ?? product.permalink;
   return `
   <article class="product-card">
     ${rank ? `<span class="card-rank" aria-label="Pozycja ${rank}">#${rank}</span>` : ''}
@@ -424,7 +428,7 @@ export function productCard(product, rank) {
       </p>
       <div class="card-actions">
         <a class="btn btn-ghost" href="${esc(cardUrl)}">Szczegóły</a>
-        <a class="btn btn-primary" href="${esc(product.permalink)}" rel="nofollow">Kup</a>
+        <a class="btn btn-primary" href="${esc(buyUrl)}" rel="nofollow">Kup</a>
       </div>
     </div>
   </article>`;
@@ -432,6 +436,132 @@ export function productCard(product, rank) {
 
 export function flavorChip(product, flavor, active = false) {
   return `<a class="flavor-chip${active ? ' is-active' : ''}" href="/produkt/${esc(product.slug)}/${esc(flavor.slug)}/">${esc(flavor.name)}</a>`;
+}
+
+// ---------- 文章（vapepl.com 精选文章镜像 + 关联推荐） ----------
+// 文章卡片：站内文章页链接 + 外跳 vapepl.com 阅读原文（nofollow）
+export function articleCard(guide) {
+  return `
+  <article class="article-card">
+    <h3 class="article-title"><a href="/artykul/${esc(guide.id)}/">${esc(guide.title)}</a></h3>
+    <p class="article-summary">${esc(guide.summary)}</p>
+    <div class="article-actions">
+      <a class="btn btn-ghost" href="/artykul/${esc(guide.id)}/">Czytaj</a>
+      <a class="btn btn-ghost" href="${esc(guide.url)}" rel="nofollow" target="_blank">Pełna wersja →</a>
+    </div>
+  </article>`;
+}
+
+// 文章列表模块：全页复用。heading 非空时渲染可视 h2（首页/商品页/文章页），
+// 其余页面用 sr-only 标题避免与"相关文章"区块撞名；intro 为可信 HTML（含链接），不转义
+export function articlesBlock(heading = '', intro = '') {
+  const h2 = heading
+    ? `<h2 id="guides-title">${esc(heading)}</h2>
+        ${intro ? `<p>${intro}</p>` : ''}`
+    : '<h2 id="guides-title" class="sr-only">Wiedza o e-papierosach</h2>';
+  const centered = heading ? ' section--center' : '';
+  return `
+  <section class="section guides${centered}" aria-labelledby="guides-title">
+    <div class="container">
+      ${h2}
+      <div class="article-grid">
+        ${GUIDES.map((g) => articleCard(g)).join('')}
+      </div>
+    </div>
+  </section>`;
+}
+
+// 商品页 → 相关文章区块（相关文章为空时整块省略）
+export function relatedArticlesBlock(data, product, flavor) {
+  const list = relatedArticlesFor(data, product, flavor);
+  if (!list.length) return '';
+  const subject = flavor ? `${product.name} · smak ${flavor.name}` : `modelu ${product.name}`;
+  return `
+  <section class="section guides section--center" aria-labelledby="related-guides-title">
+    <div class="container">
+      <div class="section-head">
+        <h2 id="related-guides-title">Poradnik do ${esc(subject)}</h2>
+        <p>Zobacz, jak ten model radzi sobie w praktyce — wybrane artykuły z vapepl.com.</p>
+      </div>
+      <div class="article-grid">
+        ${list.map((g) => articleCard(g)).join('')}
+      </div>
+    </div>
+  </section>`;
+}
+
+export function renderArticle(data, guide) {
+  const rec = recommendProductsFor(data, guide)[0];
+  const crumb = breadcrumbs([{ label: 'Poradniki', url: '/' }, { label: guide.title, url: `/artykul/${guide.id}/` }]);
+  const recCard = rec
+    ? `
+  <section class="section section--center" aria-labelledby="rec-title">
+    <div class="container">
+      <h2 id="rec-title">Zalecany produkt</h2>
+      <p class="rec-intro">Do tego poradnika pasuje:</p>
+      ${productCard(rec.product, null, { url: rec.url, buyUrl: rec.buyUrl })}
+    </div>
+  </section>`
+    : '';
+  const jsonld = [
+    organizationLd(),
+    crumb.ld,
+    {
+      '@context': 'https://schema.org',
+      '@type': 'Article',
+      headline: guide.title,
+      description: guide.summary,
+      url: SITE + `/artykul/${guide.id}/`,
+      mainEntityOfPage: SITE + `/artykul/${guide.id}/`,
+      publisher: { '@type': 'Organization', name: SITE_NAME, url: VAPEPL },
+      datePublished: '2026-10-15',
+    },
+    ...(rec
+      ? [
+          {
+            '@context': 'https://schema.org',
+            '@type': 'Article',
+            headline: guide.title,
+            about: {
+              '@type': 'Product',
+              name: rec.name,
+              url: SITE + rec.url,
+              brand: { '@type': 'Brand', name: rec.product.brand },
+              offers: {
+                '@type': 'Offer',
+                price: String(rec.product.price),
+                priceCurrency: 'PLN',
+                url: rec.product.permalink,
+              },
+            },
+          },
+        ]
+      : []),
+  ];
+  const body = `
+  ${crumb.html}
+  <section class="page-hero">
+    <div class="container article-hero">
+      <p class="article-kicker">Poradnik · źródło: <a href="${esc(guide.url)}" rel="nofollow" target="_blank">vapepl.com</a></p>
+      <h1>${esc(guide.title)}</h1>
+      <p>${esc(guide.summary)}</p>
+      <div class="hero-actions">
+        <a class="btn btn-primary" href="${esc(guide.url)}" rel="nofollow" target="_blank">Przeczytaj pełny artykuł →</a>
+        ${rec ? `<a class="btn btn-ghost" href="${esc(rec.url)}">Zalecany produkt</a>` : ''}
+      </div>
+    </div>
+  </section>
+  ${recCard}
+  ${articlesBlock('Wszystkie poradniki')}
+  ${ctaBanner()}`;
+  return page({
+    title: `${guide.title} | ${SITE_NAME}`,
+    description: `${guide.summary} Pełna wersja poradnika na vapepl.com.`,
+    canonical: SITE + `/artykul/${guide.id}/`,
+    ogImage: rec?.product.image,
+    jsonld,
+    body,
+  });
 }
 
 // ---------- 页面渲染 ----------
@@ -540,15 +670,10 @@ export function renderHome(data) {
     </div>
   </section>
   ${reviewsBlock()}
-  <section class="section guides section--white section--center" aria-labelledby="guides-title">
-    <div class="container">
-      <h2 id="guides-title">Wiedza o e-papierosach</h2>
-      <p>30 poradników na <a href="${VAPEPL}" rel="nofollow">vapepl.com</a> — wybrane artykuły:</p>
-      <ul class="guide-list">
-        ${GUIDES.map((g) => `<li><a href="${esc(g.url)}" rel="nofollow">${esc(g.title)} →</a></li>`).join('')}
-      </ul>
-    </div>
-  </section>
+  ${articlesBlock(
+    'Wiedza o e-papierosach',
+    `Poradniki z <a href="${VAPEPL}" rel="nofollow">vapepl.com</a> — wybrane artykuły z zalecanymi produktami:`,
+  )}
   ${faqBlock(HOME_FAQ, undefined, true)}
   ${ctaBanner()}`;
   return page({
@@ -590,6 +715,7 @@ export function renderShop(data) {
       ${data.products.map((p) => productCard(p)).join('')}
     </div>
   </section>
+  ${articlesBlock()}
   ${faqBlock(HOME_FAQ, 4)}
   ${ctaBanner()}`;
   const jsonld = [
@@ -653,6 +779,7 @@ export function renderCategory(data, category) {
       ${products.length ? products.map((p) => productCard(p)).join('') : '<p>Brak produktów w tej kategorii.</p>'}
     </div>
   </section>
+  ${articlesBlock()}
   ${ctaBanner()}`;
   return page({
     title,
@@ -735,6 +862,8 @@ export function renderProduct(data, product) {
       </div>
     </div>
   </section>` : ''}
+  ${relatedArticlesBlock(data, product, null)}
+  ${articlesBlock('Wszystkie poradniki')}
   ${faqBlock(HOME_FAQ, 3)}
   ${ctaBanner()}`;
   return page({
@@ -812,6 +941,8 @@ export function renderFlavor(data, product, flavor) {
       </div>
     </div>
   </section>
+  ${relatedArticlesBlock(data, product, flavor)}
+  ${articlesBlock('Wszystkie poradniki')}
   ${faqBlock(
     [
       {
@@ -884,7 +1015,9 @@ export function renderContact(data) {
       <p>Status zamówienia, fakturę i numer śledzenia znajdziesz w e-mailu potwierdzającym oraz na swoim koncie na <a href="${VAPEPL}" rel="nofollow">vapepl.com</a>. Jeśli potrzebujesz pomocy, najprościej napisać przez WhatsApp lub Telegram.</p>
     </div>
   </section>
-  ${faqBlock(HOME_FAQ.slice(-2))}`;
+  ${faqBlock(HOME_FAQ.slice(-2))}
+  ${articlesBlock()}
+  ${ctaBanner()}`;
   return page({
     title: `Kontakt — ${SITE_NAME}`,
     description: `Skontaktuj się z obsługą: telefon ${CONTACT.phone}, WhatsApp, Telegram ${CONTACT.telegram.label} lub e-mail ${CONTACT.email}. Godziny ${CONTACT.hours}.`,
@@ -925,6 +1058,7 @@ export function renderReturns(data) {
       <p class="returns-cta">Pełna treść: <a href="${VAPEPL_RETURNS}" rel="nofollow">Polityka Zwrotów na vapepl.com →</a></p>
     </div>
   </section>
+  ${articlesBlock()}
   ${ctaBanner()}`;
   return page({
     title: `Polityka zwrotów — 14 dni na odstąpienie | ${SITE_NAME}`,
@@ -948,7 +1082,8 @@ export function render404(data) {
       <a class="btn btn-primary btn-lg" href="/sklep/">Wróć do sklepu</a>
       <a class="btn btn-ghost btn-lg" href="/">Strona główna</a>
     </div>
-  </section>`;
+  </section>
+  ${articlesBlock()}`;
   return page({
     title: `Nie znaleziono — ${SITE_NAME}`,
     description: 'Ta podstrona nie istnieje. Wróć do sklepu z jednorazówkami i e-papierosami.',

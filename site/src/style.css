@@ -1,7 +1,7 @@
 /* site/src/style.css — 深色科技营销主题（mobile-first，全站单一内容轨道 1200px）
    设计体系：
    - 深空蓝黑底（--bg）+ 细网格纹理 + 霓虹青强调（--brand）；卡片 = 深表面 + hairline + 深阴影
-   - 区块节奏：.section--white（深表面 + 发丝线分隔）与网格底交替；营销区块标题居中对称（.section--center）
+   - 区块节奏：网格底区块为主；营销区块标题居中对称（.section--center）
    - 卡片 hover：微升 + 青描边 + 光晕 + 图片 zoom；全站 :focus-visible 青焦点环
    - 无"套娃"二级限宽：卡片内内容通栏，左右边缘 = 容器边缘（1160px 内容轨） */
 
@@ -198,7 +198,6 @@ h1, h2, h3 { text-wrap: balance; }
 
 /* ---------- 区块体系 ----------
    .section          默认网格底（--bg），44px 垂直节奏（桌面 56px）
-   .section--white   深表面 + 上下发丝线，与相邻网格底区块分隔
    .section--center  营销区块：h2 与导语水平居中，左右对称
    所有区块内容统一到 .container 单轨道（1200px，内容 1160px），无二级限宽
 ------------------------------------------------ */
@@ -209,7 +208,7 @@ h1, h2, h3 { text-wrap: balance; }
   letter-spacing: -0.01em;
   margin: 0 0 20px;
 }
-.section--white { background: var(--surface); border-block: 1px solid var(--line); }
+.section { padding-block: 44px; }
 .section--center, .section--center h2, .section--center h3 { text-align: center; }
 .section--center p { max-width: 56ch; margin-inline: auto; }
 .section-head p { color: var(--ink-soft); margin: 0 auto 24px; max-width: 56ch; }
@@ -451,15 +450,37 @@ a.brand-card:hover, a.flavor-card:hover, a.contact-card:hover,
 .faq-a { padding: 0 4px 16px; }
 .faq-a p { margin: 0; color: var(--ink-soft); }
 
-/* ---------- 指南（深表面区块）---------- */
+/* ---------- 文章（卡片网格 + 推荐位） ---------- */
 .guides h2 { margin-bottom: 12px; }
-.guides .container > p { color: var(--ink-soft); }
-.guide-list {
-  list-style: none; padding: 0;
-  display: grid; grid-template-columns: 1fr; gap: 12px 24px;
+.guides .section-head p, .guides .container > p { color: var(--ink-soft); }
+.article-grid {
+  display: grid; grid-template-columns: 1fr; gap: 14px;
 }
-.guide-list a { color: var(--brand); text-decoration: none; font-weight: 600; }
-.guide-list a:hover { text-decoration: underline; }
+.article-card {
+  background: var(--surface-2);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  padding: 18px;
+  display: flex; flex-direction: column; gap: 10px;
+  transition: transform var(--dur), border-color var(--dur), box-shadow var(--dur);
+}
+.article-card:hover {
+  transform: translateY(-3px);
+  border-color: rgba(34, 211, 238, 0.45);
+  box-shadow: 0 8px 28px rgba(0, 0, 0, 0.4);
+}
+.article-title { font-size: 17px; line-height: 1.35; margin: 0; }
+.article-title a { color: var(--ink); text-decoration: none; }
+.article-title a:hover { color: var(--brand); }
+.article-summary { color: var(--ink-soft); font-size: 14px; line-height: 1.6; margin: 0; flex: 1; }
+.article-actions { display: flex; gap: 8px; flex-wrap: wrap; }
+.article-actions .btn { padding: 8px 14px; font-size: 13px; }
+.rec-intro { color: var(--ink-soft); margin-bottom: 18px; }
+.article-kicker {
+  color: var(--ink-mute); font-size: 13px; font-weight: 600;
+  letter-spacing: 0.06em; text-transform: uppercase; margin: 0 0 12px;
+}
+.article-kicker a { color: var(--brand); }
 
 /* ---------- CTA banner（深空蓝渐变 + 青光晕）---------- */
 .cta-banner {
@@ -576,6 +597,7 @@ a.brand-card:hover, a.flavor-card:hover, a.contact-card:hover,
   .contact-grid { grid-template-columns: repeat(2, 1fr); }
   .top-flavors { grid-template-columns: repeat(2, 1fr); }
   .brand-grid, .flavor-grid { grid-template-columns: repeat(2, 1fr); }
+  .article-grid { grid-template-columns: repeat(2, 1fr); }
 }
 
 @media (min-width: 960px) {
@@ -588,7 +610,7 @@ a.brand-card:hover, a.flavor-card:hover, a.contact-card:hover,
   .contact-grid { grid-template-columns: repeat(4, 1fr); }
   .brand-grid, .flavor-grid { grid-template-columns: repeat(4, 1fr); }
   .top-flavors { grid-template-columns: repeat(3, 1fr); }
-  .guide-list { grid-template-columns: repeat(2, 1fr); }
+  .article-grid { grid-template-columns: repeat(3, 1fr); }
 
   /* 桌面导航：显示顶栏 + 下拉，隐藏汉堡与移动菜单（base 已 display:none，无需 !important） */
   .nav-toggle { display: none; }

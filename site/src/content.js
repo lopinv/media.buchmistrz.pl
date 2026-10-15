@@ -100,15 +100,119 @@ export const HOME_FAQ = [
   },
 ];
 
-// Wybrane poradniki (pełna lista 30 na vapepl.com)
+// 候选模型池：按口味名（小写精确）映射到该口味真实存在的站内模型。
+// 文章推荐位在此池中取与口味匹配的模型；口味缺失时取池内畅销排名最高者。
+const GUIDE_FLAVOR_POOL = {
+  'cool mint': ['fumot-randm-tornado-9000-puffs', 'xcor-max-50000-puffs'],
+  'watermelon ice': ['airmez-lux-60000-puffs', 'hifancy-dream-45000-puffs', 'xcor-max-50000-puffs'],
+  grape: ['fumot-randm-tornado-9000-puffs'],
+  'strawberry kiwi': ['xcor-max-50000-puffs'],
+  'blueberry on ice': ['airmez-lux-60000-puffs'],
+  'strawberry ice': ['hifancy-dream-45000-puffs'],
+};
+
+// 精选文章（vapepl.com 共 30 篇，此处为站内镜像列表 + 每篇关联的商品推荐位）
+// flavor: 推荐口味名（对应 GUIDE_FLAVOR_POOL 的键）；池内无该口味的模型则回退池内畅销榜首
 export const GUIDES = [
-  { title: 'IQOS vs papieros: 30 dni kosztów i drabina puffs', url: `${VAPEPL}/iqos-vs-papieros-30-dni-kosztow-i-drabina-puffs/` },
-  { title: 'E papieros vs papieros: 30 dni, 1 000 puffs i liczby', url: `${VAPEPL}/e-papieros-vs-papieros-30-dni-1-000-puffs-i-liczby/` },
-  { title: 'RandM Tornado 9000: ładowanie, przechowywanie i wymiana', url: `${VAPEPL}/randm-tornado-9000-ladowanie-przechowywanie-i-wymiana/` },
-  { title: 'Najlepsza jednorazówka w 5 scenariuszach: LUX, TORNADO i STAG', url: `${VAPEPL}/najlepsza-jednorazowka-w-5-scenariuszach-lux-tornado-i-stag/` },
-  { title: 'Jednorazówka 50mg: LUX, STAG BAR i TORNADO w liczbach', url: `${VAPEPL}/jednorazowka-50mg-lux-stag-bar-i-tornado-w-liczbach/` },
-  { title: 'Co zamiast jednorazówek: LUX 60K, MAX i DREAM', url: `${VAPEPL}/co-zamiast-jednorazowek-lux-60k-max-i-dream/` },
+  {
+    id: 'iqos-vs-papieros',
+    title: 'IQOS vs papieros: 30 dni kosztów i drabina puffs',
+    url: `${VAPEPL}/iqos-vs-papieros-30-dni-kosztow-i-drabina-puffs/`,
+    summary:
+      '30-dniowy test porównujący miesięczne wydatki na IQOS i papierosy oraz przeliczenie zużycia na liczbę puffs — kiedy e-papieros zaczyna się opłacać.',
+    flavor: 'Cool Mint',
+  },
+  {
+    id: 'e-papieros-vs-papieros',
+    title: 'E papieros vs papieros: 30 dni, 1 000 puffs i liczby',
+    url: `${VAPEPL}/e-papieros-vs-papieros-30-dni-1-000-puffs-i-liczby/`,
+    summary:
+      'Trzydzieści dni, tysiąc puffs i twarde liczby: koszt jednej dawki, zużycie baterii i ile klasycznych papierosów zastępuje jeden e-papieros.',
+    flavor: 'Watermelon Ice',
+  },
+  {
+    id: 'randm-tornado-9000-poradnik',
+    title: 'RandM Tornado 9000: ładowanie, przechowywanie i wymiana',
+    url: `${VAPEPL}/randm-tornado-9000-ladowanie-przechowywanie-i-wymiana/`,
+    summary:
+      'Praktyczny poradnik do RandM Tornado 9000: jak ładować i przechowywać urządzenie oraz co zrobić, gdy smak słabnie przed ostatnim puffem.',
+    flavor: 'Grape',
+  },
+  {
+    id: 'najlepsza-jednorazowka-5-scenariuszy',
+    title: 'Najlepsza jednorazówka w 5 scenariuszach: LUX, TORNADO i STAG',
+    url: `${VAPEPL}/najlepsza-jednorazowka-w-5-scenariuszach-lux-tornado-i-stag/`,
+    summary:
+      'Pięć scenariuszy użytkowania — od wyjazdów po pracę w terenie — i w których z nich najlepiej sprawdzają się LUX, TORNADO oraz STAG BAR.',
+    flavor: 'Strawberry Kiwi',
+  },
+  {
+    id: 'jednorazowka-50mg',
+    title: 'Jednorazówka 50mg: LUX, STAG BAR i TORNADO w liczbach',
+    url: `${VAPEPL}/jednorazowka-50mg-lux-stag-bar-i-tornado-w-liczbach/`,
+    summary:
+      'Wersje 50 mg trzech flagowych modeli w liczbach: koszt pojedynczego puffsie, czas życia i do jakich scenariuszy pasuje wysoka moc.',
+    flavor: 'Blueberry On Ice',
+  },
+  {
+    id: 'co-zamiast-jednorazowek',
+    title: 'Co zamiast jednorazówek: LUX 60K, MAX i DREAM',
+    url: `${VAPEPL}/co-zamiast-jednorazowek-lux-60k-max-i-dream/`,
+    summary:
+      'Alternatywy dla typowych jednorazówek: systemy wielorazowe LUX 60K, MAX i DREAM — co zyskujesz, a co tracisz względem jednorazówek.',
+    flavor: 'Strawberry Ice',
+  },
 ];
+
+// 文章 → 推荐商品：在口味候选池中取与该口味匹配、且畅销排名靠前的模型
+export function recommendProductsFor(data, guide) {
+  const bySlug = new Map(data.products.map((p) => [p.slug, p]));
+  const popularity = new Map((data.topSellers ?? []).map((slug, i) => [slug, i]));
+  const flavorName = (guide.flavor ?? '').trim().toLowerCase();
+  const pool = (GUIDE_FLAVOR_POOL[flavorName] ?? []).filter((slug) => {
+    const p = bySlug.get(slug);
+    return p?.flavors.some((f) => f.name.trim().toLowerCase() === flavorName);
+  });
+  pool.sort((a, b) => (popularity.get(a) ?? 99) - (popularity.get(b) ?? 99));
+  const pickSlug = pool[0] ?? (data.topSellers ?? [])[0];
+  const product = bySlug.get(pickSlug);
+  if (!product) return [];
+  const flavor =
+    product.flavors.find((f) => f.name.trim().toLowerCase() === flavorName) ?? null;
+  return [
+    {
+      product,
+      flavor,
+      name: flavor ? `${product.name} — ${flavor.name}` : product.name,
+      url: flavor ? `/produkt/${product.slug}/${flavor.slug}/` : `/produkt/${product.slug}/`,
+      buyUrl: flavor ? flavor.buyUrl : product.permalink,
+    },
+  ];
+}
+
+// 商品（模型页/口味页）→ 相关文章。评分：
+// 模型+口味双命中 3 / 同口味不同模型 1.5 / 同模型 1 / 模型在畅销榜 0.5（畅销款始终有推荐位）
+export function relatedArticlesFor(data, product, flavor) {
+  const isTop = data.topSellers?.includes(product.slug);
+  return GUIDES.map((g) => {
+    const rec = recommendProductsFor(data, g);
+    const r = rec[0];
+    let score = 0;
+    if (r && r.product.slug === product.slug) {
+      score =
+        r.flavor && flavor && r.flavor.slug === flavor.slug
+          ? 3
+          : flavor && !r.flavor
+            ? 1.5
+            : 1;
+    }
+    if (isTop) score += 0.5;
+    return { guide: g, score };
+  })
+    .filter((x) => x.score > 0)
+    .sort((a, b) => b.score - a.score || GUIDES.indexOf(a.guide) - GUIDES.indexOf(b.guide))
+    .map((x) => x.guide);
+}
 
 export const WHY_US = [
   { icon: 'shield-check', title: 'Gwarancja Jakości' },

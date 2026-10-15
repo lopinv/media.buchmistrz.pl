@@ -10,7 +10,7 @@ import {
 } from 'node:fs';
 import { dirname, join, relative, posix } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { SITE } from './src/content.js';
+import { SITE, GUIDES } from './src/content.js';
 import {
   renderHome,
   renderShop,
@@ -20,6 +20,7 @@ import {
   renderContact,
   renderReturns,
   render404,
+  renderArticle,
 } from './src/templates.js';
 
 const ROOT = dirname(fileURLToPath(import.meta.url));
@@ -53,6 +54,9 @@ for (const product of data.products) {
   }
 }
 
+// 文章页（vapepl.com 精选文章站内镜像）
+for (const guide of GUIDES) out(`artykul/${guide.id}/index.html`, renderArticle(data, guide));
+
 // 静态资源与辅助文件
 for (const f of ['style.css', 'script.js']) {
   writeFileSync(join(DIST, f), readFileSync(join(ROOT, 'src', f)));
@@ -78,6 +82,7 @@ const urls = [
     SITE + `/produkt/${p.slug}/`,
     ...p.flavors.map((f) => SITE + `/produkt/${p.slug}/${f.slug}/`),
   ]),
+  ...GUIDES.map((g) => SITE + `/artykul/${g.id}/`),
 ];
 writeFileSync(
   join(DIST, 'sitemap.xml'),
