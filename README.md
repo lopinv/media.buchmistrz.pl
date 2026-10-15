@@ -1,63 +1,75 @@
 <div align="center">
 
-<img src="https://buchmistrz.pl/wp-content/uploads/stag-bar-6in1-180000-180k-puffs.jpg" width="900" alt="BuchMistrz" style="border-radius:12px;box-shadow:0 10px 40px rgba(0,0,0,0.2)">
+<img src="https://cdn.jsdelivr.net/gh/lopinv/media.buchmistrz.pl@media/static/assets/uploads/stag-bar-6in1-180000-180k-puffs.jpg" width="900" alt="VapePL.COM" style="border-radius:12px;box-shadow:0 10px 40px rgba(0,0,0,0.2)">
 
-# 🌬️ BuchMistrz
+# 🌬️ VapePL.COM
+
+### Jednorazówki, pody, e-papierosy | Hurt i detal
 
 <div align="center">
-<img src="https://img.shields.io/badge/🇵🇱-Polska-1c61e7?style=for-the-badge" alt="Poland">
-<img src="https://img.shields.io/badge/🇨🇿-Czechy-1c61e7?style=for-the-badge" alt="Czech">
-<img src="https://img.shields.io/badge/🇸🇰-Słowacja-1c61e7?style=for-the-badge" alt="Slovakia">
-<img src="https://img.shields.io/badge/🇭🇺-Węgry-1c61e7?style=for-the-badge" alt="Hungary">
+
+<img src="https://img.shields.io/badge/🇵🇱-Polska-1c61e7?style=for-the-badge" alt="Polska">
+<img src="https://img.shields.io/badge/📅-Od%202014-007ec6?style=for-the-badge" alt="Od 2014">
+<img src="https://img.shields.io/badge/🏭-7%20marek-1e88e5?style=for-the-badge" alt="7 marek">
+<img src="https://img.shields.io/badge/📦-18%20produktów-0ea5e9?style=for-the-badge" alt="18 produktów">
+<img src="https://img.shields.io/badge/📖-30%20poradników-e05a4b?style=for-the-badge" alt="30 poradników">
+
+```
+┌──────────────┬──────────────┬──────────────┬──────────────┬──────────────┐
+│   📦 18      │   🏭 7      │   📝 30      │   💰 od 55 zł │   ⭐ 4,4/5   │
+│  Produktów   │   Marek     │  Artykułów   │   Cena od    │  Opinie     │
+└──────────────┴──────────────┴──────────────┴──────────────┴──────────────┘
+```
+
 </div>
-
-### 🏆 Największy Autoryzowany Sklep z Jednorazowych E-papierosów w Europie Środkowej
-
-<div align="center">
-
-```
-┌─────────────┬─────────────┬─────────────┬─────────────┬─────────────┐
-│   📦 13     │   ⭐ 6      │   📝 60     │   💰 55zł   │   🌍 4      │
-│  Produktów  │   Marek     │  Artykułów  │   Od ceny   │   Krajów    │
-└─────────────┴─────────────┴─────────────┴─────────────┴─────────────┘
-```
 
 </div>
 
 ---
 
-## 🗺️ Obszar Sprzedaży
+## ✨ Dlaczego VapePL.COM?
 
-| 🇵🇱 **Polska** | 🇨🇿 **Czechy** | 🇸🇰 **Słowacja** | 🇭🇺 **Węgry** |
-|:------------:|:------------:|:------------:|:------------:|
-| 🚚 **Wysyłka 24h** | 🚚 **Dostava 2-3 dni** | 🚚 **Kurier lokalny** | 🚚 **Szybka dostava** |
-| 💵 **COD (płatność przy odbiorze)** | 💵 **Bankowy převod** | 💵 **SMS platba** | 💵 **Bankkártya** |
-| 🎁 **Darmowa od 150zł** | 🎁 **Od 150 CZK** | 🎁 **Od 150 PLN** | 🎁 **Od 150 HUF** |
-| 📞 **+48 729 250 699** | 📞 **+420 xxx xxx** | 📞 **+421 xxx xxx** | 📞 **+36 xxx xxx** |
-
----
-
-## ✨ Dlaczego BuchMistrz?
-
-| ✅ **Gwarancja Jakości** | ✅ **Szybka Wysyłka** | ✅ **Bezpieczne Płatności** | ✅ **Wsparcie 24/7** |
+| ✅ **Gwarancja Jakości** | ✅ **Szybka Wysyłka** | ✅ **Bezpieczne Płatności** | ✅ **Rabaty Ilościowe** |
 |:----------------------:|:-------------------:|:------------------------:|:------------------:|
-| 100% oryginalne produkty z certyfikatem | Wysyłka tego samego dnia do 14:00 | SSL + COD | Telefon + Email + Czat |
-| Gwarancja producenta na każde urządzenie | Odpłatność śledzenia przesyłki | 14 dni na zwrot bez pytań | Profesjonalna pomoc |
+| 100% oryginalnych produktów | Wysyłka z polskiego magazynu | BLIK + szybkie przelewy | Do **−20%** przy 15+ szt. |
+| Oficjalne kanały dystrybucji | Paczkomaty InPost i kurier DPD | Płatność przy kasie online | 14 dni na zwrot |
+
+> 🕶️ Produkty sprzedawane wyłącznie osobom pełnoletnim (**18+**). Kuriery mogą zweryfikować wiek przy doręczeniu.
 
 ---
 
-## 🏷️ Nasze Produkty
+## 🏭 Nasze Marki
 
-> Kompletna oferta **13 modeli** od **6 renomowanych marek**
+| 🦊 **AiRMEZ** | 🐆 **Fumot** | ✨ **HIFANCY** | 🎭 **Maskking** | 🍬 **MerryMi** | 🦌 **Stagbar** | ⚡ **XCOR** |
+|:---:|:---:|:---:|:---:|:---:|:---:|:---:|
+| 4 produkty | 4 produkty | 4 produkty | 1 produkt | 1 produkt | 1 produkt | 3 produkty |
+
+---
+
+## 🏷️ Produkty
+
+> Kompletna oferta **18 modeli** od **7 renomowanych marek** — wszystkie w promocji
 
 ### 🦊 AiRMEZ
 
 <table width="100%">
-<tr><th width="40%" align="left">Produkt</th><th width="15%">Cena</th><th width="15%">Puffs</th><th width="30%" align="center">Widok</th></tr>
-<tr><td align="left"><a href="https://buchmistrz.pl/product/airmez-fox-4in1-120000-puffs/">AiRMEZ FOX 4IN1 120000 PUFFS</a></td><td><b>100,00 zł</b></td><td>120000 Puffs</td><td align="center"><img src="https://buchmistrz.pl/wp-content/uploads/9.jpg" width="120" height="120" style="object-fit:cover;border-radius:8px" alt="AiRMEZ FOX 4IN1 120000 PUFFS"></td></tr>
-<tr><td align="left"><a href="https://buchmistrz.pl/product/airmez-lux-60000-puffs/">AiRMEZ LUX 60000 PUFFS</a></td><td><b>90,00 zł</b></td><td>60000 Puffs</td><td align="center"><img src="https://buchmistrz.pl/wp-content/uploads/MIXED-BERRIES.png" width="120" height="120" style="object-fit:cover;border-radius:8px" alt="AiRMEZ LUX 60000 PUFFS"></td></tr>
-<tr><td align="left"><a href="https://buchmistrz.pl/product/airmez-matrix-pro-30000-puffs/">AiRMEZ MATRIX PRO 30000 PUFFS</a></td><td><b>70,00 zł</b></td><td>40000 Puffs</td><td align="center"><img src="https://buchmistrz.pl/wp-content/uploads/85a0e357f0bcf5bd736574a36eea826d.webp" width="120" height="120" style="object-fit:cover;border-radius:8px" alt="AiRMEZ MATRIX PRO 30000 PUFFS"></td></tr>
-<tr><td align="left"><a href="https://buchmistrz.pl/product/airmez-tornado-25000-puffs/">AiRMEZ TORNADO 25000 PUFFS</a></td><td><b>60,00 zł</b></td><td>25000 Puffs</td><td align="center"><img src="https://buchmistrz.pl/wp-content/uploads/blueberry-on-ice-.png" width="120" height="120" style="object-fit:cover;border-radius:8px" alt="AiRMEZ TORNADO 25000 PUFFS"></td></tr>
+<tr><th width="40%" align="left">Produkt</th><th width="15%">Puffs</th><th width="25%">Cena</th><th width="20%" align="center">Widok</th></tr>
+<tr><td align="left"><a href="https://vapepl.com/product/airmez-fox-4in1-120000-puffs/">AiRMEZ FOX 4IN1</a></td><td>120 000</td><td><s>120,00 zł</s> <b>100,00 zł</b></td><td align="center"><img src="https://cdn.jsdelivr.net/gh/lopinv/media.buchmistrz.pl@media/static/assets/uploads/9.jpg" width="100" height="100" style="object-fit:cover;border-radius:8px" alt="AiRMEZ FOX 4IN1 120000 PUFFS"></td></tr>
+<tr><td align="left"><a href="https://vapepl.com/product/airmez-lux-60000-puffs/">AiRMEZ LUX</a></td><td>60 000</td><td><s>110,00 zł</s> <b>90,00 zł</b></td><td align="center"><img src="https://cdn.jsdelivr.net/gh/lopinv/media.buchmistrz.pl@media/static/assets/uploads/MIXED-BERRIES.png" width="100" height="100" style="object-fit:cover;border-radius:8px" alt="AiRMEZ LUX 60000 PUFFS"></td></tr>
+<tr><td align="left"><a href="https://vapepl.com/product/airmez-matrix-pro-30000-puffs/">AiRMEZ MATRIX PRO</a></td><td>30 000</td><td><s>80,00 zł</s> <b>70,00 zł</b></td><td align="center"><img src="https://cdn.jsdelivr.net/gh/lopinv/media.buchmistrz.pl@media/static/assets/uploads/85a0e357f0bcf5bd736574a36eea826d.webp" width="100" height="100" style="object-fit:cover;border-radius:8px" alt="AiRMEZ MATRIX PRO 30000 PUFFS"></td></tr>
+<tr><td align="left"><a href="https://vapepl.com/product/airmez-tornado-25000-puffs/">AiRMEZ TORNADO</a></td><td>25 000</td><td><s>75,00 zł</s> <b>65,00 zł</b></td><td align="center"><img src="https://cdn.jsdelivr.net/gh/lopinv/media.buchmistrz.pl@media/static/assets/uploads/blueberry-on-ice-.png" width="100" height="100" style="object-fit:cover;border-radius:8px" alt="AiRMEZ TORNADO 25000 PUFFS"></td></tr>
+</table>
+
+---
+
+### 🐆 Fumot
+
+<table width="100%">
+<tr><th width="40%" align="left">Produkt</th><th width="15%">Puffs</th><th width="25%">Cena</th><th width="20%" align="center">Widok</th></tr>
+<tr><td align="left"><a href="https://vapepl.com/product/fumot-eco-4in1-80000-puffs/">FUMOT ECO 4IN1</a></td><td>80 000</td><td><s>140,00 zł</s> <b>125,00 zł</b></td><td align="center"><img src="https://cdn.jsdelivr.net/gh/lopinv/media.buchmistrz.pl@media/static/assets/uploads/fumot-eco-4in1-80k-specs.webp" width="100" height="100" style="object-fit:cover;border-radius:8px" alt="FUMOT ECO 4IN1 80000 PUFFS"></td></tr>
+<tr><td align="left"><a href="https://vapepl.com/product/fumot-leopard-40000-puffs/">FUMOT LEOPARD</a></td><td>40 000</td><td><s>95,00 zł</s> <b>90,00 zł</b></td><td align="center"><img src="https://cdn.jsdelivr.net/gh/lopinv/media.buchmistrz.pl@media/static/assets/uploads/fumot-leopard-40k-puffs-main.webp" width="100" height="100" style="object-fit:cover;border-radius:8px" alt="FUMOT LEOPARD 40000 PUFFS"></td></tr>
+<tr><td align="left"><a href="https://vapepl.com/product/fumot-randm-tornado-15000-puffs/">FUMOT RANDM TORNADO</a></td><td>15 000</td><td><s>65,00 zł</s> <b>60,00 zł</b></td><td align="center"><img src="https://cdn.jsdelivr.net/gh/lopinv/media.buchmistrz.pl@media/static/assets/uploads/fumot-randm-tornado-15k-puffs.webp" width="100" height="100" style="object-fit:cover;border-radius:8px" alt="FUMOT RANDM TORNADO 15000 PUFFS"></td></tr>
+<tr><td align="left"><a href="https://vapepl.com/product/fumot-randm-tornado-9000-puffs/">FUMOT RANDM TORNADO</a></td><td>9 000</td><td><s>65,00 zł</s> <b>60,00 zł</b></td><td align="center"><img src="https://cdn.jsdelivr.net/gh/lopinv/media.buchmistrz.pl@media/static/assets/uploads/fumot-randm-tornado-9k-puffs.webp" width="100" height="100" style="object-fit:cover;border-radius:8px" alt="FUMOT RANDM TORNADO 9000 PUFFS"></td></tr>
 </table>
 
 ---
@@ -65,37 +77,38 @@
 ### ✨ HIFANCY
 
 <table width="100%">
-<tr><th width="40%" align="left">Produkt</th><th width="15%">Cena</th><th width="15%">Puffs</th><th width="30%" align="center">Widok</th></tr>
-<tr><td align="left"><a href="https://buchmistrz.pl/product/hifancy-dream-45000-puffs/">HIFANCY DREAM 45000 PUFFS</a></td><td><b>70,00 zł</b></td><td>45000 Puffs</td><td align="center"><img src="https://buchmistrz.pl/wp-content/uploads/5d9d6b6e99481cb879b8d2a95948a489.webp" width="120" height="120" style="object-fit:cover;border-radius:8px" alt="HIFANCY DREAM 45000 PUFFS"></td></tr>
-<tr><td align="left"><a href="https://buchmistrz.pl/product/hifancy-space-50000-puffs/">HIFANCY SPACE 50000 PUFFS</a></td><td><b>80,00 zł</b></td><td>50000 Puffs</td><td align="center"><img src="https://buchmistrz.pl/wp-content/uploads/5aaefa0149d9574264498fd7c5fdf37b.jpg" width="120" height="120" style="object-fit:cover;border-radius:8px" alt="HIFANCY SPACE 50000 PUFFS"></td></tr>
-<tr><td align="left"><a href="https://buchmistrz.pl/product/hifancy-super-70000-puffs/">HIFANCY SUPER 70000 PUFFS</a></td><td><b>100,00 zł</b></td><td>70000 Puffs</td><td align="center"><img src="https://buchmistrz.pl/wp-content/uploads/hifancy-super-70k-cover.jpg" width="120" height="120" style="object-fit:cover;border-radius:8px" alt="HIFANCY SUPER 70000 PUFFS"></td></tr>
+<tr><th width="40%" align="left">Produkt</th><th width="15%">Puffs</th><th width="25%">Cena</th><th width="20%" align="center">Widok</th></tr>
+<tr><td align="left"><a href="https://vapepl.com/product/hifancy-clear-80000-puffs/">HIFANCY CLEAR</a></td><td>80 000</td><td><s>140,00 zł</s> <b>125,00 zł</b></td><td align="center"><img src="https://cdn.jsdelivr.net/gh/lopinv/media.buchmistrz.pl@media/static/assets/uploads/hifancy-clear-80000-puffs.jpg" width="100" height="100" style="object-fit:cover;border-radius:8px" alt="HIFANCY CLEAR 80000 PUFFS"></td></tr>
+<tr><td align="left"><a href="https://vapepl.com/product/hifancy-super-70000-puffs/">HIFANCY SUPER</a></td><td>70 000</td><td><s>110,00 zł</s> <b>100,00 zł</b></td><td align="center"><img src="https://cdn.jsdelivr.net/gh/lopinv/media.buchmistrz.pl@media/static/assets/uploads/hifancy-super-70k-cover.jpg" width="100" height="100" style="object-fit:cover;border-radius:8px" alt="HIFANCY SUPER 70000 PUFFS"></td></tr>
+<tr><td align="left"><a href="https://vapepl.com/product/hifancy-space-50000-puffs/">HIFANCY SPACE</a></td><td>50 000</td><td><s>85,00 zł</s> <b>80,00 zł</b></td><td align="center"><img src="https://cdn.jsdelivr.net/gh/lopinv/media.buchmistrz.pl@media/static/assets/uploads/5aaefa0149d9574264498fd7c5fdf37b.jpg" width="100" height="100" style="object-fit:cover;border-radius:8px" alt="HIFANCY SPACE 50000 PUFFS"></td></tr>
+<tr><td align="left"><a href="https://vapepl.com/product/hifancy-dream-45000-puffs/">HIFANCY DREAM</a></td><td>45 000</td><td><s>80,00 zł</s> <b>70,00 zł</b></td><td align="center"><img src="https://cdn.jsdelivr.net/gh/lopinv/media.buchmistrz.pl@media/static/assets/uploads/5d9d6b6e99481cb879b8d2a95948a489.webp" width="100" height="100" style="object-fit:cover;border-radius:8px" alt="HIFANCY DREAM 45000 PUFFS"></td></tr>
 </table>
 
 ---
 
-### 🎭 MASKKING
+### 🎭 Maskking
 
 <table width="100%">
-<tr><th width="40%" align="left">Produkt</th><th width="15%">Cena</th><th width="15%">Puffs</th><th width="30%" align="center">Widok</th></tr>
-<tr><td align="left"><a href="https://buchmistrz.pl/product/maskking-icex-40000-puffs/">MASKKING ICEX 40000 PUFFS</a></td><td><b>80,00 zł</b></td><td>40000 Puffs</td><td align="center"><img src="https://buchmistrz.pl/wp-content/uploads/cover.jpg" width="120" height="120" style="object-fit:cover;border-radius:8px" alt="MASKKING ICEX 40000 PUFFS"></td></tr>
+<tr><th width="40%" align="left">Produkt</th><th width="15%">Puffs</th><th width="25%">Cena</th><th width="20%" align="center">Widok</th></tr>
+<tr><td align="left"><a href="https://vapepl.com/product/maskking-icex-40000-puffs/">MASKKING ICEX</a></td><td>40 000</td><td><s>90,00 zł</s> <b>80,00 zł</b></td><td align="center"><img src="https://cdn.jsdelivr.net/gh/lopinv/media.buchmistrz.pl@media/static/assets/uploads/cover.jpg" width="100" height="100" style="object-fit:cover;border-radius:8px" alt="MASKKING ICEX 40000 PUFFS"></td></tr>
 </table>
 
 ---
 
-### 🍬 MERRYMI
+### 🍬 MerryMi
 
 <table width="100%">
-<tr><th width="40%" align="left">Produkt</th><th width="15%">Cena</th><th width="15%">Puffs</th><th width="30%" align="center">Widok</th></tr>
-<tr><td align="left"><a href="https://buchmistrz.pl/product/merrymi-blade-30000-puffs/">MERRYMI BLADE 30000 PUFFS</a></td><td><b>80,00 zł</b></td><td>30000 Puffs</td><td align="center"><img src="https://buchmistrz.pl/wp-content/uploads/merrymi-blade-30000-puffs-aperol-banner-1.jpg" width="120" height="120" style="object-fit:cover;border-radius:8px" alt="MERRYMI BLADE 30000 PUFFS"></td></tr>
+<tr><th width="40%" align="left">Produkt</th><th width="15%">Puffs</th><th width="25%">Cena</th><th width="20%" align="center">Widok</th></tr>
+<tr><td align="left"><a href="https://vapepl.com/product/merrymi-blade-30000-puffs/">MERRYMI BLADE</a></td><td>30 000</td><td><s>95,00 zł</s> <b>80,00 zł</b></td><td align="center"><img src="https://cdn.jsdelivr.net/gh/lopinv/media.buchmistrz.pl@media/static/assets/uploads/merrymi-blade-30000-puffs-aperol-banner-1.jpg" width="100" height="100" style="object-fit:cover;border-radius:8px" alt="MERRYMI BLADE 30000 PUFFS"></td></tr>
 </table>
 
 ---
 
-### 🦌 STAG BAR
+### 🦌 Stagbar
 
 <table width="100%">
-<tr><th width="40%" align="left">Produkt</th><th width="15%">Cena</th><th width="15%">Puffs</th><th width="30%" align="center">Widok</th></tr>
-<tr><td align="left"><a href="https://buchmistrz.pl/product/stag-bar-6in1-180000-puffs/">STAG BAR 6IN1 180000 PUFFS</a></td><td><b>150,00 zł</b></td><td>180000 Puffs</td><td align="center"><img src="https://buchmistrz.pl/wp-content/uploads/stag-bar-6in1-180000-180k-puffs.jpg" width="120" height="120" style="object-fit:cover;border-radius:8px" alt="STAG BAR 6IN1 180000 PUFFS"></td></tr>
+<tr><th width="40%" align="left">Produkt</th><th width="15%">Puffs</th><th width="25%">Cena</th><th width="20%" align="center">Widok</th></tr>
+<tr><td align="left"><a href="https://vapepl.com/product/stag-bar-6in1-180000-puffs/">STAG BAR 6IN1</a></td><td>180 000</td><td><s>180,00 zł</s> <b>150,00 zł</b></td><td align="center"><img src="https://cdn.jsdelivr.net/gh/lopinv/media.buchmistrz.pl@media/static/assets/uploads/stag-bar-6in1-180000-180k-puffs.jpg" width="100" height="100" style="object-fit:cover;border-radius:8px" alt="STAG BAR 6IN1 180000 PUFFS"></td></tr>
 </table>
 
 ---
@@ -103,85 +116,212 @@
 ### ⚡ XCOR
 
 <table width="100%">
-<tr><th width="40%" align="left">Produkt</th><th width="15%">Cena</th><th width="15%">Puffs</th><th width="30%" align="center">Widok</th></tr>
-<tr><td align="left"><a href="https://buchmistrz.pl/product/xcor-hawaii-pro-23000-puffs/">XCOR Hawaii PRO 23000 PUFFS</a></td><td><b>55,00 zł</b></td><td>23000 Puffs</td><td align="center"><img src="https://buchmistrz.pl/wp-content/uploads/85b21c9f1e31bb658d6c4ec5a830a8b3.webp" width="120" height="120" style="object-fit:cover;border-radius:8px" alt="XCOR Hawaii PRO 23000 PUFFS"></td></tr>
-<tr><td align="left"><a href="https://buchmistrz.pl/product/xcor-max-50000-puffs/">XCOR Max 50000 PUFFS</a></td><td><b>90,00 zł</b></td><td>50000 Puffs</td><td align="center"><img src="https://buchmistrz.pl/wp-content/uploads/Kiwi-Passion-Fruit-Guava展示盒.png" width="120" height="120" style="object-fit:cover;border-radius:8px" alt="XCOR Max 50000 PUFFS"></td></tr>
-<tr><td align="left"><a href="https://buchmistrz.pl/product/xcor-tyrant-23000-puffs/">XCOR TYRANT 23000 PUFFS</a></td><td><b>55,00 zł</b></td><td>23000 Puffs</td><td align="center"><img src="https://buchmistrz.pl/wp-content/uploads/e39b239dcb606e82481b0129ba751abe.jpg" width="120" height="120" style="object-fit:cover;border-radius:8px" alt="XCOR TYRANT 23000 PUFFS"></td></tr>
+<tr><th width="40%" align="left">Produkt</th><th width="15%">Puffs</th><th width="25%">Cena</th><th width="20%" align="center">Widok</th></tr>
+<tr><td align="left"><a href="https://vapepl.com/product/xcor-max-50000-puffs/">XCOR Max</a></td><td>50 000</td><td><s>100,00 zł</s> <b>90,00 zł</b></td><td align="center"><img src="https://cdn.jsdelivr.net/gh/lopinv/media.buchmistrz.pl@media/static/assets/uploads/Kiwi-Passion-Fruit-Guava%E5%B1%95%E7%A4%BA%E7%9B%92.png" width="100" height="100" style="object-fit:cover;border-radius:8px" alt="XCOR Max 50000 PUFFS"></td></tr>
+<tr><td align="left"><a href="https://vapepl.com/product/xcor-hawaii-pro-23000-puffs/">XCOR Hawaii PRO</a></td><td>23 000</td><td><s>60,00 zł</s> <b>55,00 zł</b></td><td align="center"><img src="https://cdn.jsdelivr.net/gh/lopinv/media.buchmistrz.pl@media/static/assets/uploads/85b21c9f1e31bb658d6c4ec5a830a8b3.webp" width="100" height="100" style="object-fit:cover;border-radius:8px" alt="XCOR Hawaii PRO 23000 PUFFS"></td></tr>
+<tr><td align="left"><a href="https://vapepl.com/product/xcor-tyrant-23000-puffs/">XCOR TYRANT</a></td><td>23 000</td><td><s>60,00 zł</s> <b>55,00 zł</b></td><td align="center"><img src="https://cdn.jsdelivr.net/gh/lopinv/media.buchmistrz.pl@media/static/assets/uploads/xcor-tyrant-23000-puffs.jpeg" width="100" height="100" style="object-fit:cover;border-radius:8px" alt="XCOR TYRANT 23000 PUFFS"></td></tr>
 </table>
 
 ---
 
-## 📰 Blog & Poradniki
+## 🍭 Kategorie Smaków
 
-<details>
-<summary><b>Rozwiń listę 60 artykułów</b></summary>
+| 🍓 **Fruity** | 🧊 **Menthol & Ice** | 🍬 **Sweet & Candy** | 🍂 **Tobacco** |
+|:------------:|:------------:|:------------:|:------------:|
+| 18 produktów | 18 produktów | 17 produktów | 2 produkty |
+| [Przejdź →](https://vapepl.com/product-category/fruity/) | [Przejdź →](https://vapepl.com/product-category/menthol-ice/) | [Przejdź →](https://vapepl.com/product-category/sweet-candy/) | [Przejdź →](https://vapepl.com/product-category/tobacco/) |
+
+<div align="center">
+
+<img src="https://cdn.jsdelivr.net/gh/lopinv/media.buchmistrz.pl@media/static/assets/uploads/Fruity.png" width="180" style="border-radius:10px" alt="Fruity">
+<img src="https://cdn.jsdelivr.net/gh/lopinv/media.buchmistrz.pl@media/static/assets/uploads/Menthol-Ice.png" width="180" style="border-radius:10px" alt="Menthol & Ice">
+<img src="https://cdn.jsdelivr.net/gh/lopinv/media.buchmistrz.pl@media/static/assets/uploads/Sweet-Candy.png" width="180" style="border-radius:10px" alt="Sweet & Candy">
+<img src="https://cdn.jsdelivr.net/gh/lopinv/media.buchmistrz.pl@media/static/assets/uploads/Tobacco.png" width="180" style="border-radius:10px" alt="Tobacco">
+
+</div>
+
+---
+
+## 🎁 Rabat Ilościowy
+
+Kupując kilka sztuk tego samego produktu, automatycznie otrzymujesz rabat progowy:
+
+| Ilość sztuk | Rabat |
+|:-----------:|:-----:|
+| 3–5 szt. | **−5 %** |
+| 6–9 szt. | **−10 %** |
+| 10–14 szt. | **−15 %** |
+| 15+ szt. | **−20 %** |
+
+---
+
+## 🔥 Najpopularniejsze Smaki
+
+| # | Smak | # | Smak |
+|:--:|:--|:--:|:--|
+| 🥇 1 | WATERMELON ICE | 🏅 7 | Strawberry Kiwi |
+| 🥈 2 | STRAWBERRY ICE | 🏅 8 | Kiwi Passion Fruit Guava |
+| 🥉 3 | Strawberry Watermelon | 🏅 9 | Mixed Berries |
+| 4 | Grape Ice | 🏅 10 | BLUEBERRY RASPBERRY |
+| 5 | LEMON LIME | 🏅 11 | MIXED BERRY |
+| 6 | BLUEBERRY ON ICE | 🏅 12 | PINK LEMONADE |
+
+---
+
+## ⭐ Opinie Klientów
 
 <table width="100%">
-<tr><th width="5%">#</th><th width="55%">Tytuł</th><th width="15%">Data</th><th width="25%" align="center">Link</th></tr>
-<tr><td>1</td><td>Fizzy candy e papieros co to smak – kompletny poradnik</td><td>2026-08-13</td><td align="center"><a href="https://buchmistrz.pl/fizzy-candy-e-papieros-co-to-smak-kompletny-poradnik-do-wy/">📖 Czytaj</a></td></tr>
-<tr><td>2</td><td>Vape składniki – co wybrać i na co zwrócić uwagę</td><td>2026-08-13</td><td align="center"><a href="https://buchmistrz.pl/vape-skladniki-co-wybrac-i-na-co-zwrocic-uwage/">📖 Czytaj</a></td></tr>
-<tr><td>3</td><td>Jak wybrać i ustawić moc w aspire e-papierosie</td><td>2026-08-13</td><td align="center"><a href="https://buchmistrz.pl/jak-wybrac-jak-ustawic-moc-w-aspire-epapierosie-poradnik-i/">📖 Czytaj</a></td></tr>
-<tr><td>4</td><td>Co to jest wapowanie dla początkujących</td><td>2026-08-13</td><td align="center"><a href="https://buchmistrz.pl/co-to-jest-wapowanie-dla-pocztkujcych-i-ktory-model-wybrac/">📖 Czytaj</a></td></tr>
-<tr><td>5</td><td>E-papierosy Tomex – kompletny poradnik do wyboru</td><td>2026-08-13</td><td align="center"><a href="https://buchmistrz.pl/e-papierosy-tomex-kompletny-poradnik-do-wyboru/">📖 Czytaj</a></td></tr>
-<tr><td>6</td><td>Jak wybrać vape shop jednorazówki – poradnik</td><td>2026-08-13</td><td align="center"><a href="https://buchmistrz.pl/jak-wybrac-vape-shop-jednoraz%c2%a8wki-poradnik-i-ranking-najle/">📖 Czytaj</a></td></tr>
-<tr><td>7</td><td>Randm Tornado 15000 PL – co wybrać i na co zwrócić uwagę</td><td>2026-08-13</td><td align="center"><a href="https://buchmistrz.pl/randm-tornado-15000-pl-co-wybrac-i-na-co-zwrocic-uwage/">📖 Czytaj</a></td></tr>
-<tr><td>8</td><td>Crystal Blind 6000 puffs – opinie, parametry i oferta</td><td>2026-08-13</td><td align="center"><a href="https://buchmistrz.pl/crystal-blind-6000-puffs-opinie-parametry-i-najlepsze-ofe/">📖 Czytaj</a></td></tr>
-<tr><td>9</td><td>Hifancy Dream 45K – co wybrać i na co zwrócić uwagę</td><td>2026-08-02</td><td align="center"><a href="https://buchmistrz.pl/hifancy-dream-45k-co-wybrac-i-na-co-zwrocic-uwage/">📖 Czytaj</a></td></tr>
-<tr><td>10</td><td>Co to jest MVRVI e-papieros 6000 puffs</td><td>2026-08-02</td><td align="center"><a href="https://buchmistrz.pl/co-to-jest-mvrvi-e-papieros-6000-puffs-i-ktory-model-wybrac/">📖 Czytaj</a></td></tr>
-<tr><td>11</td><td>Co to jest Hifancy Space 50000 puffs</td><td>2026-08-02</td><td align="center"><a href="https://buchmistrz.pl/co-to-jest-hifancy-space-50000-puffs-i-ktory-model-wybrac/">📖 Czytaj</a></td></tr>
-<tr><td>12</td><td>Merrymi sklep – co wybrać i na co zwrócić uwagę</td><td>2026-08-02</td><td align="center"><a href="https://buchmistrz.pl/merrymi-sklep-co-wybrac-i-na-co-zwrocic-uwage/">📖 Czytaj</a></td></tr>
-<tr><td>13</td><td>Elektronik Papieros 50000 Buchów – opinie i parametry</td><td>2026-08-02</td><td align="center"><a href="https://buchmistrz.pl/elektronik-papieros-50000-buchow-opinie-parametry-i-najle/">📖 Czytaj</a></td></tr>
-<tr><td>14</td><td>Jak wybrać UR1 Vape 800 puffs – cena i poradnik</td><td>2026-08-02</td><td align="center"><a href="https://buchmistrz.pl/jak-wybrac-ur1-vape-800-puffs-cena-poradnik-i-ranking-najle/">📖 Czytaj</a></td></tr>
-<tr><td>15</td><td>20 mg vape – równoważny ilu papierosom</td><td>2026-08-02</td><td align="center"><a href="https://buchmistrz.pl/20-mg-vape-rownowazny-jest-ilu-papierosom-co-wybrac-i-na-c/">📖 Czytaj</a></td></tr>
-<tr><td>16</td><td>Jak wybrać ile się ładuje e-papierosy</td><td>2026-08-02</td><td align="center"><a href="https://buchmistrz.pl/jak-wybrac-ile-sie-aduje-e-papierosy-poradnik-i-ranking-na/">📖 Czytaj</a></td></tr>
-<tr><td>17</td><td>Vape Allegro – co wybrać i na co zwrócić uwagę</td><td>2026-08-02</td><td align="center"><a href="https://buchmistrz.pl/vape-alegro-co-wybrac-i-na-co-zwrocic-uwage/">📖 Czytaj</a></td></tr>
-<tr><td>18</td><td>Frimy zamiast e-Comees – co wybrać</td><td>2026-08-02</td><td align="center"><a href="https://buchmistrz.pl/frimy-zamiasta-e-comees-co-wybrac-i-na-co-zwrocic-uwage/">📖 Czytaj</a></td></tr>
-<tr><td>19</td><td>Co to jest Fizzy Twins i który model wybrać</td><td>2026-08-02</td><td align="center"><a href="https://buchmistrz.pl/co-to-jest-fizzy-twins-i-ktory-model-wybrac/">📖 Czytaj</a></td></tr>
-<tr><td>20</td><td>MerryMi Blade 30K – kompletny poradnik</td><td>2026-08-02</td><td align="center"><a href="https://buchmistrz.pl/merry-mi-blade-30k-r%c2%a8owe-028-groszt-kompletny-poradnik/">📖 Czytaj</a></td></tr>
-<tr><td>21</td><td>Co to jest 4000 Buchów – ile liquidu w e-papierosie</td><td>2026-08-02</td><td align="center"><a href="https://buchmistrz.pl/co-to-jest-4000-buch%c2%a8w-to-ile-liquidu-w-e-papierosie-i-ktor/">📖 Czytaj</a></td></tr>
-<tr><td>22</td><td>Triple Flavor papierosy – czy można dolać liquid</td><td>2026-08-02</td><td align="center"><a href="https://buchmistrz.pl/triple-flavor-papierosy-czy-mozna-dolewa-liquid-co-wybrac/">📖 Czytaj</a></td></tr>
-<tr><td>23</td><td>Jak wybrać słabszą baterię a smak e-papierosa</td><td>2026-08-02</td><td align="center"><a href="https://buchmistrz.pl/jak-wybrac-sabsza-bateria-a-smak-epaierosa-poradnik-i-rank/">📖 Czytaj</a></td></tr>
-<tr><td>24</td><td>Hifancy – kompletny poradnik do wyboru</td><td>2026-08-02</td><td align="center"><a href="https://buchmistrz.pl/hifancy-kompletny-poradnik-do-wyboru/">📖 Czytaj</a></td></tr>
-<tr><td>25</td><td>Jakie e-papierosy kupimy w Żabce</td><td>2026-08-02</td><td align="center"><a href="https://buchmistrz.pl/jakie-e-papierosy-kupimy-w-abce-co-wybrac-i-na-co-zwrocic/">📖 Czytaj</a></td></tr>
-<tr><td>26</td><td>Co to jest 18000 Buchów i który model wybrać</td><td>2026-08-02</td><td align="center"><a href="https://buchmistrz.pl/co-to-jest-18000buch%c2%a8w-i-ktory-model-wybrac/">📖 Czytaj</a></td></tr>
-<tr><td>27</td><td>Jak wybrać wapowanie – ile nikotyny</td><td>2026-08-02</td><td align="center"><a href="https://buchmistrz.pl/jak-wybrac-wapowanie-ile-nikotyny-poradnik-i-ranking-najlep/">📖 Czytaj</a></td></tr>
-<tr><td>28</td><td>Nicliquid opinie – co wybrać i na co zwrócić uwagę</td><td>2026-08-02</td><td align="center"><a href="https://buchmistrz.pl/nicliquid-opnie-co-wybrac-i-na-co-zwrocic-uwage/">📖 Czytaj</a></td></tr>
-<tr><td>29</td><td>Wnętrze e-papieros – co wybrać i na co zwrócić uwagę</td><td>2026-08-02</td><td align="center"><a href="https://buchmistrz.pl/wntrze-e-papierosz-co-wybrac-i-na-co-zwrocic-uwage/">📖 Czytaj</a></td></tr>
-<tr><td>30</td><td>Co to jest liquid od e-papierosa – może się przelać</td><td>2026-08-02</td><td align="center"><a href="https://buchmistrz.pl/co-to-jest-czy-liquid-od-elektrycnz-apaierosa-morze-sie-prze/">📖 Czytaj</a></td></tr>
-<tr><td>31</td><td>Co to jest papieros elektroniczny na olejek</td><td>2026-08-02</td><td align="center"><a href="https://buchmistrz.pl/co-to-jest-papieros-elektroniczny-na-olejek-jak-uzupelnic-i/">📖 Czytaj</a></td></tr>
-<tr><td>32</td><td>Jak wybrać jednorazówkę 50K Buchów</td><td>2026-08-02</td><td align="center"><a href="https://buchmistrz.pl/jak-wybrac-jednoraz%c2%a8wka-50k-buch%c2%a8w-poradnik-i-ranking-naj/">📖 Czytaj</a></td></tr>
-<tr><td>33</td><td>Co to jest Hifancy Love66 – jaki smak</td><td>2026-08-02</td><td align="center"><a href="https://buchmistrz.pl/co-to-jest-hifancy-love66-co-to-za-smak-i-ktory-model-wybrac/">📖 Czytaj</a></td></tr>
-<tr><td>34</td><td>Vape Shop jednorazówki Polska – co wybrać</td><td>2026-08-02</td><td align="center"><a href="https://buchmistrz.pl/vape-shop-jednorazowki-polska-co-wybrac-i-na-co-zwrocic-uw/">📖 Czytaj</a></td></tr>
-<tr><td>35</td><td>Dragon baterii – najlepiej dobrana do mężczyzny</td><td>2026-08-02</td><td align="center"><a href="https://buchmistrz.pl/dragon-baterii-najlepiej-dobra-do-mczyzny-wobec-smaku-c/">📖 Czytaj</a></td></tr>
-<tr><td>36</td><td>Jak wybrać smaki dla papierosy</td><td>2026-08-02</td><td align="center"><a href="https://buchmistrz.pl/jak-wybrac-smaki-dla-papierosy-poradnik-i-ranking-najlepszy/">📖 Czytaj</a></td></tr>
-<tr><td>37</td><td>Jak wybrać ranking najlepszych aromatów do e-papierosów</td><td>2026-08-02</td><td align="center"><a href="https://buchmistrz.pl/jak-wybrac-rankining-najlepszych-aromat%c2%a8w-do-e-papieros%c2%a8w/">📖 Czytaj</a></td></tr>
-<tr><td>38</td><td>Smak jednorazowe Lime Pineapple</td><td>2026-08-02</td><td align="center"><a href="https://buchmistrz.pl/smak-jednorazowe-lime-pineapple-co-wybrac-i-na-co-zwrocic/">📖 Czytaj</a></td></tr>
-<tr><td>39</td><td>E-papieros do 200 zł – kompletny poradnik</td><td>2026-08-02</td><td align="center"><a href="https://buchmistrz.pl/epapieros-do-200-kompletny-poradnik-do-wyboru/">📖 Czytaj</a></td></tr>
-<tr><td>40</td><td>Jak wybrać Panda 20K Buchów</td><td>2026-08-02</td><td align="center"><a href="https://buchmistrz.pl/jak-wybrac-panda-20k-buch%c2%a8w-poradnik-i-ranking-najlepszych/">📖 Czytaj</a></td></tr>
-<tr><td>41</td><td>HIFANCY Space 50000 i HIFANCY Dream 45000 – porównanie</td><td>2026-08-01</td><td align="center"><a href="https://buchmistrz.pl/hifancy-space-50000-puffs-i-hifancy-dream-45000-porownanie/">📖 Czytaj</a></td></tr>
-<tr><td>42</td><td>AiRMEZ LUX 60000 puffs – recenzja i opinie</td><td>2026-08-01</td><td align="center"><a href="https://buchmistrz.pl/airmez-lux-60000-puffs-recenzja-i-opinie-sprawdz-smaki/">📖 Czytaj</a></td></tr>
-<tr><td>43</td><td>MerryMi Blade 30000 puffs – recenzja 28 smaków</td><td>2026-08-01</td><td align="center"><a href="https://buchmistrz.pl/merrymi-blade-30000-puffs-recenzja-28-smakow-w-jednej/">📖 Czytaj</a></td></tr>
-<tr><td>44</td><td>HIFANCY Super 70000 puffs – recenzja i opinie</td><td>2026-08-01</td><td align="center"><a href="https://buchmistrz.pl/hifancy-super-70000-puffs-recenzja-i-opinie-czy-warto/">📖 Czytaj</a></td></tr>
-<tr><td>45</td><td>Stag Bar 6in1 180000 puffs – recenzja</td><td>2026-08-01</td><td align="center"><a href="https://buchmistrz.pl/stag-bar-6in1-180000-puffs-recenzja-i-opinie-uzytkownikow/">📖 Czytaj</a></td></tr>
-<tr><td>46</td><td>XCOR Max 50000 puffs – recenzja</td><td>2026-08-01</td><td align="center"><a href="https://buchmistrz.pl/xcor-max-50000-puffs-recenzja-czy-to-najlepszy-wybor/">📖 Czytaj</a></td></tr>
-<tr><td>47</td><td>HIFANCY Space 50000 i HIFANCY Dream 45000 – który wybrać</td><td>2026-08-01</td><td align="center"><a href="https://buchmistrz.pl/hifancy-space-50000-puffs-i-hifancy-dream-45000-ktory-wybrac/">📖 Czytaj</a></td></tr>
-<tr><td>48</td><td>XCOR Tyrant 23000 i XCOR Hawaii Pro – porównanie</td><td>2026-08-01</td><td align="center"><a href="https://buchmistrz.pl/xcor-tyrant-23000-puffs-i-xcor-hawaii-pro-porownanie-modeli/">📖 Czytaj</a></td></tr>
-<tr><td>49</td><td>MerryMi Blade 30000 puffs – 28 smaków w jednej</td><td>2026-08-01</td><td align="center"><a href="https://buchmistrz.pl/merrymi-blade-30000-puffs-28-smakow-w-jednej-jednorazowce/">📖 Czytaj</a></td></tr>
-<tr><td>50</td><td>HIFANCY Super 70000 puffs – czy to najlepszy wybór</td><td>2026-08-01</td><td align="center"><a href="https://buchmistrz.pl/hifancy-super-70000-puffs-czy-to-najlepszy-wybor-w-swojej-klasie/">📖 Czytaj</a></td></tr>
+<tr>
+<td width="50%" style="padding:12px;vertical-align:top">
+★★★★★<br>„Mile zaskoczony, zamówię ponownie."<br><b>Ondřej S.</b>
+</td>
+<td width="50%" style="padding:12px;vertical-align:top">
+★★★★★<br>„Łagodne dla gardła, przyjemny posmak."<br><b>Martin T.</b>
+</td>
+</tr>
+<tr>
+<td width="50%" style="padding:12px;vertical-align:top">
+★★★★★<br>„Bez wycieków, bez spalenizny, czyste urządzenie."<br><b>Lucie H.</b>
+</td>
+<td width="50%" style="padding:12px;vertical-align:top">
+★★★★<br>„Czysty smak do końca, bez obcych nut."<br><b>Nagy B.</b>
+</td>
+</tr>
+<tr>
+<td width="50%" style="padding:12px;vertical-align:top">
+★★★★<br>„Cała nasza ekipa już to używa."<br><b>Magda L.</b>
+</td>
+<td width="50%" style="padding:12px;vertical-align:top">
+★★★★<br>„Przyjemne doznanie, bez gryzącego posmaku."<br><b>Jan P.</b>
+</td>
+</tr>
+<tr>
+<td width="50%" style="padding:12px;vertical-align:top">
+★★★★<br>„Czysty smak do końca, bez obcych nut."<br><b>Kovács A.</b>
+</td>
+<td width="50%" style="padding:12px;vertical-align:top">
+★★★★<br>„Bateria spokojnie trzyma dwa dni."<br><b>Tomasz N.</b>
+</td>
+</tr>
 </table>
-</details>
+
+---
+
+## 🚚 Dostawa · 💳 Płatności · ↩️ Zwroty
+
+| 🚚 **Dostawa** | 💳 **Płatności** | ↩️ **Zwroty** |
+|:------------:|:------------:|:------------:|
+| Magazyn w Polsce | BLIK + szybkie przelewy | 14 dni na odstąpienie od umowy |
+| Paczkomaty InPost i kurier DPD | Lista metod przy kasie | Zwrot na tą samą metodę płatności |
+| Numer śledzenia w e-mailu | Płatne zamówienia nadawane bez zbędnej zwłoki | Produkty otwarte (higiena) — bez prawa zwrotu |
 
 ---
 
 ## ❓ Często Zadawane Pytania
 
-<details><summary><b>Jakie formy płatności akceptujecie?</b></summary><p>Płacisz przy odbiorze (COD) – gotówką u kuriera. Alternatywnie: tradycyjny przelew bankowy.</p></details>
+<details>
+<summary><b>Oryginalność produktów</b></summary>
+<p>Wszystkie produkty pochodzą z oficjalnych kanałów dystrybucji. Jeśli chcesz zweryfikować autentyczność konkretnego towaru, napisz do nas przez formularz kontaktowy.</p>
+</details>
 
-<details><summary><b>Jaki jest czas dostawy?</b></summary><p>Zamówienia złożone do 14:00 wysyłamy tego samego dnia. Dostawa 1-3 dni robocze na terenie PL, CZ, SK, HU.</p></details>
+<details>
+<summary><b>Wysyłka i czas dostawy</b></summary>
+<p>Wysyłamy z polskiego magazynu — dostępne metody dostawy (m.in. Paczkomaty InPost i kurier DPD) oraz ich koszt wyświetlamy na karcie produktu i w koszyku. Zamówienia opłacone w dni robocze nadajemy bez zbędnej zwłoki.</p>
+</details>
 
-<details><summary><b>Czy produkty są oryginalne?</b></summary><p>Tak, jesteśmy autoryzowanym dystrybutorem wszystkich marek. Gwarantujemy 100% oryginałość i pełną gwarancję producenta.</p></details>
+<details>
+<summary><b>Koszty dostawy</b></summary>
+<p>Koszt wysyłki zależy od wybranej metody i obliczany jest w koszyku oraz przy kasie. Sprawdź warunki darmowej dostawy — wyświetlają się bezpośrednio w koszyku.</p>
+</details>
 
-<details><summary><b>Jak wygląda proces zwrotu?</b></summary><p>Masz 14 dni na zwrot bez podawania przyczyny. Produkt musi być nieotwierany, w oryginalnym opakowaniu.</p></details>
+<details>
+<summary><b>Śledzenie przesyłki</b></summary>
+<p>Gdy kurier przejmie paczkę, numer śledzenia znajdziesz w swoim zamówieniu. Otwórz zamówienie z linku w e-mailu potwierdzającym lub na swoim koncie i kliknij link śledzenia.</p>
+</details>
+
+<details>
+<summary><b>Zwroty i reklamacje</b></summary>
+<p>Masz 14 dni na odstąpienie od umowy bez podania przyczyny — instrukcja jest na stronie <a href="https://vapepl.com/refund_returns/">Zwroty</a>. Uszkodzony lub wadliwy towar reklamujemy; napisz do nas przez formularz kontaktowy ze zdjęciami.</p>
+</details>
+
+<details>
+<summary><b>Płatności</b></summary>
+<p>Pełną listę dostępnych metod płatności (m.in. szybkie przelewy i BLIK) wyświetlamy przy kasie — zobaczysz ją przy składaniu zamówienia.</p>
+</details>
+
+<details>
+<summary><b>Weryfikacja wieku</b></summary>
+<p>Papierosy elektroniczne i liquidy sprzedajemy wyłącznie osobom pełnoletnim (18+). Składając zamówienie potwierdzasz pełnoletność; kurier może ją sprawdzić przy doręczeniu.</p>
+</details>
+
+<details>
+<summary><b>Zniżki ilościowe</b></summary>
+<p>Kupując kilka sztuk tego samego produktu, automatycznie korzystasz z rabatu progowego — progi wyświetlamy na karcie produktu. Cenę końcową zobaczysz w koszyku.</p>
+</details>
+
+<details>
+<summary><b>Kontakt i pomoc</b></summary>
+<p>Napisz do nas przez formularz kontaktowy — odpowiadamy zwykle w ciągu jednego dnia roboczego. Status zamówienia, fakturę i numer śledzenia znajdziesz w e-mailu potwierdzającym i na koncie.</p>
+</details>
+
+---
+
+## 📰 Wiedza o E-papierosach
+
+<details>
+<summary><b>Rozwiń listę 30 poradników</b></summary>
+
+1. [IQOS vs papieros: 30 dni kosztów i drabina puffs](https://vapepl.com/iqos-vs-papieros-30-dni-kosztow-i-drabina-puffs/)
+2. [E papieros vs papieros: 30 dni, 1 000 puffs i liczby](https://vapepl.com/e-papieros-vs-papieros-30-dni-1-000-puffs-i-liczby/)
+3. [Infancy dream: HIFANCY DREAM 45K w liczbach](https://vapepl.com/infancy-dream-hifancy-dream-45k-w-liczbach/)
+4. [RandM Tornado 9000: ładowanie, przechowywanie i wymiana](https://vapepl.com/randm-tornado-9000-ladowanie-przechowywanie-i-wymiana/)
+5. [E-papierosy jakie to: STAG BAR, LUX i TORNADO w liczbach](https://vapepl.com/e-papierosy-jakie-to-stag-bar-lux-i-tornado-w-liczbach/)
+6. [Sposoby dostawy: STAG BAR, SUPER i TORNADO w trzech trasach](https://vapepl.com/sposoby-dostawy-stag-bar-super-i-tornado-w-trzech-trasach/)
+7. [Crystal Bling 6000: co kryje 6K w polskiej półce](https://vapepl.com/crystal-bling-6000-co-kryje-6k-w-polskiej-polce/)
+8. [Jednorazówka smaki: STAG, LUX i TORNADO w 5 liniach](https://vapepl.com/jednorazowka-smaki-stag-lux-i-tornado-w-5-liniach/)
+9. [Puff 50: co robić, gdy SPACE 50K i MAX nie parzą](https://vapepl.com/puff-50-co-robic-gdy-space-50k-i-max-nie-parza/)
+10. [Jednorazówka 50mg: LUX, STAG BAR i TORNADO w liczbach](https://vapepl.com/jednorazowka-50mg-lux-stag-bar-i-tornado-w-liczbach/)
+11. [Jednorazowka king: korony STAG BAR, LUX i TYRANT w liczbach](https://vapepl.com/jednorazowka-king-korony-stag-bar-lux-i-tyrant-w-liczbach/)
+12. [Produkty tytoniowe: TORNADO, LUX i STAG nie parzą](https://vapepl.com/produkty-tytoniowe-tornado-lux-i-stag-nie-parza/)
+13. [Co zamiast jednorazówek: LUX 60K, MAX i DREAM](https://vapepl.com/co-zamiast-jednorazowek-lux-60k-max-i-dream/)
+14. [Liquid liquider: 108 ml w jednej butelce STAG BAR](https://vapepl.com/liquid-liquider-108-ml-w-jednej-butelce-stag-bar/)
+15. [Produkty tytoniowe: co kupisz legalnie – DREAM, SPACE i STAG](https://vapepl.com/produkty-tytoniowe-co-kupisz-legalnie-dream-space-i-stag/)
+16. [Vapp jednorazowy ładowanie: TORNADO 9K i LUX 60K](https://vapepl.com/vapp-jednorazowy-ladowanie-tornado-9k-i-lux-60k/)
+17. [Najlepsza jednorazówka w 5 scenariuszach: LUX, TORNADO i STAG](https://vapepl.com/najlepsza-jednorazowka-w-5-scenariuszach-lux-tornado-i-stag/)
+18. [Best jednorazówki do palenia: STAG, LUX i TORNADO w 3 poziomach](https://vapepl.com/best-jednorazowki-do-palenia-stag-lux-i-tornado-w-3-poziomach/)
+19. [Liquid cytrynowy: LUX, TYRANT i TORNADO w liczbach](https://vapepl.com/liquid-cytrynowy-lux-tyrant-i-tornado-w-liczbach/)
+20. [Wysyłki za pobraniem: TORNADO, LUX i STAG](https://vapepl.com/wysylki-za-pobraniem-tornado-lux-i-stag/)
+21. [Najlepsza jednorazówka: LUX, STAG, FOX i TORNADO w liczbach](https://vapepl.com/najlepsza-jednorazowka-lux-stag-fox-i-tornado-w-liczbach/)
+22. [Jednorazowki bar: drabina cen STAG BAR, LUX i SPACE](https://vapepl.com/jednorazowki-bar-drabina-cen-stag-bar-lux-i-space/)
+23. [Tornado randm: 5 kroków, gdy nie działa](https://vapepl.com/tornado-randm-5-krokow-gdy-nie-dziala/)
+24. [Koszt jednorazówki: TORNADO, BLADE i STAG w trzech scenariuszach](https://vapepl.com/koszt-jednorazowki-tornado-blade-i-stag-w-trzech-scenariuszach/)
+25. [Cuplefox w parze: recenzja LUX 60K w liczbach](https://vapepl.com/cuplefox-w-parze-recenzja-lux-60k-w-liczbach/)
+26. [Vapp nie parzy: ratunek dla LUX, MAX i ICEX](https://vapepl.com/vapp-nie-parzy-ratunek-dla-lux-max-i-icex/)
+27. [Jednorazówka watermelon ice w LUX, TORNADO i DREAM](https://vapepl.com/jednorazowka-watermelon-ice-w-lux-tornado-i-dream/)
+28. [MerryMi buy: BLADE 30K i 4 kroki przed zakupem](https://vapepl.com/merrymi-buy-blade-30k-i-4-kroki-przed-zakupem/)
+29. [Ice cena w trzech kieszeniach: LUX, TYRANT, STAG](https://vapepl.com/ice-cena-w-trzech-kieszeniach-lux-tyrant-stag/)
+30. [Ekspresowa przesyłka: TYRANT, LUX i STAG](https://vapepl.com/ekspresowa-przesylka-tyrant-lux-i-stag/)
+
+</details>
+
+---
+
+## 🏢 O Nas
+
+> VapePL.COM od **2014 roku** sprzedaje e-papierosy w Polsce. Oferujemy bezpieczne, wygodne i wysokiej jakości alternatywy dla palenia.
+
+**Historia firmy**
+
+| Rok | Kamień milowy |
+|:---:|:--|
+| 2014 | Założenie firmy i start sprzedaży e-papierosów w Polsce |
+| 2016 | Wprowadzenie pierwszych popularnych marek jednorazówek |
+| 2018 | Rozszerzenie oferty o nowe smaki i nikotyny; partnerstwa z producentami |
+| 2020 | Rozwój sprzedaży online i mediów społecznościowych |
+| 2022 | Współpraca z międzynarodowymi markami |
+| 2024 | Wprowadzenie innowacyjnych, ekologicznych produktów |
+
+> **Filozofia firmy:** „Wyselekcjonowana Jakość, Przede Wszystkim Obsługa, Użytkownik Na Pierwszym Miejscu" — tylko sprawdzone marki, weryfikowana jakość, odpowiedzialne vapowanie i wsparcie przed i po sprzedaży.
 
 ---
 
@@ -191,18 +331,18 @@
 
 <table width="100%">
 <tr>
-<td width="25%" align="center" style="padding:15px"><div style="font-size:24px">📧</div><b>Email</b><br><a href="mailto:kontakt@buchmistrz.pl">kontakt@buchmistrz.pl</a></td>
 <td width="25%" align="center" style="padding:15px"><div style="font-size:24px">📱</div><b>Telefon</b><br><a href="tel:+48729250699">+48 729 250 699</a></td>
-<td width="25%" align="center" style="padding:15px"><div style="font-size:24px">🕐</div><b>Godziny</b><br>Pon–Pt 9:00–17:00</td>
-<td width="25%" align="center" style="padding:15px"><div style="font-size:24px">🌍</div><b>Regiony</b><br>PL 🇵🇱 CZ 🇨🇿 SK 🇸🇰 HU 🇭🇺</td>
+<td width="25%" align="center" style="padding:15px"><div style="font-size:24px">💬</div><b>WhatsApp</b><br>+48 729 250 699</td>
+<td width="25%" align="center" style="padding:15px"><div style="font-size:24px">✈️</div><b>Telegram</b><br>@buch_mistrz</td>
+<td width="25%" align="center" style="padding:15px"><div style="font-size:24px">📧</div><b>E-mail</b><br><a href="mailto:support@buchmistrz.com">support@buchmistrz.com</a></td>
 </tr>
 </table>
 
 ---
 
-<img src="https://img.shields.io/badge/🌬️_BuchMistrz-Autoryzowany_Sklep-1c61e7?style=for-the-badge" alt="Certified">
+<img src="https://img.shields.io/badge/🌬️_VapePL.COM-Jednoraz%C3%B3wki%20%C2%B7%20Pody%20%C2%B7%20E-papierosy-1c61e7?style=for-the-badge" alt="VapePL.COM">
 
-<sub>© 2019-2026 BuchMistrz • Autoryzowany dystrybutor e-papierosów jednorazowych</sub><br>
-<sub>• Dane zebrane: 14 sierpnia 2026 • <a href="https://buchmistrz.pl">buchmistrz.pl</a></sub>
+<sub>© 2014–2026 VapePL.COM · BuchMistrz · Sprzedaż wyłącznie dla osób 18+</sub><br>
+<sub>• Dane zebrane: 15 października 2026 • <a href="https://vapepl.com">vapepl.com</a> · Zwroty i reklamacje: <a href="https://vapepl.com/refund_returns/">Polityka Zwrotów</a></sub>
 
 </div>
