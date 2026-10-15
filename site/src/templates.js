@@ -564,8 +564,9 @@ export function renderHome(data) {
 
 export function renderShop(data) {
   const top = topProducts(data);
+  const crumb = breadcrumbs([{ label: 'Sklep', url: '/sklep/' }]);
   const body = `
-  ${breadcrumbs([{ label: 'Sklep', url: '/sklep/' }])}
+  ${crumb.html}
   <section class="page-hero">
     <div class="container">
       <h1>Sklep — wszystkie ${data.products.length} modeli</h1>
@@ -592,7 +593,7 @@ export function renderShop(data) {
   ${ctaBanner()}`;
   const jsonld = [
     organizationLd(),
-    breadcrumbs([{ label: 'Sklep', url: '/sklep/' }]).ld,
+    crumb.ld,
     itemListLd(data.products.map((p) => ({ name: p.name, url: SITE + `/produkt/${p.slug}/` }))),
   ];
   return page({
