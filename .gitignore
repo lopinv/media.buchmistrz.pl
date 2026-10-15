@@ -41,3 +41,6 @@ _testmain.go
 
 *.exe
 *.test
+
+# 静态站构建产物（部署到 gh-pages，不入版本库）
+site/dist/

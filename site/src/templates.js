@@ -1,0 +1,950 @@
+// site/src/templates.js — HTML 模板与 SEO/OGP/JSON-LD 生成
+// 所有文案面向波兰市场；构建时由 build.js 调用
+import {
+  SITE,
+  SITE_NAME,
+  VAPEPL,
+  VAPEPL_RETURNS,
+  BRANDS,
+  BRAND_ORDER,
+  FLAVOR_CATS,
+  REVIEWS,
+  DISCOUNT_TIERS,
+  TOP_FLAVORS,
+  HOME_FAQ,
+  GUIDES,
+  WHY_US,
+  CONTACT,
+  STATS,
+  flavorAngle,
+} from './content.js';
+
+// ---------- 基础工具 ----------
+const esc = (s) =>
+  String(s ?? '')
+    .replaceAll('&', '&amp;')
+    .replaceAll('<', '&lt;')
+    .replaceAll('>', '&gt;')
+    .replaceAll('"', '&quot;')
+    .replaceAll("'", '&#39;');
+
+export const fmtPuffs = (n) => (n ? new Intl.NumberFormat('pl-PL').format(n) : null);
+export const fmtZl = (n) =>
+  n === null || n === undefined
+    ? ''
+    : new Intl.NumberFormat('pl-PL', { minimumFractionDigits: 2 }).format(n) + ' zł';
+export const discountPct = (p) =>
+  p.onSale && p.regularPrice > p.price
+    ? Math.round((1 - p.price / p.regularPrice) * 100)
+    : null;
+
+// 畅销榜：按抓取时的 WooCommerce 累计销量（data.topSellers）实时排序取前 8
+export function topProducts(data, n = 8) {
+  const bySlug = new Map(data.products.map((p) => [p.slug, p]));
+  return (data.topSellers ?? [])
+    .map((slug) => bySlug.get(slug))
+    .filter(Boolean)
+    .slice(0, n);
+}
+
+// 面包屑（可见导航 + 同时作为结构化数据）
+export function breadcrumbs(items) {
+  const trail = [{ label: 'Strona główna', url: '/' }, ...items];
+  const html = `
+    <nav class="breadcrumbs" aria-label="Ścieżka nawigacji">
+      <ol>${trail
+        .map((b, i) =>
+          i === trail.length - 1
+            ? `<li aria-current="page">${esc(b.label)}</li>`
+            : `<li><a href="${esc(b.url)}">${esc(b.label)}</a></li>`,
+        )
+        .join('')}</ol>
+    </nav>`;
+  const ld = [
+    {
+      '@type': 'BreadcrumbList',
+      itemListElement: trail.map((b, i) => ({
+        '@type': 'ListItem',
+        position: i + 1,
+        name: b.label,
+        item: SITE + b.url,
+      })),
+    },
+  ];
+  return { html, ld, trail };
+}
+
+// ---------- 页头/页脚 ----------
+function header() {
+  const link = (url, label) =>
+    `<a class="nav-link" href="${esc(url)}">${esc(label)}</a>`;
+  const brandCats = BRAND_ORDER.map((slug) => ({
+    slug,
+    name: BRANDS[slug]?.name ?? slug,
+    emoji: BRANDS[slug]?.emoji ?? '',
+  }));
+  const flavorCats = Object.entries(FLAVOR_CATS).map(([slug, c]) => ({
+    slug,
+    name: c.name,
+    emoji: c.emoji,
+  }));
+  const brandSubs = brandCats
+    .map((c) => `<a class="nav-sub" href="/kategoria/${c.slug}/">${c.emoji} ${esc(c.name)}</a>`)
+    .join('');
+  const flavorSubs = flavorCats
+    .map((c) => `<a class="nav-sub" href="/kategoria/${c.slug}/">${c.emoji} ${esc(c.name)}</a>`)
+    .join('');
+  return `
+  <a class="skip-link" href="#tresc">Przejdź do treści</a>
+  <header class="site-header">
+    <div class="container header-inner">
+      <a class="brand" href="/" aria-label="${SITE_NAME} — strona główna">
+        <span class="brand-mark">V</span><span class="brand-name">${SITE_NAME}</span>
+      </a>
+      <nav class="site-nav" aria-label="Nawigacja główna">
+        <ul class="nav-top">
+          <li>${link('/', 'Start')}</li>
+          <li>${link('/sklep/', 'Sklep')}</li>
+          <li class="has-sub">
+            <a class="nav-link" href="/kategoria/hifancy/">Marki</a>
+            <div class="nav-dropdown">${brandSubs}</div>
+          </li>
+          <li class="has-sub">
+            <a class="nav-link" href="/kategoria/fruity/">Smaki</a>
+            <div class="nav-dropdown">${flavorSubs}</div>
+          </li>
+          <li>${link('/kontakt/', 'Kontakt')}</li>
+          <li>${link('/zwroty/', 'Zwroty')}</li>
+        </ul>
+        <button class="nav-toggle" type="button" aria-expanded="false" aria-controls="mobile-menu">
+          <span></span><span></span><span></span>
+          <span class="sr-only">Menu</span>
+        </button>
+        <div id="mobile-menu" class="mobile-menu">
+          ${link('/sklep/', 'Sklep')}
+          <div class="nav-group">
+            <span class="nav-group-title">Marki</span>
+            ${brandSubs}
+          </div>
+          <div class="nav-group">
+            <span class="nav-group-title">Smaki</span>
+            ${flavorSubs}
+          </div>
+          ${link('/kontakt/', 'Kontakt')}
+          ${link('/zwroty/', 'Zwroty')}
+        </div>
+      </nav>
+      <a class="btn btn-cta header-cta" href="/sklep/">Kup teraz</a>
+    </div>
+  </header>`;
+}
+
+function footer() {
+  return `
+  <footer class="site-footer">
+    <div class="container footer-grid">
+      <div>
+        <p class="footer-brand">${SITE_NAME}</p>
+        <p>Jednorazówki, pody i e-papierosy — od ${STATS.since} roku. Polski magazyn, Paczkomaty InPost i kurier DPD.</p>
+      </div>
+      <div>
+        <p class="footer-title">Sklep</p>
+        <ul>
+          <li><a href="/sklep/">Wszystkie produkty</a></li>
+          ${BRAND_ORDER.map((s) => `<li><a href="/kategoria/${s}/">${BRANDS[s].name}</a></li>`).join('')}
+        </ul>
+      </div>
+      <div>
+        <p class="footer-title">Smaki</p>
+        <ul>
+          ${Object.entries(FLAVOR_CATS)
+            .map(([slug, c]) => `<li><a href="/kategoria/${slug}/">${c.emoji} ${esc(c.name)}</a></li>`)
+            .join('')}
+        </ul>
+      </div>
+      <div>
+        <p class="footer-title">Kontakt</p>
+        <ul>
+          <li><a href="${CONTACT.phoneHref}">${CONTACT.phone}</a></li>
+          <li><a href="${esc(CONTACT.whatsapp)}" rel="nofollow">WhatsApp ${CONTACT.phone}</a></li>
+          <li><a href="${esc(CONTACT.telegram.href)}" rel="nofollow">${CONTACT.telegram.label}</a></li>
+          <li><a href="mailto:${esc(CONTACT.email)}">${esc(CONTACT.email)}</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="container footer-bar">
+      <p>© ${STATS.since}–2026 ${SITE_NAME} · Sprzedaż wyłącznie dla osób 18+.</p>
+      <p><a href="${VAPEPL}" rel="nofollow">vapepl.com</a> · <a href="${VAPEPL_RETURNS}" rel="nofollow">Polityka zwrotów</a> · <a href="/zwroty/">Zwroty</a></p>
+    </div>
+  </footer>
+  <div class="age-note" role="note">🔞 Produkty tytoniowe i e-papierosy przeznaczone wyłącznie dla osób pełnoletnich (18+).</div>`;
+}
+
+// ---------- 页面骨架 ----------
+export function page({
+  title,
+  description,
+  canonical,
+  ogImage,
+  ogType = 'website',
+  jsonld = [],
+  body,
+  noFollow = false,
+}) {
+  const ldScripts = jsonld
+    .map((o) => `<script type="application/ld+json">${JSON.stringify(o)}</script>`)
+    .join('\n');
+  const image = ogImage || '';
+  return `<!doctype html>
+<html lang="pl">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>${esc(title)}</title>
+  <meta name="description" content="${esc(description)}">
+  <link rel="canonical" href="${esc(canonical)}">
+  <meta property="og:site_name" content="${SITE_NAME}">
+  <meta property="og:type" content="${esc(ogType)}">
+  <meta property="og:title" content="${esc(title)}">
+  <meta property="og:description" content="${esc(description)}">
+  <meta property="og:url" content="${esc(canonical)}">
+  ${image ? `<meta property="og:image" content="${esc(image)}">\n  <meta property="og:image:width" content="1200">\n  <meta property="og:image:height" content="630">\n` : ''}
+  <meta name="twitter:card" content="${image ? 'summary_large_image' : 'summary'}">
+  <meta name="twitter:title" content="${esc(title)}">
+  <meta name="twitter:description" content="${esc(description)}">
+  ${image ? `<meta name="twitter:image" content="${esc(image)}">\n` : ''}
+  <meta name="robots" content="${noFollow ? 'noindex, follow' : 'index, follow'}">
+  <meta name="theme-color" content="#0f172a">
+  <meta name="format-detection" content="telephone=yes">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🌬️</text></svg>">
+  <link rel="preload" as="style" href="/style.css">
+  <link rel="stylesheet" href="/style.css">
+  ${ldScripts}
+  <script src="/script.js" defer></script>
+</head>
+<body>
+${header()}
+<main id="tresc">
+${body}
+</main>
+${footer()}
+</body>
+</html>
+`;
+}
+
+// ---------- 结构化数据 ----------
+export function productLd({ product, flavor, image }) {
+  const name = flavor ? `${product.name} — smak ${flavor.name}` : product.name;
+  const offers =
+    !flavor && product.flavors.length > 0
+      ? {
+          '@type': 'AggregateOffer',
+          priceCurrency: 'PLN',
+          lowPrice: String(product.price),
+          highPrice: String(product.price),
+          offerCount: product.flavors.length,
+          availability: 'https://schema.org/InStock',
+          url: product.permalink,
+        }
+      : {
+          '@type': 'Offer',
+          price: String(product.price),
+          priceCurrency: 'PLN',
+          availability: 'https://schema.org/InStock',
+          url: flavor ? flavor.buyUrl : product.permalink,
+        };
+  return {
+    '@context': 'https://schema.org',
+    '@type': 'Product',
+    name,
+    image,
+    description: flavor
+      ? `${product.name} w smaku ${flavor.name} — jednorazowy e-papieros o wydajności ${fmtPuffs(product.puffs)} puffs.`
+      : product.shortDescription ||
+        `${product.name} — jednorazowy e-papieros, ${fmtPuffs(product.puffs)} puffs, ${product.flavors.length} smaków.`,
+    brand: { '@type': 'Brand', name: product.brand },
+    sku: `${product.slug}${flavor ? '-' + flavor.slug : ''}`,
+    offers,
+  };
+}
+
+export function itemListLd(items) {
+  return {
+    '@context': 'https://schema.org',
+    '@type': 'ItemList',
+    itemListElement: items.map((it, i) => ({
+      '@type': 'ListItem',
+      position: i + 1,
+      name: it.name,
+      url: it.url,
+    })),
+  };
+}
+
+export function organizationLd() {
+  return {
+    '@context': 'https://schema.org',
+    '@type': 'Organization',
+    name: SITE_NAME,
+    url: VAPEPL,
+    foundingDate: String(STATS.since),
+    description: `Sklep z jednorazówkami i e-papierosami w Polsce — ${STATS.brandsLabel} marek, ${STATS.productsLabel} produktów.`,
+    sameAs: [VAPEPL, CONTACT.whatsapp, CONTACT.telegram.href],
+    contactPoint: {
+      '@type': 'ContactPoint',
+      telephone: CONTACT.phone,
+      email: CONTACT.email,
+      contactType: 'customer support',
+      availableLanguage: ['pl'],
+    },
+  };
+}
+
+export function faqLd(questions) {
+  return {
+    '@context': 'https://schema.org',
+    '@type': 'FAQPage',
+    mainEntity: questions.map((f) => ({
+      '@type': 'Question',
+      name: f.q,
+      acceptedAnswer: { '@type': 'Answer', text: f.a },
+    })),
+  };
+}
+
+// ---------- 共享区块 ----------
+export function faqBlock(questions, limit) {
+  const list = limit ? questions.slice(0, limit) : questions;
+  return `
+  <section class="section faq" aria-labelledby="faq-title">
+    <div class="container container-faq">
+      <h2 id="faq-title">Najczęstsze pytania</h2>
+      <dl class="faq-list">
+        ${list
+          .map(
+            (f) => `
+      <div class="faq-item">
+        <dt>${esc(f.q)}</dt>
+        <dd>${esc(f.a)}</dd>
+      </div>`,
+          )
+          .join('')}
+      </dl>
+    </div>
+  </section>`;
+}
+
+export function discountBlock() {
+  return `
+  <section class="section discount" aria-labelledby="discount-title">
+    <div class="container">
+      <h2 id="discount-title">Rabat ilościowy</h2>
+      <p>Kupując kilka sztuk tego samego produktu, automatycznie otrzymujesz rabat progowy:</p>
+      <table class="discount-table">
+        <thead><tr><th>Ilość sztuk</th><th>Rabat</th></tr></thead>
+        <tbody>
+          ${DISCOUNT_TIERS.map((t) => `<tr><td>${esc(t.qty)}</td><td class="discount-off">${esc(t.off)}</td></tr>`).join('')}
+        </tbody>
+      </table>
+      <div class="discount-cta">
+        <a class="btn btn-primary btn-lg" href="/sklep/">Zobacz sklep</a>
+      </div>
+    </div>
+  </section>`;
+}
+
+export function trustStrip() {
+  return `
+  <section class="trust-strip" aria-label="Nasze atuty">
+    <div class="container">
+      ${WHY_US.map(
+        (w) => `
+      <div class="trust-item">
+        <span class="trust-emoji" aria-hidden="true">${w.emoji}</span>
+        <b>${esc(w.title)}</b>
+        <span>${esc(w.text)}</span>
+      </div>`,
+      )
+        .join('')}
+    </div>
+  </section>`;
+}
+
+export function ctaBanner() {
+  return `
+  <section class="cta-banner" aria-label="Kup na vapepl.com">
+    <div class="container">
+      <h2>Gotowy na zakup?</h2>
+      <p>Zamówienia realizujemy w sklepie <strong>vapepl.com</strong> — polski magazyn, Paczkomaty InPost i kurier DPD, płatność BLIK-iem.</p>
+      <a class="btn btn-primary btn-lg" href="${VAPEPL}" rel="nofollow">Przejdź do sklepu →</a>
+    </div>
+  </section>`;
+}
+
+export function reviewsBlock() {
+  return `
+  <section class="section reviews" aria-labelledby="reviews-title">
+    <div class="container">
+      <h2 id="reviews-title">Opinie klientów</h2>
+      <div class="reviews-grid">
+        ${REVIEWS.map(
+          (r) => `
+      <blockquote class="review">
+        <p class="review-stars" aria-label="Ocena: ${r.stars} z 5">${'★'.repeat(r.stars)}${'☆'.repeat(5 - r.stars)}</p>
+        <p>„${esc(r.text)}”</p>
+        <footer>— ${esc(r.author)}</footer>
+      </blockquote>`,
+        )
+          .join('')}
+      </div>
+    </div>
+  </section>`;
+}
+
+export function productCard(product, rank) {
+  const pct = discountPct(product);
+  const cardUrl = `/produkt/${product.slug}/`;
+  return `
+  <article class="product-card${rank ? ' is-ranked' : ''}">
+    ${rank ? `<span class="card-rank" aria-label="Pozycja ${rank}">#${rank}</span>` : ''}
+    ${pct ? `<span class="card-badge">-${pct}%</span>` : ''}
+    <a class="card-media" href="${esc(cardUrl)}">
+      ${product.image ? `<img src="${esc(product.image)}" alt="${esc(product.name)}" loading="lazy">` : ''}
+    </a>
+    <div class="card-body">
+      <p class="card-brand">${esc(product.brand)}</p>
+      <h3 class="card-title"><a href="${esc(cardUrl)}">${esc(product.name)}</a></h3>
+      <p class="card-meta">${fmtPuffs(product.puffs)} puffs · ${product.flavors.length} smaków</p>
+      <p class="card-price">
+        ${product.onSale ? `<s>${fmtZl(product.regularPrice)}</s>` : ''}
+        <strong>${fmtZl(product.price)}</strong>
+      </p>
+      <div class="card-actions">
+        <a class="btn btn-ghost" href="${esc(cardUrl)}">Szczegóły</a>
+        <a class="btn btn-primary" href="${esc(product.permalink)}" rel="nofollow">Kup</a>
+      </div>
+    </div>
+  </article>`;
+}
+
+export function flavorChip(product, flavor, active = false) {
+  return `<a class="flavor-chip${active ? ' is-active' : ''}" href="/produkt/${esc(product.slug)}/${esc(flavor.slug)}/">${esc(flavor.name)}</a>`;
+}
+
+// ---------- 页面渲染 ----------
+export function renderHome(data) {
+  const bySlug = new Map(data.products.map((p) => [p.slug, p]));
+  const top = topProducts(data);
+  const flavorCats = Object.entries(FLAVOR_CATS).map(([slug, c]) => ({
+    slug,
+    ...c,
+    count: data.categories.find((x) => x.slug === slug)?.count ?? 0,
+    image: data.categories.find((x) => x.slug === slug)?.image ?? null,
+  }));
+  const heroImage = bySlug.get('stag-bar-6in1-180000-puffs')?.image;
+  const jsonld = [
+    organizationLd(),
+    faqLd(HOME_FAQ),
+    {
+      '@context': 'https://schema.org',
+      '@type': 'WebSite',
+      name: SITE_NAME,
+      url: SITE,
+      description: 'Oferta jednorazówek i e-papierosów — kierunek vapepl.com',
+    },
+    itemListLd(
+      top.map((p) => ({ name: p.name, url: SITE + `/produkt/${p.slug}/` })),
+    ),
+  ];
+  const body = `
+  <section class="hero">
+    <div class="container hero-grid">
+      <div class="hero-copy">
+        <p class="hero-kicker">Jednorazówki · Pody · E-papierosy</p>
+        <h1>${SITE_NAME} — ${STATS.productsLabel} modeli od ${STATS.brandsLabel} marek, do <strong>−20%</strong> rabatu</h1>
+        <p>Od roku ${STATS.since} sprzedajemy wyselekcjonowane jednorazówki w Polsce. Wybierz model na tej stronie, a zakup sfinalizujesz w sklepie <a href="${VAPEPL}" rel="nofollow">vapepl.com</a> — polski magazyn, Paczkomaty InPost i kurier DPD.</p>
+        <div class="hero-actions">
+          <a class="btn btn-primary btn-lg" href="/sklep/">Przeglądaj sklep</a>
+          <a class="btn btn-ghost btn-lg" href="/kontakt/">Kontakt</a>
+        </div>
+        <ul class="hero-stats" aria-label="Statystyki sklepu">
+          <li><b>${STATS.productsLabel}</b> produktów</li>
+          <li><b>${STATS.brandsLabel}</b> marek</li>
+          <li><b>od ${fmtZl(Math.min(...data.products.map((p) => p.price)))}</b></li>
+          <li><b>${STATS.ratingLabel}</b> opinie</li>
+        </ul>
+      </div>
+      ${heroImage ? `
+      <figure class="hero-media">
+        <img src="${esc(heroImage)}" alt="STAG BAR 6IN1 180000 puffs — flagowy model 6 w 1">
+        <figcaption>Flagowiec STAG BAR 6IN1 — do 180 000 puffs w jednym urządzeniu</figcaption>
+      </figure>` : ''}
+    </div>
+  </section>
+  ${trustStrip()}
+  <section class="section" aria-labelledby="top-title">
+    <div class="container">
+      <div class="section-head">
+        <h2 id="top-title">Topowe trendy</h2>
+        <p>Najczęściej kupowane modele — z miejscami na podium.</p>
+      </div>
+      <div class="product-grid">
+        ${top.map((p, i) => productCard(p, i + 1)).join('')}
+      </div>
+    </div>
+  </section>
+  <section class="section brands" aria-labelledby="brands-title">
+    <div class="container">
+      <h2 id="brands-title">Nasze marki</h2>
+      <div class="brand-grid">
+        ${data.categories
+          .filter((c) => c.kind === 'brand')
+          .sort((a, b) => BRAND_ORDER.indexOf(a.slug) - BRAND_ORDER.indexOf(b.slug))
+          .map(
+            (c) => `
+      <a class="brand-card" href="/kategoria/${esc(c.slug)}/">
+        <span class="brand-emoji" aria-hidden="true">${BRANDS[c.slug]?.emoji ?? ''}</span>
+        <b>${esc(c.name)}</b>
+        <span>${c.count} produkt${c.count === 1 ? '' : 'y'}</span>
+        <i class="sr-only">${esc(BRANDS[c.slug]?.blurb ?? '')}</i>
+      </a>`,
+          )
+          .join('')}
+      </div>
+    </div>
+  </section>
+  <section class="section flavors" aria-labelledby="flavor-title">
+    <div class="container">
+      <h2 id="flavor-title">Kategorie smaków</h2>
+      <div class="flavor-grid">
+        ${flavorCats
+          .map(
+            (c) => `
+      <a class="flavor-card" href="/kategoria/${esc(c.slug)}/">
+        ${c.image ? `<img src="${esc(c.image)}" alt="" loading="lazy">` : ''}
+        <b>${c.emoji} ${esc(c.name)}</b>
+        <span>${c.count} produktów</span>
+      </a>`,
+          )
+          .join('')}
+      </div>
+      <h3 class="subhead">Najpopularniejsze smaki</h3>
+      <ul class="top-flavors">
+        ${TOP_FLAVORS.map((f) => `<li><span aria-hidden="true">${f.medal}</span> ${esc(f.name)}</li>`).join('')}
+      </ul>
+    </div>
+  </section>
+  ${discountBlock()}
+  ${reviewsBlock()}
+  <section class="section guides" aria-labelledby="guides-title">
+    <div class="container">
+      <h2 id="guides-title">Wiedza o e-papierosach</h2>
+      <p>30 poradników na <a href="${VAPEPL}" rel="nofollow">vapepl.com</a> — wybrane artykuły:</p>
+      <ul class="guide-list">
+        ${GUIDES.map((g) => `<li><a href="${esc(g.url)}" rel="nofollow">${esc(g.title)} →</a></li>`).join('')}
+      </ul>
+    </div>
+  </section>
+  ${faqBlock(HOME_FAQ)}
+  ${ctaBanner()}`;
+  return page({
+    title: `Jednorazówki i e-papierosy — ${STATS.productsLabel} modeli, 7 marek | ${SITE_NAME}`,
+    description: `Oferta ${STATS.productsLabel} jednorazówek od ${STATS.brandsLabel} marek (ceny od ${fmtZl(
+      Math.min(...data.products.map((p) => p.price)),
+    )}). Polski magazyn, rabaty do −20%, 14 dni na zwrot. Kup na vapepl.com.`,
+    canonical: SITE + '/',
+    ogImage: heroImage,
+    jsonld,
+    body,
+  });
+}
+
+export function renderShop(data) {
+  const top = topProducts(data);
+  const body = `
+  ${breadcrumbs([{ label: 'Sklep', url: '/sklep/' }])}
+  <section class="page-hero">
+    <div class="container">
+      <h1>Sklep — wszystkie ${data.products.length} modeli</h1>
+      <p>Wybierz model, zobacz smaki i ceny, a zakup sfinalizujesz w <a href="${VAPEPL}" rel="nofollow">vapepl.com</a>. Wszystkie produkty w promocji.</p>
+    </div>
+  </section>
+  ${trustStrip()}
+  <section class="section" aria-labelledby="top-title">
+    <div class="container">
+      <h2 id="top-title">🔥 Bestselleri</h2>
+      <div class="product-grid">
+        ${top.map((p, i) => productCard(p, i + 1)).join('')}
+      </div>
+    </div>
+  </section>
+  <section class="section" aria-labelledby="catalog-title">
+    <div class="container">
+      <h2 id="catalog-title">Pełna oferta</h2>
+      ${data.products.map((p) => productCard(p)).join('')}
+    </div>
+  </section>
+  ${discountBlock()}
+  ${faqBlock(HOME_FAQ, 4)}
+  ${ctaBanner()}`;
+  const jsonld = [
+    organizationLd(),
+    breadcrumbs([{ label: 'Sklep', url: '/sklep/' }]).ld,
+    itemListLd(data.products.map((p) => ({ name: p.name, url: SITE + `/produkt/${p.slug}/` }))),
+  ];
+  return page({
+    title: `Sklep z jednorazówkami i e-papierosami — ${data.products.length} modeli | ${SITE_NAME}`,
+    description: `Pełna oferta ${data.products.length} jednorazówek w promocji: ceny od ${fmtZl(
+      Math.min(...data.products.map((p) => p.price)),
+    )}, 220 smaków do wyboru. Rabat ilościowy do −20%. Zakaupy na vapepl.com.`,
+    canonical: SITE + '/sklep/',
+    jsonld,
+    body,
+  });
+}
+
+export function renderCategory(data, category) {
+  const products = data.products.filter((p) =>
+    p.categories.some((c) => c.slug === category.slug),
+  );
+  const meta =
+    category.kind === 'brand'
+      ? BRANDS[category.slug] ?? { name: category.name, blurb: '' }
+      : FLAVOR_CATS[category.slug] ?? { name: category.name, blurb: '' };
+  const title =
+    category.kind === 'brand'
+      ? `Marka ${category.name} — jednorazówki i pody | ${SITE_NAME}`
+      : `Smaki ${category.name} — jednorazówki ${category.count} produktów | ${SITE_NAME}`;
+  const desc =
+    category.kind === 'brand'
+      ? `${meta.blurb || `Wszystkie produkty marki ${category.name}.`} Ceny od ${fmtZl(
+          products.length ? Math.min(...products.map((p) => p.price)) : 0,
+        )} — zakup na vapepl.com.`
+      : `Kategoria smaków ${category.name}: ${products.length} produktów, od ${fmtZl(
+          products.length ? Math.min(...products.map((p) => p.price)) : 0,
+        )}. Zobacz wszystkie smaki i kup na vapepl.com.`;
+  const crumb = breadcrumbs([
+    { label: 'Sklep', url: '/sklep/' },
+    { label: category.name, url: `/kategoria/${category.slug}/` },
+  ]);
+  const jsonld = [
+    organizationLd(),
+    crumb.ld,
+    itemListLd(products.map((p) => ({ name: p.name, url: SITE + `/produkt/${p.slug}/` }))),
+  ];
+  const body = `
+  ${crumb.html}
+  <section class="page-hero">
+    <div class="container">
+      <h1>${category.kind === 'brand' ? `Marka ${category.name}` : `Smaki: ${category.name}`}</h1>
+      <p>${esc(meta.blurb || `Wybierz model, porównaj smaki i przejdź do zakupu na vapepl.com.`)} W tej kategorii: <strong>${products.length}</strong> produktów${
+        category.count && products.length !== category.count ? ` (na sklepie ${category.count} w tym smaku)` : ''
+      }.</p>
+    </div>
+  </section>
+  <section class="section">
+    <div class="container product-grid">
+      ${products.length ? products.map((p) => productCard(p)).join('') : '<p>Brak produktów w tej kategorii.</p>'}
+    </div>
+  </section>
+  ${discountBlock()}
+  ${ctaBanner()}`;
+  return page({
+    title,
+    description: desc,
+    canonical: SITE + `/kategoria/${category.slug}/`,
+    ogImage: products[0]?.image ?? category.image,
+    jsonld,
+    body,
+  });
+}
+
+// 品牌分类（用于面包屑与品牌页），由 data.categories 推导
+export const brandSlugFor = (data, product) =>
+  data.categories.find((c) => c.kind === 'brand' && c.name === product.brand)?.slug ?? null;
+
+export function renderProduct(data, product) {
+  const flavors = product.flavors;
+  const brandSlug = brandSlugFor(data, product);
+  const crumb = breadcrumbs([
+    { label: 'Sklep', url: '/sklep/' },
+    ...(brandSlug
+      ? [{ label: product.brand, url: `/kategoria/${brandSlug}/` }]
+      : []),
+    { label: product.name, url: `/produkt/${product.slug}/` },
+  ]);
+  const image = product.image ?? '';
+  const desc = product.shortDescription ||
+    `${product.name} — jednorazowy e-papieros ${fmtPuffs(product.puffs)} puffs, ${flavors.length} smaków. W promocji: ${fmtZl(product.price)}.`;
+  const jsonld = [
+    organizationLd(),
+    crumb.ld,
+    productLd({ product, flavor: null, image }),
+  ];
+  const specs = [
+    ['Marka', product.brand],
+    ['Wydajność', `${fmtPuffs(product.puffs)} puffs`],
+    ['Liczba smaków', String(flavors.length)],
+    ['Cena', fmtZl(product.price)],
+    ['Cena przed promocją', product.onSale ? fmtZl(product.regularPrice) : null],
+    ['Status', product.onSale ? 'W promocji' : 'W ofercie'],
+  ];
+  const body = `
+  ${crumb.html}
+  <section class="section product-detail">
+    <div class="container product-layout">
+      <figure class="product-media">
+        ${product.image ? `<img src="${esc(product.image)}" alt="${esc(product.name)}">` : ''}
+        <figcaption>${esc(product.name)}</figcaption>
+      </figure>
+      <div class="product-info">
+        <p class="product-brand">${esc(product.brand)}</p>
+        <h1>${esc(product.name)}</h1>
+        ${flavors.length ? `<p class="product-flavor-count">${flavors.length} dostępnych smaków</p>` : ''}
+        <p class="product-price">
+          ${product.onSale ? `<s>${fmtZl(product.regularPrice)}</s>` : ''}
+          <strong>${fmtZl(product.price)}</strong>
+        </p>
+        <p class="product-desc">${esc(desc)}</p>
+        <div class="product-cta">
+          <a class="btn btn-primary btn-lg" href="${esc(product.permalink)}" rel="nofollow">Kup na vapepl.com →</a>
+          <a class="btn btn-ghost" href="/sklep/">Wróć do sklepu</a>
+        </div>
+        <table class="specs">
+          ${specs
+            .filter(([, v]) => v)
+            .map(([k, v]) => `<tr><th scope="row">${esc(k)}</th><td>${esc(v)}</td></tr>`)
+            .join('')}
+        </table>
+      </div>
+    </div>
+  </section>
+  ${flavors.length ? `
+  <section class="section flavors-list" aria-labelledby="flavors-title">
+    <div class="container">
+      <h2 id="flavors-title">Wybierz smak</h2>
+      <p>Każdy smak ma swoją stronę — porównaj i kup wybrany wariant na vapepl.com.</p>
+      <div class="flavor-chips">
+        ${flavors.map((f) => flavorChip(product, f)).join('')}
+      </div>
+    </div>
+  </section>` : ''}
+  ${discountBlock()}
+  ${faqBlock(HOME_FAQ, 3)}`;
+  return page({
+    title: `${product.name} — ${fmtPuffs(product.puffs)} puffs, ${fmtZl(product.price)} | ${SITE_NAME}`,
+    description: desc,
+    canonical: SITE + `/produkt/${product.slug}/`,
+    ogImage: image,
+    ogType: 'product',
+    jsonld,
+    body,
+  });
+}
+
+export function renderFlavor(data, product, flavor) {
+  const brandSlug = brandSlugFor(data, product);
+  const crumb = breadcrumbs([
+    { label: 'Sklep', url: '/sklep/' },
+    ...(brandSlug
+      ? [{ label: product.brand, url: `/kategoria/${brandSlug}/` }]
+      : []),
+    { label: product.name, url: `/produkt/${product.slug}/` },
+    { label: flavor.name, url: `/produkt/${product.slug}/${flavor.slug}/` },
+  ]);
+  const angle = flavorAngle(flavor.name);
+  const title = `${product.name} — smak ${flavor.name} | ${SITE_NAME}`;
+  const desc = `${product.name} w smaku ${flavor.name} — ${angle}. Wydajność ${fmtPuffs(
+    product.puffs,
+  )} puffs, cena ${fmtZl(product.price)} (w promocji, wcześniej ${fmtZl(product.regularPrice)}). Zakup na vapepl.com.`;
+  const jsonld = [
+    organizationLd(),
+    crumb.ld,
+    productLd({ product, flavor, image: product.image ?? '' }),
+  ];
+  const body = `
+  ${crumb.html}
+  <section class="section product-detail">
+    <div class="container product-layout">
+      <figure class="product-media">
+        ${product.image ? `<img src="${esc(product.image)}" alt="${esc(product.name)} — smak ${esc(flavor.name)}">` : ''}
+        <figcaption>${esc(product.name)} · smak ${esc(flavor.name)}</figcaption>
+      </figure>
+      <div class="product-info">
+        <p class="product-brand">${esc(product.brand)}</p>
+        <h1>${esc(product.name)} — smak ${esc(flavor.name)}</h1>
+        <p class="product-desc">
+          ${esc(
+            `${product.name} w wersji ${flavor.name} to ${angle}. Urządzenie oferuje ${fmtPuffs(product.puffs)} puffs w przystępnej cenie ${fmtZl(product.price)}. Wybierz smak, dodaj do koszyka na vapepl.com i odbierz w Paczkomacie lub kurierem DPD.`,
+          )}
+        </p>
+        <p class="product-price">
+          <s>${fmtZl(product.regularPrice)}</s>
+          <strong>${fmtZl(product.price)}</strong>
+        </p>
+        <div class="product-cta">
+          <a class="btn btn-primary btn-lg" href="${esc(flavor.buyUrl)}" rel="nofollow">Kup smak ${esc(flavor.name)} →</a>
+          <a class="btn btn-ghost" href="/produkt/${esc(product.slug)}/">Wszystkie smaki</a>
+        </div>
+        <table class="specs">
+          <tr><th scope="row">Smak</th><td>${esc(flavor.name)}</td></tr>
+          <tr><th scope="row">Marka</th><td>${esc(product.brand)}</td></tr>
+          <tr><th scope="row">Wydajność</th><td>${fmtPuffs(product.puffs)} puffs</td></tr>
+          <tr><th scope="row">Cena</th><td>${fmtZl(product.price)}</td></tr>
+          <tr><th scope="row">W promocji</th><td>${product.onSale ? 'Tak' : 'Nie'}</td></tr>
+          <tr><th scope="row">Zakres smaków w tym modelu</th><td>${product.flavors.length}</td></tr>
+        </table>
+      </div>
+    </div>
+  </section>
+  <section class="section" aria-labelledby="related-title">
+    <div class="container">
+      <h2 id="related-title">Inne smaki modelu ${esc(product.name)}</h2>
+      <div class="flavor-chips">
+        ${product.flavors.map((f) => flavorChip(product, f, f.slug === flavor.slug)).join('')}
+      </div>
+    </div>
+  </section>
+  ${discountBlock()}
+  ${faqBlock(
+    [
+      {
+        q: `Jak smakuje ${flavor.name} w ${product.name}?`,
+        a: `Smak ${flavor.name} to ${angle}. To jeden z ${product.flavors.length} dostępnych wariantów modelu ${product.name}.`,
+      },
+      {
+        q: 'Czy produkty są oryginalne?',
+        a: 'Tak — wszystkie produkty pochodzą z oficjalnych kanałów dystrybucji. Weryfikację autentyczności można poprosić u obsługi.',
+      },
+      {
+        q: 'Jak złożyć zamówienie na ten smak?',
+        a: `Kliknij przycisk „Kup smak ${flavor.name}” powyżej — otworzy on kartę produktu na vapepl.com z wybranym wariantem. Płatność BLIK-iem lub szybkim przelewem; odbiór Paczkomatem InPost lub kurierem DPD.`,
+      },
+    ],
+    3,
+  )}`;
+  return page({
+    title,
+    description: desc,
+    canonical: SITE + `/produkt/${product.slug}/${flavor.slug}/`,
+    ogImage: product.image,
+    ogType: 'product',
+    jsonld,
+    body,
+  });
+}
+
+export function renderContact(data) {
+  const crumb = breadcrumbs([{ label: 'Kontakt', url: '/kontakt/' }]);
+  const jsonld = [
+    organizationLd(),
+    crumb.ld,
+    faqLd(HOME_FAQ.slice(-2)),
+  ];
+  const body = `
+  ${crumb.html}
+  <section class="page-hero">
+    <div class="container">
+      <h1>Kontakt</h1>
+      <p>Napisz lub zadzwoń — odpowiadamy zwykle w ciągu jednego dnia roboczego. Godziny: <strong>${esc(CONTACT.hours)}</strong>.</p>
+    </div>
+  </section>
+  <section class="section contact">
+    <div class="container contact-grid">
+      <a class="contact-card" href="${CONTACT.phoneHref}">
+        <span aria-hidden="true">📱</span>
+        <b>Telefon</b>
+        <span>${esc(CONTACT.phone)}</span>
+      </a>
+      <a class="contact-card" href="${esc(CONTACT.whatsapp)}" rel="nofollow">
+        <span aria-hidden="true">💬</span>
+        <b>WhatsApp</b>
+        <span>${esc(CONTACT.phone)}</span>
+      </a>
+      <a class="contact-card" href="${esc(CONTACT.telegram.href)}" rel="nofollow">
+        <span aria-hidden="true">✈️</span>
+        <b>Telegram</b>
+        <span>${esc(CONTACT.telegram.label)}</span>
+      </a>
+      <a class="contact-card" href="mailto:${esc(CONTACT.email)}">
+        <span aria-hidden="true">📧</span>
+        <b>E-mail</b>
+        <span>${esc(CONTACT.email)}</span>
+      </a>
+    </div>
+    <div class="container">
+      <h2>Pytania o zamówienie</h2>
+      <p>Status zamówienia, fakturę i numer śledzenia znajdziesz w e-mailu potwierdzającym oraz na swoim koncie na <a href="${VAPEPL}" rel="nofollow">vapepl.com</a>. Jeśli potrzebujesz pomocy, najprościej napisać przez WhatsApp lub Telegram.</p>
+    </div>
+  </section>
+  ${faqBlock(HOME_FAQ.slice(-2))}`;
+  return page({
+    title: `Kontakt — ${SITE_NAME}`,
+    description: `Skontaktuj się z obsługą: telefon ${CONTACT.phone}, WhatsApp, Telegram ${CONTACT.telegram.label} lub e-mail ${CONTACT.email}. Godziny ${CONTACT.hours}.`,
+    canonical: SITE + '/kontakt/',
+    jsonld,
+    body,
+  });
+}
+
+export function renderReturns(data) {
+  const crumb = breadcrumbs([{ label: 'Zwroty', url: '/zwroty/' }]);
+  const jsonld = [organizationLd(), crumb.ld];
+  const body = `
+  ${crumb.html}
+  <section class="page-hero">
+    <div class="container">
+      <h1>Polityka zwrotów</h1>
+      <p>Zwroty na <a href="${VAPEPL_RETURNS}" rel="nofollow">vapepl.com</a> — poniżej skrócone zasady obowiązujące w sklepie.</p>
+    </div>
+  </section>
+  <section class="section returns">
+    <div class="container">
+      <h2>Prawo odstąpienia od umowy</h2>
+      <p>Masz <strong>14 dni</strong> na odstąpienie od umowy bez podania przyczyny. Wymagania:</p>
+      <ul>
+        <li>produkt musi być nienaruszony i w oryginalnym opakowaniu,</li>
+        <li>dopiero po zwrocie potwierdzisz, że zachowane są warunki handlowe,</li>
+        <li>dowód zakupu (faktura/rachunek) będzie potrzebny do zidentyfikowania zamówienia.</li>
+      </ul>
+      <h2>Wyłączenia</h2>
+      <p>Względem produktów higienicznych (np. otwarte liquidy, użyte wkłady, otwarte opakowania jednorazówek) prawo odstąpienia nie przysługuje — zasady te wynikają z polskiego prawa konsumenckiego.</p>
+      <h2>Zwrot kosztów i termin</h2>
+      <p>Zwrot następuje tą samą metodą płatności w ciągu <strong>14 dni</strong> od otrzymania przesyłki zwrotnej. Koszty zwrotu ponosi kupujący, chyba że błąd jest po stronie sklepu.</p>
+      <h2>Wysyłka zwrotna</h2>
+      <p>Możesz nadać paczkę <strong>InPost Paczkomatem</strong> lub <strong>DPD Pickup</strong>. W paczce dołącz dowód zakupu i krótką notatkę z powodem zwrotu.</p>
+      <h2>Rękojmia</h2>
+      <p>Wadliwy towar rozpatrujemy w ramach rękojmi — zgłoś reklamację ze zdjęciami. Sklep zweryfikuje produkt w terminie 14 dni i podejmie jedną z trzech akcji: naprawa, wymiana lub zwrot.</p>
+      <p class="returns-link">Pełna treść: <a href="${VAPEPL_RETURNS}" rel="nofollow">Polityka Zwrotów na vapepl.com →</a></p>
+    </div>
+  </section>
+  ${ctaBanner()}`;
+  return page({
+    title: `Polityka zwrotów — 14 dni na odstąpienie | ${SITE_NAME}`,
+    description: 'Zwroty w sklepach vapepl.com: 14 dni na odstąpienie od umowy bez podania przyczyny. Wymagania, wyłączenia i zasady rękojmi.',
+    canonical: SITE + '/zwroty/',
+    jsonld,
+    body,
+  });
+}
+
+export function render404(data) {
+  const body = `
+  <section class="section not-found">
+    <div class="container">
+      <h1>Strona nie znaleziona</h1>
+      <p>Nie mamy tej podstrony. Wróć do sklepu lub sprawdź listę produktów.</p>
+      <a class="btn btn-primary" href="/sklep/">Wróć do sklepu</a>
+      <a class="btn btn-ghost" href="/">Strona główna</a>
+    </div>
+  </section>`;
+  return page({
+    title: `Nie znaleziono — ${SITE_NAME}`,
+    description: 'Ta podstrona nie istnieje. Wróć do sklepu z jednorazówkami i e-papierosami.',
+    canonical: SITE + '/404.html',
+    jsonld: [organizationLd()],
+    body,
+    noFollow: true,
+  });
+}
