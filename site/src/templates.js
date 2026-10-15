@@ -178,7 +178,7 @@ function footer() {
         <p class="footer-title">Sklep</p>
         <ul>
           <li><a href="/sklep/">Wszystkie produkty</a></li>
-          ${BRAND_ORDER.map((s) => `<li><a href="/kategoria/${s}/">${BRANDS[s].name}</a></li>`).join('')}
+          ${BRAND_ORDER.slice(0, 3).map((s) => `<li><a href="/kategoria/${s}/">${BRANDS[s].name}</a></li>`).join('')}
         </ul>
       </div>
       <div>
