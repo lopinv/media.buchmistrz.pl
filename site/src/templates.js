@@ -372,7 +372,6 @@ export function trustStrip() {
       <div class="trust-item">
         <span class="trust-emoji" aria-hidden="true">${w.emoji}</span>
         <b>${esc(w.title)}</b>
-        <span>${esc(w.text)}</span>
       </div>`,
       )
         .join('')}

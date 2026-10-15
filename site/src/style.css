@@ -196,8 +196,7 @@ nav.breadcrumbs + .page-hero { padding-top: 0; }
 .trust-strip .container { display: grid; grid-template-columns: 1fr; gap: 16px; padding-block: 22px; }
 .trust-item { display: flex; align-items: center; gap: 12px; }
 .trust-emoji { font-size: 26px; }
-.trust-item b { display: block; font-weight: 700; }
-.trust-item span { color: var(--ink-soft); font-size: 14px; }
+.trust-item b { display: block; font-weight: 700; font-size: 16px; }
 
 /* ---------- 卡片通用（统一规格：1px 线 + 14px 圆角 + 轻阴影 + hover 微升）---------- */
 .product-card, .review, .brand-card, .flavor-card, .contact-card {

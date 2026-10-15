@@ -112,10 +112,10 @@ export const GUIDES = [
 ];
 
 export const WHY_US = [
-  { emoji: '✅', title: 'Gwarancja Jakości', text: '100% oryginalnych produktów z oficjalnych kanałów dystrybucji.' },
-  { emoji: '🚚', title: 'Szybka Wysyłka', text: 'Polski magazyn — Paczkomaty InPost i kurier DPD.' },
-  { emoji: '💳', title: 'Bezpieczne Płatności', text: 'BLIK i szybkie przelewy przy kasie online.' },
-  { emoji: '🎁', title: 'Rabaty Ilościowe', text: 'Do −20% przy 15+ sztukach i 14 dni na zwrot.' },
+  { emoji: '✅', title: 'Gwarancja Jakości' },
+  { emoji: '🚚', title: 'Szybka Wysyłka' },
+  { emoji: '💳', title: 'Bezpieczne Płatności' },
+  { emoji: '🎁', title: 'Rabaty Ilościowe' },
 ];
 
 export const CONTACT = {
