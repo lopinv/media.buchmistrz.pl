@@ -17,6 +17,12 @@ const MIME = {
   '.svg': 'image/svg+xml',
 };
 
+// 启动自检：dist 缺失（如 git 切换分支后 gitignored 产物被清除）时明确提示，避免请求时崩溃
+if (!existsSync(join(DIST, 'index.html'))) {
+  console.error(`✘ 未找到构建产物 ${DIST}（可能被 git 分支切换清除）。\n  请先运行: node site/build.js`);
+  process.exit(1);
+}
+
 createServer((req, res) => {
   let p = decodeURIComponent(new URL(req.url, 'http://x').pathname);
   if (p === '/') p = '/index.html';
@@ -31,7 +37,7 @@ createServer((req, res) => {
   }
   if (!target || !existsSync(target)) {
     res.writeHead(404, { 'Content-Type': MIME['.html'] });
-    res.end(readFileSync(join(DIST, '404.html')));
+    res.end(existsSync(join(DIST, '404.html')) ? readFileSync(join(DIST, '404.html')) : 'Not Found');
     return;
   }
   res.writeHead(200, { 'Content-Type': MIME[extname(target)] || 'application/octet-stream' });
