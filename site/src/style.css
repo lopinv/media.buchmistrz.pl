@@ -428,7 +428,7 @@ a.brand-card:hover, a.flavor-card:hover, a.contact-card:hover,
   .section { padding-block: 56px; }
   .cta-banner .container { padding-block: 56px; }
 
-  .product-grid { grid-template-columns: repeat(3, 1fr); }
+  .product-grid { grid-template-columns: repeat(4, 1fr); }
   .reviews-grid { grid-template-columns: repeat(3, 1fr); }
   .contact-grid { grid-template-columns: repeat(4, 1fr); }
   .brand-grid, .flavor-grid { grid-template-columns: repeat(4, 1fr); }
