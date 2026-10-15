@@ -340,39 +340,46 @@ export function faqLd(questions) {
 }
 
 // ---------- 共享区块 ----------
-export function faqBlock(questions, limit) {
+// 原生 <details>/<summary> 手风琴（零 JS）。openFirst=true 时首条默认展开（首页用）。
+export function faqBlock(questions, limit, openFirst = false) {
   const list = limit ? questions.slice(0, limit) : questions;
   return `
   <section class="section faq section--center" aria-labelledby="faq-title">
     <div class="container">
       <h2 id="faq-title">Najczęstsze pytania</h2>
-      <dl class="faq-list">
+      <div class="faq-list">
         ${list
           .map(
-            (f) => `
-      <div class="faq-item">
-        <dt>${esc(f.q)}</dt>
-        <dd>${esc(f.a)}</dd>
-      </div>`,
+            (f, i) => `
+      <details class="faq-item"${i === 0 && openFirst ? ' open' : ''}>
+        <summary>
+          <span class="faq-q">${esc(f.q)}</span>
+          <span class="faq-chevron" aria-hidden="true"></span>
+        </summary>
+        <div class="faq-a"><p>${esc(f.a)}</p></div>
+      </details>`,
           )
           .join('')}
-      </dl>
+      </div>
     </div>
   </section>`;
 }
 
 export function discountBlock() {
+  const lastIdx = DISCOUNT_TIERS.length - 1;
   return `
   <section class="section discount section--center" aria-labelledby="discount-title">
     <div class="container">
       <h2 id="discount-title">Rabat ilościowy</h2>
-      <p>Kupując kilka sztuk tego samego produktu, automatycznie otrzymujesz rabat progowy:</p>
-      <table class="discount-table">
-        <thead><tr><th>Ilość sztuk</th><th>Rabat</th></tr></thead>
-        <tbody>
-          ${DISCOUNT_TIERS.map((t) => `<tr><td>${esc(t.qty)}</td><td class="discount-off">${esc(t.off)}</td></tr>`).join('')}
-        </tbody>
-      </table>
+      <p>Kupując kilka sztuk tego samego produktu, automatycznie otrzymujesz rabat progowy — bez kodów:</p>
+      <div class="discount-tiers">
+        ${DISCOUNT_TIERS.map((t, i) => `
+        <div class="discount-tier${i === lastIdx ? ' is-featured' : ''}">
+          ${i === lastIdx ? '<span class="tier-badge">Najlepsza stawka</span>' : ''}
+          <span class="tier-qty">${esc(t.qty)}</span>
+          <b class="tier-off">${esc(t.off)}</b>
+        </div>`).join('')}
+      </div>
       <div class="discount-cta">
         <a class="btn btn-primary btn-lg" href="/sklep/">Zobacz sklep</a>
       </div>
@@ -572,7 +579,7 @@ export function renderHome(data) {
       </ul>
     </div>
   </section>
-  ${faqBlock(HOME_FAQ)}
+  ${faqBlock(HOME_FAQ, undefined, true)}
   ${ctaBanner()}`;
   return page({
     title: `Jednorazówki i e-papierosy — ${STATS.productsLabel} modeli, 7 marek | ${SITE_NAME}`,

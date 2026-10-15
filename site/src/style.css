@@ -70,7 +70,7 @@ img { max-width: 100%; height: auto; display: block; }
 h1, h2, h3 { text-wrap: balance; }
 
 /* 价格与规格表数字对齐 */
-.card-price strong, .product-price strong, .specs td, .discount-table td {
+.card-price strong, .product-price strong, .specs td {
   font-variant-numeric: tabular-nums;
 }
 
@@ -369,7 +369,7 @@ a.brand-card:hover, a.flavor-card:hover, a.contact-card:hover,
   width: calc(min(100%, var(--maxw)) - 40px);
 }
 
-/* ---------- 折扣区（深色琥珀卡 + 通栏两列表格）---------- */
+/* ---------- 折扣区（深色琥珀卡 + 阶梯档位卡：2 列 → 桌面 4 列，最高档高亮）---------- */
 .discount .container {
   background: linear-gradient(135deg, #1a1408, #171106);
   border: 1px solid rgba(251, 191, 36, 0.28);
@@ -378,19 +378,36 @@ a.brand-card:hover, a.flavor-card:hover, a.contact-card:hover,
   text-align: center;
 }
 .discount h2 { margin-bottom: 8px; }
-.discount-table {
-  width: 100%;
-  border-collapse: collapse; background: rgba(10, 14, 24, 0.6);
-  border-radius: var(--radius-sm); overflow: hidden;
+.discount-tiers {
+  display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px;
+  margin: 24px 0 4px;
 }
-.discount-table th, .discount-table td {
-  padding: 14px 16px; text-align: center; border-bottom: 1px solid var(--line);
+.discount-tier {
+  position: relative;
+  background: rgba(10, 14, 24, 0.6);
+  border: 1px solid var(--line); border-radius: var(--radius-sm);
+  padding: 18px 12px 16px;
+  display: flex; flex-direction: column; align-items: center; gap: 2px;
 }
-.discount-table th {
-  font-size: 13px; text-transform: uppercase; letter-spacing: 0.04em;
-  color: var(--ink-soft); background: var(--surface-2); font-weight: 700;
+.tier-qty { font-size: 14px; color: var(--ink-soft); font-weight: 600; }
+.tier-off { font-size: 28px; font-weight: 800; color: var(--danger); line-height: 1.2; font-variant-numeric: tabular-nums; }
+/* 最高档：更深底 + 琥珀描边 + 光晕，徽章骑在上缘 */
+.discount-tier.is-featured {
+  background: #0a0e18;
+  border-color: rgba(251, 191, 36, 0.55);
+  box-shadow: 0 0 0 1px rgba(251, 191, 36, 0.25), 0 8px 32px rgba(251, 191, 36, 0.12);
 }
-.discount-off { font-weight: 800; color: var(--danger); font-size: 18px; }
+.discount-tier.is-featured .tier-qty { color: var(--ink-soft); }
+.discount-tier.is-featured .tier-off {
+  color: var(--accent); font-size: 32px;
+  text-shadow: 0 0 24px rgba(251, 191, 36, 0.45);
+}
+.tier-badge {
+  position: absolute; top: -11px; left: 50%; transform: translateX(-50%);
+  background: var(--accent); color: #1a1305;
+  font-size: 11px; font-weight: 800; letter-spacing: 0.02em;
+  padding: 3px 10px; border-radius: 999px; white-space: nowrap;
+}
 .discount-cta { margin-top: 20px; }
 .discount-cta .btn { min-width: 180px; display: inline-block; }
 
@@ -406,7 +423,7 @@ a.brand-card:hover, a.flavor-card:hover, a.contact-card:hover,
 .review p { margin: 0 0 8px; }
 .review footer { color: var(--ink-soft); font-size: 14px; }
 
-/* ---------- FAQ（深卡，问答通栏）---------- */
+/* ---------- FAQ（深卡 + 原生 details 手风琴，零 JS）---------- */
 .faq .container {
   background: var(--surface);
   border: 1px solid var(--line);
@@ -414,10 +431,25 @@ a.brand-card:hover, a.flavor-card:hover, a.contact-card:hover,
   padding: clamp(20px, 4vw, 32px);
 }
 .faq-list { margin: 0; text-align: left; }
-.faq-item { padding: 14px 0; border-bottom: 1px solid var(--line); }
+.faq-item { border-bottom: 1px solid var(--line); }
 .faq-item:last-child { border-bottom: 0; }
-.faq-item dt { font-weight: 700; margin-bottom: 6px; }
-.faq-item dd { margin: 0; color: var(--ink-soft); }
+.faq-item summary {
+  display: flex; align-items: center; justify-content: space-between; gap: 16px;
+  padding: 16px 4px; cursor: pointer; list-style: none;
+  font-weight: 600; font-size: 16px; color: var(--ink);
+  transition: background-color var(--dur), color var(--dur);
+}
+.faq-item summary::-webkit-details-marker { display: none; }
+.faq-item summary:hover { background: rgba(34, 211, 238, 0.05); color: var(--brand); border-radius: var(--radius-sm); }
+.faq-chevron {
+  flex: none; width: 10px; height: 10px;
+  border-right: 2px solid var(--ink-mute); border-bottom: 2px solid var(--ink-mute);
+  transform: rotate(-45deg); transition: transform var(--dur);
+}
+.faq-item[open] .faq-chevron { transform: rotate(45deg); border-color: var(--brand); }
+.faq-item[open] summary { color: var(--brand); }
+.faq-a { padding: 0 4px 16px; }
+.faq-a p { margin: 0; color: var(--ink-soft); }
 
 /* ---------- 指南（深表面区块）---------- */
 .guides h2 { margin-bottom: 12px; }
@@ -554,6 +586,7 @@ a.brand-card:hover, a.flavor-card:hover, a.contact-card:hover,
   .section { padding-block: 56px; }
   .cta-banner .container { padding-block: 56px; }
 
+  .discount-tiers { grid-template-columns: repeat(4, 1fr); }
   .product-grid { grid-template-columns: repeat(4, 1fr); }
   .reviews-grid { grid-template-columns: repeat(3, 1fr); }
   .contact-grid { grid-template-columns: repeat(4, 1fr); }
