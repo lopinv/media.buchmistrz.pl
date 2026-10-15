@@ -733,7 +733,8 @@ export function renderProduct(data, product) {
     </div>
   </section>` : ''}
   ${discountBlock()}
-  ${faqBlock(HOME_FAQ, 3)}`;
+  ${faqBlock(HOME_FAQ, 3)}
+  ${ctaBanner()}`;
   return page({
     title: `${product.name} — ${fmtPuffs(product.puffs)} puffs, ${fmtZl(product.price)} | ${SITE_NAME}`,
     description: desc,
@@ -825,7 +826,8 @@ export function renderFlavor(data, product, flavor) {
       },
     ],
     3,
-  )}`;
+  )}
+  ${ctaBanner()}`;
   return page({
     title,
     description: desc,
