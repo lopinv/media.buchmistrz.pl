@@ -57,6 +57,14 @@ for (const product of data.products) {
 for (const f of ['style.css', 'script.js']) {
   writeFileSync(join(DIST, f), readFileSync(join(ROOT, 'src', f)));
 }
+// 自托管 webfont（Inter 可变字重，latin + latin-ext 子集）
+const FONTS_SRC = join(ROOT, 'src', 'fonts');
+if (existsSync(FONTS_SRC)) {
+  mkdirSync(join(DIST, 'fonts'), { recursive: true });
+  for (const f of readdirSync(FONTS_SRC)) {
+    writeFileSync(join(DIST, 'fonts', f), readFileSync(join(FONTS_SRC, f)));
+  }
+}
 writeFileSync(join(DIST, '.nojekyll'), '');
 
 // 与生成页面一一对应的 sitemap.xml

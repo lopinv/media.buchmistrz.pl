@@ -6,22 +6,24 @@ export const SITE_NAME = 'VapePL.COM';
 export const VAPEPL = 'https://vapepl.com';
 export const VAPEPL_RETURNS = `${VAPEPL}/refund_returns/`;
 
+// 品牌卡用字母字标瓦片（首字母），不再用动物 emoji
 export const BRANDS = {
-  airmez: { name: 'AiRMEZ', emoji: '🦊', blurb: 'Wydajne jednorazówki 4IN1 z wymiennymi wkładami.' },
-  fumot: { name: 'Fumot', emoji: '🐆', blurb: 'RandM Tornado i ECO — klasyki w bestowych cenach.' },
-  hifancy: { name: 'HIFANCY', emoji: '✨', blurb: 'Premium design i czysty smak do ostatniego puffs.' },
-  maskking: { name: 'Maskking', emoji: '🎭', blurb: 'Lekkie, przenośne urządzenia dla początkujących.' },
-  merrymi: { name: 'MerryMi', emoji: '🍬', blurb: 'Słodkie aromaty i stabilna jakość atomizacji.' },
-  stagbar: { name: 'Stagbar', emoji: '🦌', blurb: 'Rekordowa wydajność 6IN1 — do 180 000 puffs.' },
-  xcor: { name: 'XCOR', emoji: '⚡', blurb: 'Mocne baterie i intensywne, chłodzące smaki.' },
+  airmez: { name: 'AiRMEZ', blurb: 'Wydajne jednorazówki 4IN1 z wymiennymi wkładami.' },
+  fumot: { name: 'Fumot', blurb: 'RandM Tornado i ECO — klasyki w bestowych cenach.' },
+  hifancy: { name: 'HIFANCY', blurb: 'Premium design i czysty smak do ostatniego puffs.' },
+  maskking: { name: 'Maskking', blurb: 'Lekkie, przenośne urządzenia dla początkujących.' },
+  merrymi: { name: 'MerryMi', blurb: 'Słodkie aromaty i stabilna jakość atomizacji.' },
+  stagbar: { name: 'Stagbar', blurb: 'Rekordowa wydajność 6IN1 — do 180 000 puffs.' },
+  xcor: { name: 'XCOR', blurb: 'Mocne baterie i intensywne, chłodzące smaki.' },
 };
 export const BRAND_ORDER = ['airmez', 'fumot', 'hifancy', 'maskking', 'merrymi', 'stagbar', 'xcor'];
 
+// 口味分类：icon 名对应 templates.js 的 icon() SVG（droplet=果味, snowflake=冰薄荷, candy=甜, leaf=烟草）
 export const FLAVOR_CATS = {
-  fruity: { name: 'Fruity', emoji: '🍓', blurb: 'Owocowe aromaty — od arbuzowych po egzotyczne mieszanki.' },
-  'menthol-ice': { name: 'Menthol & Ice', emoji: '🧊', blurb: 'Chłodzące smaki z mentolem i lodową nutą.' },
-  'sweet-candy': { name: 'Sweet & Candy', emoji: '🍬', blurb: 'Słodkie, deserowe i bubblegumowe aromaty.' },
-  tobacco: { name: 'Tobacco', emoji: '🍂', blurb: 'Klasyczne tytoniowe nuty dla tradycjonalistów.' },
+  fruity: { name: 'Fruity', icon: 'droplet', blurb: 'Owocowe aromaty — od arbuzowych po egzotyczne mieszanki.' },
+  'menthol-ice': { name: 'Menthol & Ice', icon: 'snowflake', blurb: 'Chłodzące smaki z mentolem i lodową nutą.' },
+  'sweet-candy': { name: 'Sweet & Candy', icon: 'candy', blurb: 'Słodkie, deserowe i bubblegumowe aromaty.' },
+  tobacco: { name: 'Tobacco', icon: 'leaf', blurb: 'Klasyczne tytoniowe nuty dla tradycjonalistów.' },
 };
 
 // Topowe Trendy z README (pozycje sprzedażowe)
@@ -48,18 +50,18 @@ export const DISCOUNT_TIERS = [
 ];
 
 export const TOP_FLAVORS = [
-  { name: 'Watermelon Ice', medal: '🥇' },
-  { name: 'Strawberry Ice', medal: '🥈' },
-  { name: 'Strawberry Watermelon', medal: '🥉' },
-  { name: 'Grape Ice', medal: '4' },
-  { name: 'Lemon Lime', medal: '5' },
-  { name: 'Blueberry On Ice', medal: '6' },
-  { name: 'Strawberry Kiwi', medal: '7' },
-  { name: 'Kiwi Passion Fruit Guava', medal: '8' },
-  { name: 'Mixed Berries', medal: '9' },
-  { name: 'Blueberry Raspberry', medal: '10' },
-  { name: 'Mixed Berry', medal: '11' },
-  { name: 'Pink Lemonade', medal: '12' },
+  { name: 'Watermelon Ice', rank: 1 },
+  { name: 'Strawberry Ice', rank: 2 },
+  { name: 'Strawberry Watermelon', rank: 3 },
+  { name: 'Grape Ice', rank: 4 },
+  { name: 'Lemon Lime', rank: 5 },
+  { name: 'Blueberry On Ice', rank: 6 },
+  { name: 'Strawberry Kiwi', rank: 7 },
+  { name: 'Kiwi Passion Fruit Guava', rank: 8 },
+  { name: 'Mixed Berries', rank: 9 },
+  { name: 'Blueberry Raspberry', rank: 10 },
+  { name: 'Mixed Berry', rank: 11 },
+  { name: 'Pink Lemonade', rank: 12 },
 ];
 
 // FAQ strony głównej (AEO: pytanie → 2-3 zdania bezpośredniej odpowiedzi)
@@ -83,10 +85,6 @@ export const HOME_FAQ = [
   {
     q: 'Czy mogę zwrócić produkt?',
     a: 'Tak — masz 14 dni na odstąpienie od umowy bez podania przyczyny. Szczegóły opisaliśmy na stronie Zwroty. Uszkodzony lub wadliwy towar zgłaszasz jako reklamację (rękojmia).',
-  },
-  {
-    q: 'Jakie metody płatności są dostępne?',
-    a: 'Przy kasie na vapepl.com zapłacisz BLIK-iem lub szybkim przelewem. Pełna lista metod wyświetla się w trakcie składania zamówienia.',
   },
   {
     q: 'Czy sprzedajecie osobom niepełnoletnim?',
@@ -113,10 +111,9 @@ export const GUIDES = [
 ];
 
 export const WHY_US = [
-  { emoji: '✅', title: 'Gwarancja Jakości' },
-  { emoji: '🚚', title: 'Szybka Wysyłka' },
-  { emoji: '💳', title: 'Bezpieczne Płatności' },
-  { emoji: '🎁', title: 'Rabaty Ilościowe' },
+  { icon: 'shield-check', title: 'Gwarancja Jakości' },
+  { icon: 'truck', title: 'Szybka Wysyłka' },
+  { icon: 'percent', title: 'Rabaty Ilościowe' },
 ];
 
 export const CONTACT = {

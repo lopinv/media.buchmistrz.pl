@@ -28,6 +28,33 @@ const esc = (s) =>
     .replaceAll('"', '&quot;')
     .replaceAll("'", '&#39;');
 
+// ---------- SVG 图标（内联，currentColor，1.5px 线性，24 视口）----------
+const ICONS = {
+  'shield-check': '<path d="M12 3l7 3v5c0 4.6-3 8.4-7 10-4-1.6-7-5.4-7-10V6l7-3z"/><path d="M9.2 12.2l2 2 3.6-4"/>',
+  truck: '<path d="M3 7h11v8H3z"/><path d="M14 10h4l3 3v2h-7z"/><circle cx="7" cy="18" r="1.8"/><circle cx="17.5" cy="18" r="1.8"/>',
+  percent: '<path d="M19 5L5 19"/><circle cx="7.5" cy="7.5" r="2.2"/><circle cx="16.5" cy="16.5" r="2.2"/>',
+  phone: '<path d="M5 4h4l1.5 4.5L8 10a12 12 0 0 0 6 6l1.5-2.5L20 15v4a2 2 0 0 1-2 2A14 14 0 0 1 3 6a2 2 0 0 1 2-2z"/>',
+  message: '<path d="M4 5h16v11H8l-4 4z"/>',
+  send: '<path d="M4 12l16-8-6 16-3-6-7-2z"/><path d="M20 4l-9 9"/>',
+  mail: '<rect x="3" y="5" width="18" height="14" rx="2"/><path d="M3 7l9 6 9-6"/>',
+  droplet: '<path d="M12 3s6 6.4 6 10.2a6 6 0 1 1-12 0C6 9.4 12 3 12 3z"/>',
+  snowflake: '<path d="M12 2v20M4 6l16 12M20 6L4 18M12 2l-2 3h4l-2-3zm0 20l-2-3h4l-2 3z"/>',
+  candy: '<circle cx="12" cy="12" r="5"/><path d="M7.5 7.5L4 4m0 5l5-5m9 8l3.5 3.5M20 12l-5 5m5-11l-3.5 3.5"/>',
+  leaf: '<path d="M5 20c0-8 4-13 14-14-1 10-6 14-14 14z"/><path d="M5 20c3-5 6-8 10-10"/>',
+  star: '<path d="M12 3.5l2.6 5.3 5.9.9-4.3 4.1 1 5.8-5.2-2.7-5.2 2.7 1-5.8L3.5 9.7l5.9-.9L12 3.5z"/>',
+};
+const icon = (name, cls = 'icon') =>
+  `<svg class="${cls}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${ICONS[name] ?? ''}</svg>`;
+// 星级（5 枚，filled 星 + 空星）
+const starRow = (filled) =>
+  [1, 2, 3, 4, 5]
+    .map((i) =>
+      i <= filled
+        ? `<svg class="icon" viewBox="0 0 24 24" fill="currentColor" stroke="none" aria-hidden="true"><path d="M12 3.5l2.6 5.3 5.9.9-4.3 4.1 1 5.8-5.2-2.7-5.2 2.7 1-5.8L3.5 9.7l5.9-.9L12 3.5z"/></svg>`
+        : `<svg class="icon is-empty" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><path d="M12 3.5l2.6 5.3 5.9.9-4.3 4.1 1 5.8-5.2-2.7-5.2 2.7 1-5.8L3.5 9.7l5.9-.9L12 3.5z"/></svg>`,
+    )
+    .join('');
+
 export const fmtPuffs = (n) => (n ? new Intl.NumberFormat('pl-PL').format(n) : null);
 export const fmtZl = (n) =>
   n === null || n === undefined
@@ -83,18 +110,16 @@ function header() {
   const brandCats = BRAND_ORDER.map((slug) => ({
     slug,
     name: BRANDS[slug]?.name ?? slug,
-    emoji: BRANDS[slug]?.emoji ?? '',
   }));
   const flavorCats = Object.entries(FLAVOR_CATS).map(([slug, c]) => ({
     slug,
     name: c.name,
-    emoji: c.emoji,
   }));
   const brandSubs = brandCats
-    .map((c) => `<a class="nav-sub" href="/kategoria/${c.slug}/">${c.emoji} ${esc(c.name)}</a>`)
+    .map((c) => `<a class="nav-sub" href="/kategoria/${c.slug}/">${esc(c.name)}</a>`)
     .join('');
   const flavorSubs = flavorCats
-    .map((c) => `<a class="nav-sub" href="/kategoria/${c.slug}/">${c.emoji} ${esc(c.name)}</a>`)
+    .map((c) => `<a class="nav-sub" href="/kategoria/${c.slug}/">${esc(c.name)}</a>`)
     .join('');
   return `
   <a class="skip-link" href="#tresc">Przejdź do treści</a>
@@ -160,7 +185,7 @@ function footer() {
         <p class="footer-title">Smaki</p>
         <ul>
           ${Object.entries(FLAVOR_CATS)
-            .map(([slug, c]) => `<li><a href="/kategoria/${slug}/">${c.emoji} ${esc(c.name)}</a></li>`)
+            .map(([slug, c]) => `<li><a href="/kategoria/${slug}/">${esc(c.name)}</a></li>`)
             .join('')}
         </ul>
       </div>
@@ -179,7 +204,7 @@ function footer() {
       <p><a href="${VAPEPL}" rel="nofollow">vapepl.com</a> · <a href="${VAPEPL_RETURNS}" rel="nofollow">Polityka zwrotów</a> · <a href="/zwroty/">Zwroty</a></p>
     </div>
   </footer>
-  <div class="age-note" role="note">🔞 Produkty tytoniowe i e-papierosy przeznaczone wyłącznie dla osób pełnoletnich (18+).</div>`;
+  <div class="age-note" role="note"><strong>18+</strong> · Produkty tytoniowe i e-papierosy przeznaczone wyłącznie dla osób pełnoletnich (18+).</div>`;
 }
 
 // ---------- 页面骨架 ----------
@@ -216,10 +241,9 @@ export function page({
   <meta name="twitter:description" content="${esc(description)}">
   ${image ? `<meta name="twitter:image" content="${esc(image)}">\n` : ''}
   <meta name="robots" content="${noFollow ? 'noindex, follow' : 'index, follow'}">
-  <meta name="theme-color" content="#0f172a">
+  <meta name="theme-color" content="#070b14">
   <meta name="format-detection" content="telephone=yes">
-  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🌬️</text></svg>">
-  <link rel="preload" as="style" href="/style.css">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='8' fill='%2322d3ee'/><text x='16' y='22' font-family='sans-serif' font-size='18' font-weight='800' fill='%2304141a' text-anchor='middle'>V</text></svg>">
   <link rel="stylesheet" href="/style.css">
   ${ldScripts}
   <script src="/script.js" defer></script>
@@ -363,7 +387,7 @@ export function trustStrip() {
       ${WHY_US.map(
         (w) => `
       <div class="trust-item">
-        <span class="trust-emoji" aria-hidden="true">${w.emoji}</span>
+        ${icon(w.icon)}
         <b>${esc(w.title)}</b>
       </div>`,
       )
@@ -377,7 +401,7 @@ export function ctaBanner() {
   <section class="cta-banner" aria-label="Kup na vapepl.com">
     <div class="container">
       <h2>Gotowy na zakup?</h2>
-      <p>Zamówienia realizujemy w sklepie <strong>vapepl.com</strong> — polski magazyn, Paczkomaty InPost i kurier DPD, płatność BLIK-iem.</p>
+      <p>Zamówienia realizujemy w sklepie <strong>vapepl.com</strong> — polski magazyn, Paczkomaty InPost i kurier DPD.</p>
       <a class="btn btn-primary btn-lg" href="${VAPEPL}" rel="nofollow">Przejdź do sklepu →</a>
     </div>
   </section>`;
@@ -392,7 +416,7 @@ export function reviewsBlock() {
         ${REVIEWS.map(
           (r) => `
       <blockquote class="review">
-        <p class="review-stars" aria-label="Ocena: ${r.stars} z 5">${'★'.repeat(r.stars)}${'☆'.repeat(5 - r.stars)}</p>
+        <p class="review-stars" aria-label="Ocena: ${r.stars} z 5">${starRow(r.stars)}</p>
         <p>„${esc(r.text)}”</p>
         <footer>— ${esc(r.author)}</footer>
       </blockquote>`,
@@ -505,7 +529,7 @@ export function renderHome(data) {
           .map(
             (c) => `
       <a class="brand-card" href="/kategoria/${esc(c.slug)}/">
-        <span class="brand-emoji" aria-hidden="true">${BRANDS[c.slug]?.emoji ?? ''}</span>
+        <span class="brand-initial" aria-hidden="true">${esc((BRANDS[c.slug]?.name ?? c.name).charAt(0))}</span>
         <b>${esc(c.name)}</b>
         <span>${c.count} produkt${c.count === 1 ? '' : 'y'}</span>
         <i class="sr-only">${esc(BRANDS[c.slug]?.blurb ?? '')}</i>
@@ -524,7 +548,8 @@ export function renderHome(data) {
             (c) => `
       <a class="flavor-card" href="/kategoria/${esc(c.slug)}/">
         ${c.image ? `<img src="${esc(c.image)}" alt="" loading="lazy">` : ''}
-        <b>${c.emoji} ${esc(c.name)}</b>
+        ${icon(c.icon)}
+        <b>${esc(c.name)}</b>
         <span>${c.count} produktów</span>
       </a>`,
           )
@@ -532,7 +557,7 @@ export function renderHome(data) {
       </div>
       <h3 class="subhead">Najpopularniejsze smaki</h3>
       <ul class="top-flavors">
-        ${TOP_FLAVORS.map((f) => `<li><span aria-hidden="true">${f.medal}</span> ${esc(f.name)}</li>`).join('')}
+        ${TOP_FLAVORS.map((f) => `<li><span class="flavor-rank${f.rank <= 3 ? ` top-${f.rank}` : ''}" aria-hidden="true">${f.rank}</span> ${esc(f.name)}</li>`).join('')}
       </ul>
     </div>
   </section>
@@ -575,7 +600,7 @@ export function renderShop(data) {
   ${trustStrip()}
   <section class="section section--center" aria-labelledby="top-title">
     <div class="container">
-      <h2 id="top-title">🔥 Bestselleri</h2>
+      <h2 id="top-title">Bestselleri</h2>
       <div class="product-grid">
         ${top.map((p, i) => productCard(p, i + 1)).join('')}
       </div>
@@ -599,7 +624,7 @@ export function renderShop(data) {
     title: `Sklep z jednorazówkami i e-papierosami — ${data.products.length} modeli | ${SITE_NAME}`,
     description: `Pełna oferta ${data.products.length} jednorazówek w promocji: ceny od ${fmtZl(
       Math.min(...data.products.map((p) => p.price)),
-    )}, 220 smaków do wyboru. Rabat ilościowy do −20%. Zakaupy na vapepl.com.`,
+    )}, 220 smaków do wyboru. Rabat ilościowy do −20%. Zakup na vapepl.com.`,
     canonical: SITE + '/sklep/',
     jsonld,
     body,
@@ -822,7 +847,7 @@ export function renderFlavor(data, product, flavor) {
       },
       {
         q: 'Jak złożyć zamówienie na ten smak?',
-        a: `Kliknij przycisk „Kup smak ${flavor.name}” powyżej — otworzy on kartę produktu na vapepl.com z wybranym wariantem. Płatność BLIK-iem lub szybkim przelewem; odbiór Paczkomatem InPost lub kurierem DPD.`,
+        a: `Kliknij przycisk „Kup smak ${flavor.name}” powyżej — otworzy on kartę produktu na vapepl.com z wybranym wariantem. Odbiór Paczkomatem InPost lub kurierem DPD.`,
       },
     ],
     3,
@@ -857,22 +882,22 @@ export function renderContact(data) {
   <section class="section contact">
     <div class="container contact-grid">
       <a class="contact-card" href="${CONTACT.phoneHref}">
-        <span aria-hidden="true">📱</span>
+        ${icon('phone')}
         <b>Telefon</b>
         <span>${esc(CONTACT.phone)}</span>
       </a>
       <a class="contact-card" href="${esc(CONTACT.whatsapp)}" rel="nofollow">
-        <span aria-hidden="true">💬</span>
+        ${icon('message')}
         <b>WhatsApp</b>
         <span>${esc(CONTACT.phone)}</span>
       </a>
       <a class="contact-card" href="${esc(CONTACT.telegram.href)}" rel="nofollow">
-        <span aria-hidden="true">✈️</span>
+        ${icon('send')}
         <b>Telegram</b>
         <span>${esc(CONTACT.telegram.label)}</span>
       </a>
       <a class="contact-card" href="mailto:${esc(CONTACT.email)}">
-        <span aria-hidden="true">📧</span>
+        ${icon('mail')}
         <b>E-mail</b>
         <span>${esc(CONTACT.email)}</span>
       </a>
