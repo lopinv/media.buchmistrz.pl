@@ -338,17 +338,24 @@ export function faqBlock(questions, limit) {
 }
 
 export function discountBlock() {
+  const tiers = DISCOUNT_TIERS;
+  const lastIdx = tiers.length - 1;
   return `
   <section class="section discount section--center" aria-labelledby="discount-title">
     <div class="container">
-      <h2 id="discount-title">Rabat ilościowy</h2>
-      <p>Kupując kilka sztuk tego samego produktu, automatycznie otrzymujesz rabat progowy:</p>
-      <table class="discount-table">
-        <thead><tr><th>Ilość sztuk</th><th>Rabat</th></tr></thead>
-        <tbody>
-          ${DISCOUNT_TIERS.map((t) => `<tr><td>${esc(t.qty)}</td><td class="discount-off">${esc(t.off)}</td></tr>`).join('')}
-        </tbody>
-      </table>
+      <p class="discount-eyebrow">Kupujesz więcej — płacisz mniej</p>
+      <h2 id="discount-title">Rabat ilościowy do −20%</h2>
+      <p>Kupując kilka sztuk tego samego produktu, automatycznie otrzymujesz rabat progowy. Rabat naliczamy w koszyku — bez kodów.</p>
+      <div class="discount-tiers">
+        ${tiers
+          .map((t, i) => `
+        <div class="discount-tier${i === lastIdx ? ' is-featured' : ''}">
+          ${i === lastIdx ? '<span class="tier-badge">Największy rabat</span>' : ''}
+          <span class="tier-qty">${esc(t.qty)}</span>
+          <b class="tier-off">${esc(t.off)}</b>
+        </div>`)
+          .join('')}
+      </div>
       <div class="discount-cta">
         <a class="btn btn-primary btn-lg" href="/sklep/">Zobacz sklep</a>
       </div>
