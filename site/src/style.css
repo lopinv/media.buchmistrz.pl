@@ -126,6 +126,11 @@ img { max-width: 100%; height: auto; display: block; }
 .breadcrumbs { padding: 14px 0; }
 .breadcrumbs ol { list-style: none; display: flex; flex-wrap: wrap; gap: 8px; margin: 0; padding: 0; }
 .breadcrumbs li { color: var(--ink-soft); font-size: 14px; }
+.breadcrumbs li + li::before {
+  content: "/";
+  margin-right: 8px;
+  color: var(--line);
+}
 .breadcrumbs a { color: var(--ink-soft); text-decoration: none; }
 .breadcrumbs a:hover { color: var(--brand-dark); }
 .breadcrumbs li[aria-current] { color: var(--ink); font-weight: 600; }
@@ -279,7 +284,7 @@ img { max-width: 100%; height: auto; display: block; }
 /* ---------- CTA banner ---------- */
 .cta-banner { background: linear-gradient(135deg, var(--brand-dark), var(--brand)); color: #fff; text-align: center; }
 .cta-banner .container { padding-block: 40px; max-width: 640px; }
-.cta-banner h2 { margin: 0 0 8px; }
+.cta-banner h2 { font-size: clamp(20px, 3vw, 26px); margin: 0 0 8px; }
 .cta-banner p { margin: 0 0 20px; }
 .cta-banner .btn-primary { background: #fff; color: var(--brand-dark); }
 
@@ -362,6 +367,7 @@ img { max-width: 100%; height: auto; display: block; }
   .card-price strong { font-size: 22px; }
   .card-actions { flex-direction: row; gap: 8px; }
   .card-actions .btn { flex: 1; padding: 10px 12px; font-size: 15px; }
+  .trust-strip .container { grid-template-columns: repeat(2, 1fr); }
   .reviews-grid { grid-template-columns: repeat(2, 1fr); }
   .contact-grid { grid-template-columns: repeat(2, 1fr); }
   .top-flavors { grid-template-columns: repeat(2, 1fr); }

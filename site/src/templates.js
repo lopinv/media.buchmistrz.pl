@@ -471,10 +471,10 @@ export function renderHome(data) {
           <a class="btn btn-ghost btn-lg" href="/kontakt/">Kontakt</a>
         </div>
         <ul class="hero-stats" aria-label="Statystyki sklepu">
-          <li><b>${STATS.productsLabel}</b> produktów</li>
-          <li><b>${STATS.brandsLabel}</b> marek</li>
-          <li><b>od ${fmtZl(Math.min(...data.products.map((p) => p.price)))}</b></li>
-          <li><b>${STATS.ratingLabel}</b> opinie</li>
+          <li><b>${STATS.productsLabel}</b><span>produktów</span></li>
+          <li><b>${STATS.brandsLabel}</b><span>marek</span></li>
+          <li><b>${fmtZl(Math.min(...data.products.map((p) => p.price)))}</b><span>ceny od</span></li>
+          <li><b>${STATS.ratingLabel}</b><span>opinie</span></li>
         </ul>
       </div>
       ${heroImage ? `
