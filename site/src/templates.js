@@ -185,6 +185,7 @@ function footer() {
         <p class="footer-title">Smaki</p>
         <ul>
           ${Object.entries(FLAVOR_CATS)
+            .slice(0, 4)
             .map(([slug, c]) => `<li><a href="/kategoria/${slug}/">${esc(c.name)}</a></li>`)
             .join('')}
         </ul>
