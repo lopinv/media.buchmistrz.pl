@@ -36,6 +36,7 @@ export const REVIEWS = [
   { stars: 4, text: 'Cała nasza ekipa już to używa.', author: 'Magda L.' },
   { stars: 4, text: 'Przyjemne doznanie, bez gryzącego posmaku.', author: 'Jan P.' },
   { stars: 4, text: 'Stabilna jakość, zamawiam regularnie.', author: 'Kovács A.' },
+  { stars: 5, text: 'Szybka wysyłka, solidne opakowanie bez zarysowań.', author: 'Piotr W.' },
   { stars: 4, text: 'Bateria spokojnie trzyma dwa dni.', author: 'Tomasz N.' },
 ];
 
