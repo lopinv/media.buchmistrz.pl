@@ -263,7 +263,7 @@ a.brand-card:hover, a.flavor-card:hover, a.contact-card:hover,
   width: calc(min(100%, var(--maxw)) - 40px);
 }
 
-/* ---------- 折扣区（灰底上暖色卡，内容通栏两端对齐）---------- */
+/* ---------- 折扣区（灰底上暖色卡，阶梯档位卡：2 列 → 桌面 4 列，最高档深色高亮）---------- */
 .discount .container {
   background: linear-gradient(135deg, #fffbeb, #fef3c7);
   border: 1px solid #fde68a;
@@ -271,17 +271,37 @@ a.brand-card:hover, a.flavor-card:hover, a.contact-card:hover,
   padding: clamp(20px, 4vw, 32px);
   text-align: center;
 }
-.discount-table {
-  width: 100%;
-  border-collapse: collapse; background: var(--surface);
-  border-radius: var(--radius-sm); overflow: hidden;
+.discount-eyebrow {
+  text-transform: uppercase; letter-spacing: 0.1em;
+  font-size: 12px; font-weight: 700; color: #92400e; margin: 0 0 8px;
 }
-.discount-table th, .discount-table td { padding: 14px 16px; text-align: center; border-bottom: 1px solid var(--line); }
-.discount-table th {
-  font-size: 13px; text-transform: uppercase; letter-spacing: 0.04em;
-  color: var(--ink-soft); background: var(--bg); font-weight: 700;
+.discount h2 { margin-bottom: 8px; }
+.discount .container > p { margin-top: 0; }
+.discount-tiers {
+  display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px;
+  margin: 24px 0 4px;
 }
-.discount-off { font-weight: 800; color: var(--danger); font-size: 18px; }
+.discount-tier {
+  position: relative;
+  background: var(--surface);
+  border: 1px solid var(--line); border-radius: var(--radius-sm);
+  padding: 18px 12px 16px;
+  display: flex; flex-direction: column; align-items: center; gap: 2px;
+}
+.tier-qty { font-size: 14px; color: var(--ink-soft); font-weight: 600; }
+.tier-off { font-size: 26px; font-weight: 800; color: var(--danger); line-height: 1.2; }
+.discount-tier.is-featured {
+  background: var(--ink); border-color: var(--ink);
+  box-shadow: var(--shadow);
+}
+.discount-tier.is-featured .tier-qty { color: #cbd5e1; }
+.discount-tier.is-featured .tier-off { color: var(--accent); }
+.tier-badge {
+  position: absolute; top: -11px; left: 50%; transform: translateX(-50%);
+  background: var(--accent); color: #241a05;
+  font-size: 11px; font-weight: 800; letter-spacing: 0.02em;
+  padding: 3px 10px; border-radius: 999px; white-space: nowrap;
+}
 .discount-cta { margin-top: 20px; }
 .discount-cta .btn { min-width: 180px; display: inline-block; }
 
@@ -428,6 +448,7 @@ a.brand-card:hover, a.flavor-card:hover, a.contact-card:hover,
   .section { padding-block: 56px; }
   .cta-banner .container { padding-block: 56px; }
 
+  .discount-tiers { grid-template-columns: repeat(4, 1fr); }
   .product-grid { grid-template-columns: repeat(4, 1fr); }
   .reviews-grid { grid-template-columns: repeat(3, 1fr); }
   .contact-grid { grid-template-columns: repeat(4, 1fr); }
