@@ -136,7 +136,7 @@ function header() {
           ${link('/zwroty/', 'Zwroty')}
         </div>
       </nav>
-      <a class="btn btn-cta header-cta" href="/sklep/">Kup teraz</a>
+      <a class="btn btn-cta" href="/sklep/">Kup teraz</a>
     </div>
   </header>`;
 }
@@ -319,8 +319,8 @@ export function faqLd(questions) {
 export function faqBlock(questions, limit) {
   const list = limit ? questions.slice(0, limit) : questions;
   return `
-  <section class="section faq" aria-labelledby="faq-title">
-    <div class="container container-faq">
+  <section class="section faq section--center" aria-labelledby="faq-title">
+    <div class="container">
       <h2 id="faq-title">Najczęstsze pytania</h2>
       <dl class="faq-list">
         ${list
@@ -339,7 +339,7 @@ export function faqBlock(questions, limit) {
 
 export function discountBlock() {
   return `
-  <section class="section discount" aria-labelledby="discount-title">
+  <section class="section discount section--center" aria-labelledby="discount-title">
     <div class="container">
       <h2 id="discount-title">Rabat ilościowy</h2>
       <p>Kupując kilka sztuk tego samego produktu, automatycznie otrzymujesz rabat progowy:</p>
@@ -386,7 +386,7 @@ export function ctaBanner() {
 
 export function reviewsBlock() {
   return `
-  <section class="section reviews" aria-labelledby="reviews-title">
+  <section class="section reviews section--center" aria-labelledby="reviews-title">
     <div class="container">
       <h2 id="reviews-title">Opinie klientów</h2>
       <div class="reviews-grid">
@@ -408,7 +408,7 @@ export function productCard(product, rank) {
   const pct = discountPct(product);
   const cardUrl = `/produkt/${product.slug}/`;
   return `
-  <article class="product-card${rank ? ' is-ranked' : ''}">
+  <article class="product-card">
     ${rank ? `<span class="card-rank" aria-label="Pozycja ${rank}">#${rank}</span>` : ''}
     ${pct ? `<span class="card-badge">-${pct}%</span>` : ''}
     <a class="card-media" href="${esc(cardUrl)}">
@@ -485,7 +485,7 @@ export function renderHome(data) {
     </div>
   </section>
   ${trustStrip()}
-  <section class="section" aria-labelledby="top-title">
+  <section class="section section--center" aria-labelledby="top-title">
     <div class="container">
       <div class="section-head">
         <h2 id="top-title">Topowe trendy</h2>
@@ -496,7 +496,7 @@ export function renderHome(data) {
       </div>
     </div>
   </section>
-  <section class="section brands" aria-labelledby="brands-title">
+  <section class="section brands section--center" aria-labelledby="brands-title">
     <div class="container">
       <h2 id="brands-title">Nasze marki</h2>
       <div class="brand-grid">
@@ -516,7 +516,7 @@ export function renderHome(data) {
       </div>
     </div>
   </section>
-  <section class="section flavors" aria-labelledby="flavor-title">
+  <section class="section flavors section--center" aria-labelledby="flavor-title">
     <div class="container">
       <h2 id="flavor-title">Kategorie smaków</h2>
       <div class="flavor-grid">
@@ -539,7 +539,7 @@ export function renderHome(data) {
   </section>
   ${discountBlock()}
   ${reviewsBlock()}
-  <section class="section guides" aria-labelledby="guides-title">
+  <section class="section guides section--white section--center" aria-labelledby="guides-title">
     <div class="container">
       <h2 id="guides-title">Wiedza o e-papierosach</h2>
       <p>30 poradników na <a href="${VAPEPL}" rel="nofollow">vapepl.com</a> — wybrane artykuły:</p>
@@ -573,7 +573,7 @@ export function renderShop(data) {
     </div>
   </section>
   ${trustStrip()}
-  <section class="section" aria-labelledby="top-title">
+  <section class="section section--center" aria-labelledby="top-title">
     <div class="container">
       <h2 id="top-title">🔥 Bestselleri</h2>
       <div class="product-grid">
@@ -581,8 +581,8 @@ export function renderShop(data) {
       </div>
     </div>
   </section>
-  <section class="section" aria-labelledby="catalog-title">
-    <div class="container">
+  <section class="section section--center" aria-labelledby="catalog-title">
+      <div class="container product-grid">
       <h2 id="catalog-title">Pełna oferta</h2>
       ${data.products.map((p) => productCard(p)).join('')}
     </div>
@@ -723,7 +723,7 @@ export function renderProduct(data, product) {
     </div>
   </section>
   ${flavors.length ? `
-  <section class="section flavors-list" aria-labelledby="flavors-title">
+  <section class="section flavors-list section--center" aria-labelledby="flavors-title">
     <div class="container">
       <h2 id="flavors-title">Wybierz smak</h2>
       <p>Każdy smak ma swoją stronę — porównaj i kup wybrany wariant na vapepl.com.</p>
@@ -800,7 +800,7 @@ export function renderFlavor(data, product, flavor) {
       </div>
     </div>
   </section>
-  <section class="section" aria-labelledby="related-title">
+  <section class="section section--center" aria-labelledby="related-title">
     <div class="container">
       <h2 id="related-title">Inne smaki modelu ${esc(product.name)}</h2>
       <div class="flavor-chips">
@@ -918,7 +918,7 @@ export function renderReturns(data) {
       <p>Możesz nadać paczkę <strong>InPost Paczkomatem</strong> lub <strong>DPD Pickup</strong>. W paczce dołącz dowód zakupu i krótką notatkę z powodem zwrotu.</p>
       <h2>Rękojmia</h2>
       <p>Wadliwy towar rozpatrujemy w ramach rękojmi — zgłoś reklamację ze zdjęciami. Sklep zweryfikuje produkt w terminie 14 dni i podejmie jedną z trzech akcji: naprawa, wymiana lub zwrot.</p>
-      <p class="returns-link">Pełna treść: <a href="${VAPEPL_RETURNS}" rel="nofollow">Polityka Zwrotów na vapepl.com →</a></p>
+      <p class="returns-cta">Pełna treść: <a href="${VAPEPL_RETURNS}" rel="nofollow">Polityka Zwrotów na vapepl.com →</a></p>
     </div>
   </section>
   ${ctaBanner()}`;
@@ -933,12 +933,16 @@ export function renderReturns(data) {
 
 export function render404(data) {
   const body = `
-  <section class="section not-found">
+  <section class="page-hero">
     <div class="container">
       <h1>Strona nie znaleziona</h1>
       <p>Nie mamy tej podstrony. Wróć do sklepu lub sprawdź listę produktów.</p>
-      <a class="btn btn-primary" href="/sklep/">Wróć do sklepu</a>
-      <a class="btn btn-ghost" href="/">Strona główna</a>
+    </div>
+  </section>
+  <section class="section not-found section--center">
+    <div class="container">
+      <a class="btn btn-primary btn-lg" href="/sklep/">Wróć do sklepu</a>
+      <a class="btn btn-ghost btn-lg" href="/">Strona główna</a>
     </div>
   </section>`;
   return page({
