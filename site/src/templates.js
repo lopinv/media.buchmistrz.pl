@@ -169,37 +169,6 @@ function header() {
 function footer() {
   return `
   <footer class="site-footer">
-    <div class="container footer-grid">
-      <div>
-        <p class="footer-brand">${SITE_NAME}</p>
-        <p>Jednorazówki, pody i e-papierosy — od ${STATS.since} roku. Polski magazyn, Paczkomaty InPost i kurier DPD.</p>
-      </div>
-      <div>
-        <p class="footer-title">Sklep</p>
-        <ul>
-          <li><a href="/sklep/">Wszystkie produkty</a></li>
-          ${BRAND_ORDER.slice(0, 3).map((s) => `<li><a href="/kategoria/${s}/">${BRANDS[s].name}</a></li>`).join('')}
-        </ul>
-      </div>
-      <div>
-        <p class="footer-title">Smaki</p>
-        <ul>
-          ${Object.entries(FLAVOR_CATS)
-            .slice(0, 4)
-            .map(([slug, c]) => `<li><a href="/kategoria/${slug}/">${esc(c.name)}</a></li>`)
-            .join('')}
-        </ul>
-      </div>
-      <div>
-        <p class="footer-title">Kontakt</p>
-        <ul>
-          <li><a href="${CONTACT.phoneHref}">${CONTACT.phone}</a></li>
-          <li><a href="${esc(CONTACT.whatsapp)}" rel="nofollow">WhatsApp ${CONTACT.phone}</a></li>
-          <li><a href="${esc(CONTACT.telegram.href)}" rel="nofollow">${CONTACT.telegram.label}</a></li>
-          <li><a href="mailto:${esc(CONTACT.email)}">${esc(CONTACT.email)}</a></li>
-        </ul>
-      </div>
-    </div>
     <div class="container footer-bar">
       <p>© ${STATS.since}–2026 ${SITE_NAME} · Sprzedaż wyłącznie dla osób 18+.</p>
       <p><a href="${VAPEPL}" rel="nofollow">vapepl.com</a> · <a href="${VAPEPL_RETURNS}" rel="nofollow">Polityka zwrotów</a> · <a href="/zwroty/">Zwroty</a></p>
