@@ -52,13 +52,15 @@ export function breadcrumbs(items) {
   const trail = [{ label: 'Strona główna', url: '/' }, ...items];
   const html = `
     <nav class="breadcrumbs" aria-label="Ścieżka nawigacji">
-      <ol>${trail
-        .map((b, i) =>
-          i === trail.length - 1
-            ? `<li aria-current="page">${esc(b.label)}</li>`
-            : `<li><a href="${esc(b.url)}">${esc(b.label)}</a></li>`,
-        )
-        .join('')}</ol>
+      <div class="container">
+        <ol>${trail
+          .map((b, i) =>
+            i === trail.length - 1
+              ? `<li aria-current="page">${esc(b.label)}</li>`
+              : `<li><a href="${esc(b.url)}">${esc(b.label)}</a></li>`,
+          )
+          .join('')}</ol>
+      </div>
     </nav>`;
   const ld = [
     {
