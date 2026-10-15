@@ -484,6 +484,7 @@ export function renderHome(data) {
       </figure>` : ''}
     </div>
   </section>
+  ${discountBlock()}
   ${trustStrip()}
   <section class="section section--center" aria-labelledby="top-title">
     <div class="container">
@@ -538,7 +539,6 @@ export function renderHome(data) {
       </ul>
     </div>
   </section>
-  ${discountBlock()}
   ${reviewsBlock()}
   <section class="section guides section--white section--center" aria-labelledby="guides-title">
     <div class="container">
