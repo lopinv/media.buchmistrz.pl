@@ -113,9 +113,15 @@ for (const file of htmlFiles) {
 
 let jsonLdErrors = 0;
 const linkErrors = new Set();
+let objectErrors = 0;
 
 for (const file of htmlFiles) {
   const html = readFileSync(join(DIST, file), 'utf8');
+  // 模板插值对象未取 .html 时会漏出 "[object Object]"，构建即报错
+  if (/\[object Object\]/.test(html)) {
+    objectErrors += 1;
+    console.error(`✘ 检测到 [object Object]（模板插值了对象）: ${file}`);
+  }
   for (const m of html.matchAll(/<script type="application\/ld\+json">([\s\S]*?)<\/script>/g)) {
     try {
       JSON.parse(m[1]);
@@ -149,6 +155,7 @@ console.log(
     `✔ dist 文件总数: ${distFiles.size}`,
     jsonLdErrors ? `✘ JSON-LD 错误: ${jsonLdErrors}` : '✔ JSON-LD 全部合法',
     linkErrors.size ? `✘ 断链 ${linkErrors.size} 处: ${[...linkErrors].slice(0, 10).join(', ')}` : '✔ 站内链接全部可达',
+    objectErrors ? `✘ [object Object] 泄漏: ${objectErrors} 页` : '✔ 无 [object Object] 泄漏',
   ].join('\n'),
 );
-if (jsonLdErrors || linkErrors.size) process.exit(1);
+if (jsonLdErrors || linkErrors.size || objectErrors) process.exit(1);
