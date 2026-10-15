@@ -392,7 +392,7 @@ export function ctaBanner() {
 
 export function reviewsBlock() {
   return `
-  <section class="section reviews section--center" aria-labelledby="reviews-title">
+  <section class="section reviews" aria-labelledby="reviews-title">
     <div class="container">
       <h2 id="reviews-title">Opinie klientów</h2>
       <div class="reviews-grid">
