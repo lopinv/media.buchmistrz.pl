@@ -574,6 +574,7 @@ export function renderShop(data) {
       <p>Wybierz model, zobacz smaki i ceny, a zakup sfinalizujesz w <a href="${VAPEPL}" rel="nofollow">vapepl.com</a>. Wszystkie produkty w promocji.</p>
     </div>
   </section>
+  ${discountBlock()}
   ${trustStrip()}
   <section class="section section--center" aria-labelledby="top-title">
     <div class="container">
@@ -589,7 +590,6 @@ export function renderShop(data) {
       ${data.products.map((p) => productCard(p)).join('')}
     </div>
   </section>
-  ${discountBlock()}
   ${faqBlock(HOME_FAQ, 4)}
   ${ctaBanner()}`;
   const jsonld = [
@@ -647,12 +647,12 @@ export function renderCategory(data, category) {
       }.</p>
     </div>
   </section>
+  ${discountBlock()}
   <section class="section">
     <div class="container product-grid">
       ${products.length ? products.map((p) => productCard(p)).join('') : '<p>Brak produktów w tej kategorii.</p>'}
     </div>
   </section>
-  ${discountBlock()}
   ${ctaBanner()}`;
   return page({
     title,
@@ -724,6 +724,7 @@ export function renderProduct(data, product) {
       </div>
     </div>
   </section>
+  ${discountBlock()}
   ${flavors.length ? `
   <section class="section flavors-list section--center" aria-labelledby="flavors-title">
     <div class="container">
@@ -734,7 +735,6 @@ export function renderProduct(data, product) {
       </div>
     </div>
   </section>` : ''}
-  ${discountBlock()}
   ${faqBlock(HOME_FAQ, 3)}
   ${ctaBanner()}`;
   return page({
@@ -803,6 +803,7 @@ export function renderFlavor(data, product, flavor) {
       </div>
     </div>
   </section>
+  ${discountBlock()}
   <section class="section section--center" aria-labelledby="related-title">
     <div class="container">
       <h2 id="related-title">Inne smaki modelu ${esc(product.name)}</h2>
@@ -811,7 +812,6 @@ export function renderFlavor(data, product, flavor) {
       </div>
     </div>
   </section>
-  ${discountBlock()}
   ${faqBlock(
     [
       {
