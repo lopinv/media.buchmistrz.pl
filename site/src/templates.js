@@ -795,9 +795,12 @@ export function renderShop(data) {
 }
 
 export function renderCategory(data, category) {
-  const products = data.products.filter((p) =>
-    p.categories.some((c) => c.slug === category.slug),
-  );
+  // 分类成员优先用 categoryMembers（分类接口权威映射，覆盖产品侧标签与分类
+  // count 不一致的情况，如 tobacco）；缺失时回退到产品自带分类
+  const members = data.categoryMembers?.[category.slug];
+  const products = members
+    ? data.products.filter((p) => members.includes(p.slug))
+    : data.products.filter((p) => p.categories.some((c) => c.slug === category.slug));
   const meta =
     category.kind === 'brand'
       ? BRANDS[category.slug] ?? { name: category.name, blurb: '' }

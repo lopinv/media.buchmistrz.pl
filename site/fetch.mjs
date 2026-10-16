@@ -93,6 +93,19 @@ async function main() {
   // 畅销榜：以 WooCommerce 当前累计销量（popularity）实时排序，取前 8
   const topSellers = popularity.map((p) => p.slug);
 
+  // 分类成员映射：以「分类接口按 id 拉成员」为准（产品侧分类标签与分类 count 可能
+  // 不一致，如 tobacco 分类含 2 款但其产品标签未挂 tobacco）。键 = 分类 slug
+  const categoryMembers = {};
+  for (const c of rawCategories) {
+    try {
+      const members = await getJson(`${API}/wc/store/v1/products?category=${c.id}&per_page=100`);
+      categoryMembers[c.slug] = (Array.isArray(members) ? members : []).map((p) => p.slug);
+    } catch {
+      categoryMembers[c.slug] = [];
+    }
+    await sleep(300);
+  }
+
   const categories = rawCategories.map((c) => ({
     id: c.id,
     name: stripHtml(c.name),
@@ -171,6 +184,7 @@ async function main() {
     currency: 'PLN',
     buyUrlVerified: verified,
     topSellers,
+    categoryMembers,
     categories,
     products,
   };
