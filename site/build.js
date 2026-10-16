@@ -116,32 +116,47 @@ if (existsSync(FONTS_SRC)) {
 }
 writeFileSync(join(DIST, '.nojekyll'), '');
 
-// 与生成页面一一对应的 sitemap.xml
+// 与生成页面一一对应的 sitemap.xml（带 lastmod/changefreq/priority，Google 友好）
+// lastmod：目录/文章页用数据源时间戳（抓取日期、文章发布日期），框架页用构建日期
 const bands = puffBandsFor(data).filter((b) => b.products.length);
 const priceBands = priceBandsFor(data).filter((b) => b.products.length);
 const scenarios = scenariosFor(data);
 const flavorLanding = flavorGroups(data, 3);
-const urls = [
-  SITE + '/',
-  SITE + '/sklep/',
-  SITE + '/kontakt/',
-  SITE + '/zwroty/',
-  ...data.categories.map((c) => SITE + `/kategoria/${c.slug}/`),
-  ...bands.map((b) => SITE + `/kategoria/puffs-${b.id}/`),
-  ...priceBands.map((b) => SITE + `/kategoria/cena-${b.id}/`),
-  ...scenarios.map((s) => SITE + `/scenariusz/${s.id}/`),
-  ...flavorLanding.map((g) => SITE + `/smak/${g.slug}/`),
+const buildDate = new Date().toISOString().slice(0, 10);
+const catalogDate = (data.fetchedAt ?? buildDate).slice(0, 10);
+// url + 属性 → <url> 条目
+const entry = (loc, { lastmod, changefreq, priority }) =>
+  `  <url>\n    <loc>${loc}</loc>\n    <lastmod>${lastmod}</lastmod>\n    <changefreq>${changefreq}</changefreq>\n    <priority>${priority}</priority>\n  </url>`;
+const entries = [
+  entry(SITE + '/', { lastmod: buildDate, changefreq: 'daily', priority: 1.0 }),
+  entry(SITE + '/sklep/', { lastmod: catalogDate, changefreq: 'weekly', priority: 0.9 }),
+  entry(SITE + '/kontakt/', { lastmod: buildDate, changefreq: 'monthly', priority: 0.3 }),
+  entry(SITE + '/zwroty/', { lastmod: buildDate, changefreq: 'monthly', priority: 0.3 }),
+  ...data.categories.map((c) =>
+    entry(SITE + `/kategoria/${c.slug}/`, { lastmod: catalogDate, changefreq: 'weekly', priority: 0.7 })),
+  ...bands.map((b) =>
+    entry(SITE + `/kategoria/puffs-${b.id}/`, { lastmod: catalogDate, changefreq: 'weekly', priority: 0.6 })),
+  ...priceBands.map((b) =>
+    entry(SITE + `/kategoria/cena-${b.id}/`, { lastmod: catalogDate, changefreq: 'weekly', priority: 0.6 })),
+  ...scenarios.map((s) =>
+    entry(SITE + `/scenariusz/${s.id}/`, { lastmod: catalogDate, changefreq: 'weekly', priority: 0.6 })),
+  ...flavorLanding.map((g) =>
+    entry(SITE + `/smak/${g.slug}/`, { lastmod: catalogDate, changefreq: 'weekly', priority: 0.6 })),
   ...data.products.flatMap((p) => [
-    SITE + `/produkt/${p.slug}/`,
-    ...p.flavors.map((f) => SITE + `/produkt/${p.slug}/${f.slug}/`),
+    entry(SITE + `/produkt/${p.slug}/`, { lastmod: catalogDate, changefreq: 'weekly', priority: 0.7 }),
+    ...p.flavors.map((f) =>
+      entry(SITE + `/produkt/${p.slug}/${f.slug}/`, { lastmod: catalogDate, changefreq: 'weekly', priority: 0.5 })),
   ]),
-  ...data.guides.map((g) => SITE + `/artykul/${g.id}/`),
+  ...data.guides.map((g) =>
+    entry(SITE + `/artykul/${g.id}/`, {
+      lastmod: g.datePublished ?? catalogDate,
+      changefreq: 'monthly',
+      priority: 0.4,
+    })),
 ];
 writeFileSync(
   join(DIST, 'sitemap.xml'),
-  `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n${urls
-    .map((u) => `  <url>\n    <loc>${u}</loc>\n  </url>`)
-    .join('\n')}\n</urlset>\n`,
+  `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n${entries.join('\n')}\n</urlset>\n`,
 );
 writeFileSync(
   join(DIST, 'robots.txt'),
