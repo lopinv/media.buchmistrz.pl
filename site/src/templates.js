@@ -863,8 +863,8 @@ export function renderProduct(data, product) {
     </div>
   </section>` : ''}
   ${relatedArticlesBlock(data, product, null)}
-  ${articlesBlock('Wszystkie poradniki')}
   ${faqBlock(HOME_FAQ, 3)}
+  ${articlesBlock('Wszystkie poradniki')}
   ${ctaBanner()}`;
   return page({
     title: `${product.name} — ${fmtPuffs(product.puffs)} puffs, ${fmtZl(product.price)} | ${SITE_NAME}`,
@@ -942,7 +942,6 @@ export function renderFlavor(data, product, flavor) {
     </div>
   </section>
   ${relatedArticlesBlock(data, product, flavor)}
-  ${articlesBlock('Wszystkie poradniki')}
   ${faqBlock(
     [
       {
@@ -960,6 +959,7 @@ export function renderFlavor(data, product, flavor) {
     ],
     3,
   )}
+  ${articlesBlock('Wszystkie poradniki')}
   ${ctaBanner()}`;
   return page({
     title,
