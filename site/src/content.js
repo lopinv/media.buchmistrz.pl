@@ -4,8 +4,7 @@
 export const SITE = 'https://github.vapepl.com';
 // 自定义域名（GitHub Pages CNAME 文件内容，构建时写入 dist 根）
 export const CNAME = 'github.vapepl.com';
-// 暂时使用项目名作为站点标题（title/OG/品牌名/JSON-LD 组织名），便于与其他站点区分；验证完成后改回
-export const SITE_NAME = 'media.buchmistrz.pl';
+export const SITE_NAME = 'VapePL.COM';
 export const VAPEPL = 'https://vapepl.com';
 export const VAPEPL_RETURNS = `${VAPEPL}/refund_returns/`;
 // 商品/分类图统一托管域（GitHub Pages media 分支经 jsDelivr 分发），preconnect 用
