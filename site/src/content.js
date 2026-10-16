@@ -178,8 +178,8 @@ export function flavorLandingFaq(group) {
   ];
 }
 
-// puffs 分段页 FAQ（3 题，段内数值逐段不同）
-export function puffBandFaq(band, products) {
+// 分段页 FAQ（3 题，段/场景名与段内数值逐页不同）——puffs 段、价格段、场景页共用
+export function bandFaq(name, products) {
   const eff = products
     .filter((p) => p.puffs > 0)
     .map((p) => ({ p, v: (p.price / p.puffs) * 1000 }));
@@ -188,24 +188,80 @@ export function puffBandFaq(band, products) {
   const maxP = Math.max(...products.map((p) => p.price));
   return [
     {
-      q: `Ile modeli ma wydajność ${band.label}?`,
-      a: `W tym segmencie jest ${products.length} ${pluralModels(products.length)}: ${products
+      q: `Ile modeli obejmuje grupa ${name}?`,
+      a: `W tej grupie jest ${products.length} ${pluralModels(products.length)}: ${products
         .map((p) => p.name)
         .join(', ')}.`,
     },
     {
-      q: `Od jakiej ceny zaczynają się modele ${band.label}?`,
-      a: `Ceny w segmencie: od ${pln(minP)}${minP !== maxP ? ` do ${pln(maxP)}` : ''} — wszystkie w promocji.`,
+      q: `Od jakiej ceny zaczynają się modele w grupie ${name}?`,
+      a: `Ceny w grupie: od ${pln(minP)}${minP !== maxP ? ` do ${pln(maxP)}` : ''} — wszystkie w promocji.`,
     },
     {
-      q: `Który model w przedziale ${band.label} ma najlepszy stosunek ceny do puffs?`,
+      q: `Który model w grupie ${name} ma najlepszy stosunek ceny do puffs?`,
       a: best
         ? `${best.p.name} — ${new Intl.NumberFormat('pl-PL', { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(
             best.v,
-          )} zł za 1 000 puffs, czyli najtańszy puffs w segmencie.`
-        : 'W segmencie brak modeli z deklarowaną liczbą puffs.',
+          )} zł za 1 000 puffs, czyli najtańszy puffs w grupie.`
+        : 'W grupie brak modeli z deklarowaną liczbą puffs.',
     },
   ];
+}
+
+// ---------- 使用场景（数据驱动 top 4，各场景命中集互异） ----------
+// sort 返回得分（越大越靠前）；blurb 为该场景的 hero 文案
+export const SCENARIOS = [
+  {
+    id: 'budzet',
+    name: 'Niski budżet',
+    blurb:
+      'Szukasz najtańszych modeli? Te cztery urządzenia kosztują najmniej w całej ofercie — sprawdź, ile puffs dostaniesz w najniższych cenach.',
+    score: (p) => -p.price * 100 + (p.puffs ?? 0) / 100,
+  },
+  {
+    id: 'wydajnosc',
+    name: 'Maksymalna wydajność',
+    blurb:
+      'Chcesz jak najwięcej puffs w jednym urządzeniu? To cztery modele o największej liczbie puffs w ofercie — idealne, gdy rzadko wymieniasz sprzęt.',
+    score: (p) => (p.puffs ?? 0) * 1000 - p.price,
+  },
+  {
+    id: 'cena-za-puffs',
+    name: 'Najtańszy puffs',
+    blurb:
+      'Liczy się koszt pojedynczego puffsia? Porównujemy stosunek ceny do wydajności — te cztery modele dają najtaniejszy puffs w ofercie.',
+    score: (p) => ((p.puffs ?? 0) > 0 ? 1000000 / ((p.price / (p.puffs ?? 0)) * 1000) : 0),
+  },
+  {
+    id: 'smaki',
+    name: 'Najwięcej smaków',
+    blurb:
+      'Lubisz próbować wielu wariantów? Te cztery modele oferują najszerszy wybór smaków — od owocowych po deserowe.',
+    score: (p) => (p.flavors?.length ?? 0) * 1000 + (p.puffs ?? 0) / 1000,
+  },
+];
+
+export function scenariosFor(data) {
+  return SCENARIOS.map((s) => ({
+    ...s,
+    products: [...data.products]
+      .sort((a, b) => (s.score(b) ?? 0) - (s.score(a) ?? 0))
+      .slice(0, 4),
+  }));
+}
+
+// ---------- 价格段（数据驱动，/kategoria/cena-<id>/ 下） ----------
+export const PRICE_BANDS = [
+  { id: 'do-70', label: 'do 70 zł', min: 0, max: 70 },
+  { id: '71-100', label: '71–100 zł', min: 70, max: 100 },
+  { id: 'od-101', label: 'od 101 zł', min: 100, max: Infinity },
+];
+
+export function priceBandsFor(data) {
+  return PRICE_BANDS.map((b) => ({
+    ...b,
+    products: data.products.filter((p) => p.price > b.min && p.price <= b.max),
+  }));
 }
 
 // FAQ strony głównej (AEO: pytanie → 2-3 zdania bezpośredniej odpowiedzi)

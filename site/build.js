@@ -10,7 +10,7 @@ import {
 } from 'node:fs';
 import { dirname, join, relative, posix } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { SITE, SITE_NAME, CNAME, flavorGroups, puffBandsFor } from './src/content.js';
+import { SITE, SITE_NAME, CNAME, flavorGroups, puffBandsFor, scenariosFor, priceBandsFor } from './src/content.js';
 import {
   renderHome,
   renderShop,
@@ -23,6 +23,8 @@ import {
   renderArticle,
   renderFlavorLanding,
   renderPuffsBand,
+  renderScenario,
+  renderPriceBand,
 } from './src/templates.js';
 
 const ROOT = dirname(fileURLToPath(import.meta.url));
@@ -59,6 +61,14 @@ for (const band of puffBandsFor(data)) {
 
 // 口味落地页（同一口味在 ≥3 款产品中可选才出页，/smak/<slug>/ 独立命名空间）
 for (const group of flavorGroups(data, 3)) out(`smak/${group.slug}/index.html`, renderFlavorLanding(data, group));
+
+// 价格段页（按价格区间切分，数据驱动，仅出有产品的段）
+for (const band of priceBandsFor(data)) {
+  if (band.products.length) out(`kategoria/cena-${band.id}/index.html`, renderPriceBand(data, band));
+}
+
+// 使用场景页（4 个数据驱动场景，top 4 命中集互异）
+for (const s of scenariosFor(data)) out(`scenariusz/${s.id}/index.html`, renderScenario(data, s));
 
 // 商品聚合页 + 每个口味变体页
 for (const product of data.products) {
@@ -108,6 +118,8 @@ writeFileSync(join(DIST, '.nojekyll'), '');
 
 // 与生成页面一一对应的 sitemap.xml
 const bands = puffBandsFor(data).filter((b) => b.products.length);
+const priceBands = priceBandsFor(data).filter((b) => b.products.length);
+const scenarios = scenariosFor(data);
 const flavorLanding = flavorGroups(data, 3);
 const urls = [
   SITE + '/',
@@ -116,6 +128,8 @@ const urls = [
   SITE + '/zwroty/',
   ...data.categories.map((c) => SITE + `/kategoria/${c.slug}/`),
   ...bands.map((b) => SITE + `/kategoria/puffs-${b.id}/`),
+  ...priceBands.map((b) => SITE + `/kategoria/cena-${b.id}/`),
+  ...scenarios.map((s) => SITE + `/scenariusz/${s.id}/`),
   ...flavorLanding.map((g) => SITE + `/smak/${g.slug}/`),
   ...data.products.flatMap((p) => [
     SITE + `/produkt/${p.slug}/`,

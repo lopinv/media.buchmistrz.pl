@@ -572,6 +572,9 @@ a.brand-card:hover, a.flavor-card:hover, a.contact-card:hover,
   background: transparent; border-style: dashed;
 }
 .flavor-chip.is-disabled:hover { border-color: var(--line); color: var(--ink-mute); }
+/* 价格段导航 chips：琥珀描边区分于场景（青色）chips */
+.flavor-chip.is-muted { border-color: rgba(251, 191, 36, 0.4); color: var(--ink-soft); }
+.flavor-chip.is-muted:hover { border-color: var(--accent); color: var(--accent); }
 
 /* ---------- 联系（深卡 + SVG 图标）---------- */
 .contact-grid { display: grid; grid-template-columns: 1fr; gap: 16px; margin-bottom: 32px; }

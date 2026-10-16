@@ -28,7 +28,9 @@ import {
   PUFF_BANDS,
   puffBandsFor,
   flavorLandingFaq,
-  puffBandFaq,
+  bandFaq,
+  scenariosFor,
+  priceBandsFor,
 } from './content.js';
 
 // ---------- 基础工具 ----------
@@ -774,6 +776,8 @@ export function renderShop(data) {
   const flavorsTotal = data.products.reduce((s, p) => s + p.flavors.length, 0);
   const minPrice = Math.min(...data.products.map((p) => p.price));
   const bands = puffBandsFor(data).filter((b) => b.products.length > 0);
+  const scenarios = scenariosFor(data);
+  const priceBands = priceBandsFor(data).filter((b) => b.products.length > 0);
   const stats = [
     { icon: 'leaf', value: String(data.products.length), label: `${pluralModels(data.products.length)} w ofercie` },
     { icon: 'droplet', value: String(flavorsTotal), label: 'smaków do wyboru' },
@@ -800,6 +804,17 @@ export function renderShop(data) {
         .join('')}
     </div>
   </div>` : ''}
+  <div class="container">
+    <h2 class="subhead" id="filter-title">Przeglądaj według</h2>
+    <div class="flavor-chips">
+      ${scenarios
+        .map((s) => `<a class="flavor-chip" href="/scenariusz/${esc(s.id)}/">${esc(s.name)}</a>`)
+        .join('')}
+      ${priceBands
+        .map((b) => `<a class="flavor-chip is-muted" href="/kategoria/cena-${esc(b.id)}/">${esc(b.label)}</a>`)
+        .join('')}
+    </div>
+  </div>
   <section class="section section--center" aria-labelledby="top-title">
     <div class="container">
       <h2 id="top-title">Bestselleri</h2>
@@ -1291,47 +1306,58 @@ export function relatedArticlesFromList(list) {
 }
 
 // ---------- puffs 段分类页（/kategoria/puffs-<id>/）：按 puffs 区间切"品类" ----------
+// 段/场景页共用的数据条数值（款数/puffs 区间/价格区间/最低单千 puff 成本）
+function bandStats(products, countLabel) {
+  if (!products.length) return [];
+  const minP = Math.min(...products.map((p) => p.price));
+  const maxP = Math.max(...products.map((p) => p.price));
+  const eff = products
+    .filter((p) => p.puffs > 0)
+    .map((p) => (p.price / p.puffs) * 1000);
+  const best = eff.length ? Math.min(...eff) : null;
+  return [
+    { icon: 'leaf', value: String(products.length), label: countLabel },
+    {
+      icon: 'droplet',
+      value: `${fmtPuffs(Math.min(...products.map((p) => p.puffs)))} – ${fmtPuffs(
+        Math.max(...products.map((p) => p.puffs)),
+      )} puffs`,
+      label: 'zakres wydajności',
+    },
+    {
+      icon: 'banknote',
+      value:
+        minP === maxP
+          ? fmtZl(minP)
+          : `${fmtZl(minP)} – ${fmtZl(maxP)}`,
+      label: 'zakres cen',
+    },
+    {
+      icon: 'percent',
+      value:
+        best === null
+          ? '—'
+          : new Intl.NumberFormat('pl-PL', { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(best) +
+            ' zł',
+      label: 'najtańszy puffs kosztuje',
+    },
+  ];
+}
+
 export function renderPuffsBand(data, band) {
   const products = band.products;
   const crumb = breadcrumbs([
     { label: 'Sklep', url: '/sklep/' },
     { label: `Puffs: ${band.label}`, url: `/kategoria/puffs-${band.id}/` },
   ]);
-  const faqs = puffBandFaq(band, products);
+  const faqs = bandFaq(band.label, products);
   const jsonld = [
     organizationLd(),
     crumb.ld,
     itemListLd(products.map((p) => ({ name: p.name, url: SITE + `/produkt/${p.slug}/` }))),
     faqLd(faqs),
   ];
-  const stats = products.length
-    ? [
-        { icon: 'leaf', value: String(products.length), label: 'modeli w segmencie' },
-        { icon: 'droplet', value: `${fmtPuffs(Math.min(...products.map((p) => p.puffs)))} – ${fmtPuffs(Math.max(...products.map((p) => p.puffs)))} puffs`, label: 'zakres wydajności' },
-        {
-          icon: 'banknote',
-          value:
-            Math.min(...products.map((p) => p.price)) === Math.max(...products.map((p) => p.price))
-              ? fmtZl(products[0].price)
-              : `${fmtZl(Math.min(...products.map((p) => p.price)))} – ${fmtZl(Math.max(...products.map((p) => p.price)))}`,
-          label: 'zakres cen',
-        },
-        {
-          icon: 'percent',
-          value:
-            (() => {
-              const eff = products
-                .filter((p) => p.puffs > 0)
-                .map((p) => (p.price / p.puffs) * 1000);
-              return eff.length
-                ? new Intl.NumberFormat('pl-PL', { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(Math.min(...eff)) +
-                  ' zł'
-                : '—';
-            })(),
-          label: 'najtańszy puffs kosztuje',
-        },
-      ]
-    : [];
+  const stats = bandStats(products, 'modeli w segmencie');
   const body = `
   ${crumb.html}
   <section class="page-hero">
@@ -1359,6 +1385,102 @@ export function renderPuffsBand(data, band) {
     title: `Jednorazówki ${band.label} — ${products.length} modeli | ${SITE_NAME}`,
     description: `Modele z wydajnością ${band.label}: ${products.length} produktów, porównaj puffs i ceny i kup na vapepl.com.`,
     canonical: SITE + `/kategoria/puffs-${band.id}/`,
+    ogImage: products[0]?.image,
+    jsonld,
+    body,
+  });
+}
+
+// ---------- 使用场景页（/scenariusz/<id>/）：4 个数据驱动场景，top 4 命中集互异 ----------
+export function renderScenario(data, scenario) {
+  const products = scenario.products;
+  const crumb = breadcrumbs([
+    { label: 'Sklep', url: '/sklep/' },
+    { label: scenario.name, url: `/scenariusz/${scenario.id}/` },
+  ]);
+  const faqs = bandFaq(scenario.name, products);
+  const jsonld = [
+    organizationLd(),
+    crumb.ld,
+    itemListLd(products.map((p) => ({ name: p.name, url: SITE + `/produkt/${p.slug}/` }))),
+    faqLd(faqs),
+  ];
+  const stats = bandStats(products, 'modeli w tym scenariuszu');
+  const body = `
+  ${crumb.html}
+  <section class="page-hero">
+    <div class="container">
+      <h1>${esc(scenario.name)}</h1>
+      <p>${esc(scenario.blurb)}</p>
+    </div>
+  </section>
+  ${statStrip(stats)}
+  <section class="section section--center" aria-labelledby="top4-title">
+    <div class="container">
+      <div class="section-head">
+        <h2 id="top4-title">Nasze top 4 — ${esc(scenario.name.toLowerCase())}</h2>
+        <p>Cztery modele wybrane pod ten scenariusz, w kolejności rekomendowanej.</p>
+      </div>
+      <div class="product-grid">
+        ${products.map((p, i) => productCard(p, i + 1)).join('')}
+      </div>
+    </div>
+  </section>
+  ${compareTable(products)}
+  ${faqBlock(faqs)}
+  ${articlesBlock(data, 'Wszystkie poradniki')}`;
+  return page({
+    title: `${scenario.name} — top 4 modeli | ${SITE_NAME}`,
+    description: `${scenario.name}: ${products.map((p) => p.name).join(', ')}. Porównaj i kup na vapepl.com.`,
+    canonical: SITE + `/scenariusz/${scenario.id}/`,
+    ogImage: products[0]?.image,
+    jsonld,
+    body,
+  });
+}
+
+// ---------- 价格段页（/kategoria/cena-<id>/）：按价格区间切"品类" ----------
+export function renderPriceBand(data, band) {
+  const products = band.products;
+  const crumb = breadcrumbs([
+    { label: 'Sklep', url: '/sklep/' },
+    { label: `Cena: ${band.label}`, url: `/kategoria/cena-${band.id}/` },
+  ]);
+  const faqs = bandFaq(band.label, products);
+  const jsonld = [
+    organizationLd(),
+    crumb.ld,
+    itemListLd(products.map((p) => ({ name: p.name, url: SITE + `/produkt/${p.slug}/` }))),
+    faqLd(faqs),
+  ];
+  const stats = bandStats(products, 'modeli w tym przedziale');
+  const body = `
+  ${crumb.html}
+  <section class="page-hero">
+    <div class="container">
+      <h1>Cena: ${esc(band.label)}</h1>
+      <p>Modele w przedziale cenowym ${esc(band.label)} — ${esc(
+        band.id === 'do-70'
+          ? 'najtańsza półka: sprawdź, ile puffs daje się w tej cenie.'
+          : band.id === '71-100'
+            ? 'środkowa półka: najlepszy stosunek ceny do liczby puffs.'
+            : 'najwydajniejsze urządzenia w ofercie — płacisz więcej, ale puffs starcza na miesiące.',
+      )}</p>
+    </div>
+  </section>
+  ${statStrip(stats)}
+  <section class="section">
+    <div class="container product-grid">
+      ${products.length ? products.map((p) => productCard(p)).join('') : '<p>Brak produktów w tym przedziale.</p>'}
+    </div>
+  </section>
+  ${compareTable(products)}
+  ${faqBlock(faqs)}
+  ${articlesBlock(data)}`;
+  return page({
+    title: `Jednorazówki ${band.label} — ${products.length} modeli | ${SITE_NAME}`,
+    description: `Modele w przedziale ${band.label}: ${products.length} produktów w promocji. Porównaj i kup na vapepl.com.`,
+    canonical: SITE + `/kategoria/cena-${band.id}/`,
     ogImage: products[0]?.image,
     jsonld,
     body,
