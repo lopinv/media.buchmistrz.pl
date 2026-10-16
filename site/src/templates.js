@@ -5,6 +5,7 @@ import {
   SITE_NAME,
   VAPEPL,
   VAPEPL_RETURNS,
+  IMG_CDN,
   BRANDS,
   BRAND_ORDER,
   FLAVOR_CATS,
@@ -193,6 +194,7 @@ export function page({
   jsonld = [],
   body,
   noFollow = false,
+  lcpImage = '',
 }) {
   const ldScripts = jsonld
     .map((o) => `<script type="application/ld+json">${JSON.stringify(o)}</script>`)
@@ -203,6 +205,8 @@ export function page({
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="preconnect" href="${IMG_CDN}">
+  ${lcpImage ? `<link rel="preload" as="image" fetchpriority="high" href="${esc(lcpImage)}">` : ''}
   <title>${esc(title)}</title>
   <meta name="description" content="${esc(description)}">
   <link rel="canonical" href="${esc(canonical)}">
@@ -601,7 +605,7 @@ export function renderHome(data) {
       </div>
       ${heroImage ? `
       <figure class="hero-media">
-        <img src="${esc(heroImage)}" alt="STAG BAR 6IN1 180000 puffs — flagowy model 6 w 1">
+        <img src="${esc(heroImage)}" alt="STAG BAR 6IN1 180000 puffs — flagowy model 6 w 1" fetchpriority="high">
         <figcaption>Flagowiec STAG BAR 6IN1 — do 180 000 puffs w jednym urządzeniu</figcaption>
       </figure>` : ''}
     </div>
@@ -676,6 +680,7 @@ export function renderHome(data) {
     ogImage: heroImage,
     jsonld,
     body,
+    lcpImage: heroImage ?? '',
   });
 }
 
@@ -815,7 +820,7 @@ export function renderProduct(data, product) {
   <section class="section product-detail">
     <div class="container product-layout">
       <figure class="product-media">
-        ${product.image ? `<img src="${esc(product.image)}" alt="${esc(product.name)}">` : ''}
+        ${product.image ? `<img src="${esc(product.image)}" alt="${esc(product.name)}" fetchpriority="high">` : ''}
         <figcaption>${esc(product.name)}</figcaption>
       </figure>
       <div class="product-info">
@@ -862,6 +867,7 @@ export function renderProduct(data, product) {
     ogType: 'product',
     jsonld,
     body,
+    lcpImage: image ?? '',
   });
 }
 
@@ -890,7 +896,7 @@ export function renderFlavor(data, product, flavor) {
   <section class="section product-detail">
     <div class="container product-layout">
       <figure class="product-media">
-        ${product.image ? `<img src="${esc(product.image)}" alt="${esc(product.name)} — smak ${esc(flavor.name)}">` : ''}
+        ${product.image ? `<img src="${esc(product.image)}" alt="${esc(product.name)} — smak ${esc(flavor.name)}" fetchpriority="high">` : ''}
         <figcaption>${esc(product.name)} · smak ${esc(flavor.name)}</figcaption>
       </figure>
       <div class="product-info">
@@ -956,6 +962,7 @@ export function renderFlavor(data, product, flavor) {
     ogType: 'product',
     jsonld,
     body,
+    lcpImage: product.image ?? '',
   });
 }
 

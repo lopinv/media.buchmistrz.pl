@@ -6,6 +6,8 @@ export const SITE = 'https://lopinv.github.io/media.buchmistrz.pl';
 export const SITE_NAME = 'media.buchmistrz.pl';
 export const VAPEPL = 'https://vapepl.com';
 export const VAPEPL_RETURNS = `${VAPEPL}/refund_returns/`;
+// 商品/分类图统一托管域（GitHub Pages media 分支经 jsDelivr 分发），preconnect 用
+export const IMG_CDN = 'https://cdn.jsdelivr.net';
 
 // 品牌卡用字母字标瓦片（首字母），不再用动物 emoji
 export const BRANDS = {
