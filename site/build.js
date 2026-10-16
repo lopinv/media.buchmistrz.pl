@@ -10,7 +10,7 @@ import {
 } from 'node:fs';
 import { dirname, join, relative, posix } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { SITE, SITE_NAME, CNAME, GUIDES, flavorGroups, puffBandsFor } from './src/content.js';
+import { SITE, SITE_NAME, CNAME, flavorGroups, puffBandsFor } from './src/content.js';
 import {
   renderHome,
   renderShop,
@@ -28,6 +28,10 @@ import {
 const ROOT = dirname(fileURLToPath(import.meta.url));
 const DIST = join(ROOT, 'dist');
 const data = JSON.parse(readFileSync(join(ROOT, 'data', 'products.json'), 'utf8'));
+// 文章库（generate-guides.mjs 生成的数据驱动清单；缺失时退回空库）
+data.guides = existsSync(join(ROOT, 'data', 'guides.json'))
+  ? JSON.parse(readFileSync(join(ROOT, 'data', 'guides.json'), 'utf8'))
+  : [];
 
 rmSync(DIST, { recursive: true, force: true });
 mkdirSync(DIST, { recursive: true });
@@ -65,7 +69,7 @@ for (const product of data.products) {
 }
 
 // 文章页（vapepl.com 精选文章站内镜像）
-for (const guide of GUIDES) out(`artykul/${guide.id}/index.html`, renderArticle(data, guide));
+for (const guide of data.guides) out(`artykul/${guide.id}/index.html`, renderArticle(data, guide));
 
 // 静态资源与辅助文件
 // /produkt/ 直接访问（不带 slug）不是真实路由：重定向到商品列表页，避免落到 404。
@@ -117,7 +121,7 @@ const urls = [
     SITE + `/produkt/${p.slug}/`,
     ...p.flavors.map((f) => SITE + `/produkt/${p.slug}/${f.slug}/`),
   ]),
-  ...GUIDES.map((g) => SITE + `/artykul/${g.id}/`),
+  ...data.guides.map((g) => SITE + `/artykul/${g.id}/`),
 ];
 writeFileSync(
   join(DIST, 'sitemap.xml'),

@@ -244,85 +244,28 @@ export const HOME_FAQ = [
   },
 ];
 
-// 候选模型池：按口味名（小写精确）映射到该口味真实存在的站内模型。
-// 文章推荐位在此池中取与口味匹配的模型；口味缺失时取池内畅销排名最高者。
-const GUIDE_FLAVOR_POOL = {
-  'cool mint': ['fumot-randm-tornado-9000-puffs', 'xcor-max-50000-puffs'],
-  'watermelon ice': ['airmez-lux-60000-puffs', 'hifancy-dream-45000-puffs', 'xcor-max-50000-puffs'],
-  grape: ['fumot-randm-tornado-9000-puffs'],
-  'strawberry kiwi': ['xcor-max-50000-puffs'],
-  'blueberry on ice': ['airmez-lux-60000-puffs'],
-  'strawberry ice': ['hifancy-dream-45000-puffs'],
-};
+// ---------- 文章库（site/data/guides.json，由 generate-guides.mjs 生成） ----------
+// 数据驱动：50 篇与站内模型/口味相关的 vapepl.com 文章，每篇带 flavor（归一化口味键）
+// 与 datePublished；本文件不再手写文章清单。
 
-// 精选文章（vapepl.com 共 30 篇，此处为站内镜像列表 + 每篇关联的商品推荐位）
-// flavor: 推荐口味名（对应 GUIDE_FLAVOR_POOL 的键）；池内无该口味的模型则回退池内畅销榜首
-export const GUIDES = [
-  {
-    id: 'iqos-vs-papieros',
-    title: 'IQOS vs papieros: 30 dni kosztów i drabina puffs',
-    url: `${VAPEPL}/iqos-vs-papieros-30-dni-kosztow-i-drabina-puffs/`,
-    summary:
-      '30-dniowy test porównujący miesięczne wydatki na IQOS i papierosy oraz przeliczenie zużycia na liczbę puffs — kiedy e-papieros zaczyna się opłacać.',
-    flavor: 'Cool Mint',
-  },
-  {
-    id: 'e-papieros-vs-papieros',
-    title: 'E papieros vs papieros: 30 dni, 1 000 puffs i liczby',
-    url: `${VAPEPL}/e-papieros-vs-papieros-30-dni-1-000-puffs-i-liczby/`,
-    summary:
-      'Trzydzieści dni, tysiąc puffs i twarde liczby: koszt jednej dawki, zużycie baterii i ile klasycznych papierosów zastępuje jeden e-papieros.',
-    flavor: 'Watermelon Ice',
-  },
-  {
-    id: 'randm-tornado-9000-poradnik',
-    title: 'RandM Tornado 9000: ładowanie, przechowywanie i wymiana',
-    url: `${VAPEPL}/randm-tornado-9000-ladowanie-przechowywanie-i-wymiana/`,
-    summary:
-      'Praktyczny poradnik do RandM Tornado 9000: jak ładować i przechowywać urządzenie oraz co zrobić, gdy smak słabnie przed ostatnim puffem.',
-    flavor: 'Grape',
-  },
-  {
-    id: 'najlepsza-jednorazowka-5-scenariuszy',
-    title: 'Najlepsza jednorazówka w 5 scenariuszach: LUX, TORNADO i STAG',
-    url: `${VAPEPL}/najlepsza-jednorazowka-w-5-scenariuszach-lux-tornado-i-stag/`,
-    summary:
-      'Pięć scenariuszy użytkowania — od wyjazdów po pracę w terenie — i w których z nich najlepiej sprawdzają się LUX, TORNADO oraz STAG BAR.',
-    flavor: 'Strawberry Kiwi',
-  },
-  {
-    id: 'jednorazowka-50mg',
-    title: 'Jednorazówka 50mg: LUX, STAG BAR i TORNADO w liczbach',
-    url: `${VAPEPL}/jednorazowka-50mg-lux-stag-bar-i-tornado-w-liczbach/`,
-    summary:
-      'Wersje 50 mg trzech flagowych modeli w liczbach: koszt pojedynczego puffsie, czas życia i do jakich scenariuszy pasuje wysoka moc.',
-    flavor: 'Blueberry On Ice',
-  },
-  {
-    id: 'co-zamiast-jednorazowek',
-    title: 'Co zamiast jednorazówek: LUX 60K, MAX i DREAM',
-    url: `${VAPEPL}/co-zamiast-jednorazowek-lux-60k-max-i-dream/`,
-    summary:
-      'Alternatywy dla typowych jednorazówek: systemy wielorazowe LUX 60K, MAX i DREAM — co zyskujesz, a co tracisz względem jednorazówek.',
-    flavor: 'Strawberry Ice',
-  },
-];
-
-// 文章 → 推荐商品：在口味候选池中取与该口味匹配、且畅销排名靠前的模型
+// 文章 → 推荐商品：按 guide.flavor（口味键）在站内找提供该口味的模型，
+// 按畅销榜排名取最靠前一款（推荐位落到口味直购页）；无匹配则回退畅销榜首模型页
 export function recommendProductsFor(data, guide) {
   const bySlug = new Map(data.products.map((p) => [p.slug, p]));
   const popularity = new Map((data.topSellers ?? []).map((slug, i) => [slug, i]));
-  const flavorName = (guide.flavor ?? '').trim().toLowerCase();
-  const pool = (GUIDE_FLAVOR_POOL[flavorName] ?? []).filter((slug) => {
-    const p = bySlug.get(slug);
-    return p?.flavors.some((f) => f.name.trim().toLowerCase() === flavorName);
-  });
-  pool.sort((a, b) => (popularity.get(a) ?? 99) - (popularity.get(b) ?? 99));
-  const pickSlug = pool[0] ?? (data.topSellers ?? [])[0];
+  const flavorKeyOf = (guide.flavor ?? '').trim().toLowerCase();
+  const candidates = flavorKeyOf
+    ? [...data.products]
+        .filter((p) => p.flavors.some((f) => flavorKey(f.name) === flavorKeyOf))
+        .map((p) => p.slug)
+        .sort((a, b) => (popularity.get(a) ?? 99) - (popularity.get(b) ?? 99))
+    : [];
+  const pickSlug = candidates[0] ?? (data.topSellers ?? [])[0];
   const product = bySlug.get(pickSlug);
   if (!product) return [];
-  const flavor =
-    product.flavors.find((f) => f.name.trim().toLowerCase() === flavorName) ?? null;
+  const flavor = flavorKeyOf
+    ? product.flavors.find((f) => flavorKey(f.name) === flavorKeyOf) ?? null
+    : null;
   return [
     {
       product,
@@ -335,18 +278,19 @@ export function recommendProductsFor(data, guide) {
 }
 
 // 商品（模型页/口味页）→ 相关文章。评分：
-// 模型+口味双命中 3 / 同口味不同模型 1.5 / 同模型 1 / 模型在畅销榜 0.5（畅销款始终有推荐位）
-export function relatedArticlesFor(data, product, flavor) {
+// 文章推荐位命中同模型+同口味 3 / 同口味不同模型 1.5 / 同模型 1 / 模型在畅销榜 0.5
+export function relatedArticlesFor(data, product, flavor, guides = data.guides ?? []) {
   const isTop = data.topSellers?.includes(product.slug);
-  return GUIDES.map((g) => {
+  const myKey = flavor ? flavorKey(flavor.name) : null;
+  return guides.map((g) => {
     const rec = recommendProductsFor(data, g);
     const r = rec[0];
     let score = 0;
     if (r && r.product.slug === product.slug) {
       score =
-        r.flavor && flavor && r.flavor.slug === flavor.slug
+        r.flavor && myKey && flavorKey(r.flavor.name) === myKey
           ? 3
-          : flavor && !r.flavor
+          : myKey && !r.flavor
             ? 1.5
             : 1;
     }
@@ -354,7 +298,7 @@ export function relatedArticlesFor(data, product, flavor) {
     return { guide: g, score };
   })
     .filter((x) => x.score > 0)
-    .sort((a, b) => b.score - a.score || GUIDES.indexOf(a.guide) - GUIDES.indexOf(b.guide))
+    .sort((a, b) => b.score - a.score || guides.indexOf(a.guide) - guides.indexOf(b.guide))
     .map((x) => x.guide);
 }
 

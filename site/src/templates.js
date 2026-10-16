@@ -12,7 +12,6 @@ import {
   REVIEWS,
   DISCOUNT_TIERS,
   HOME_FAQ,
-  GUIDES,
   WHY_US,
   CONTACT,
   STATS,
@@ -459,12 +458,13 @@ export function articleCard(guide) {
   </article>`;
 }
 
-// 文章列表模块：全页复用。heading 非空时渲染可视 h2（首页/商品页/文章页），
-// 其余页面用 sr-only 标题避免与"相关文章"区块撞名；intro 为可信 HTML（含链接），不转义；
-// exclude 传入已展示过的相关文章（避免同一页重复出现相同卡片），全空时整块省略
-export function articlesBlock(heading = '', intro = '', exclude = []) {
+// 文章列表模块：全页复用，内容来自 data.guides（generate-guides.mjs 生成，50 篇数据驱动）。
+// heading 非空时渲染可视 h2（首页/商品页/文章页），其余页面用 sr-only 标题避免与
+// "相关文章"区块撞名；intro 为可信 HTML（含链接），不转义；exclude 排除已展示的
+// 相关文章；limit 限制卡片数（50 篇全渲染会过重），hub 页传 12
+export function articlesBlock(data, heading = '', intro = '', exclude = [], limit = 8) {
   const excluded = new Set(exclude.map((g) => g.id));
-  const list = GUIDES.filter((g) => !excluded.has(g.id));
+  const list = (data.guides ?? []).filter((g) => !excluded.has(g.id)).slice(0, limit);
   if (list.length === 0) return '';
   const h2 = heading
     ? `<h2 id="guides-title">${esc(heading)}</h2>
@@ -485,7 +485,7 @@ export function articlesBlock(heading = '', intro = '', exclude = []) {
 // 商品页 → 相关文章区块（相关文章为空时整块省略）
 // precomputed: 调用方先算好的推荐列表（复用给 articlesBlock 的 exclude，避免重复计算）
 export function relatedArticlesBlock(data, product, flavor, precomputed = null) {
-  const list = precomputed ?? relatedArticlesFor(data, product, flavor);
+  const list = (precomputed ?? relatedArticlesFor(data, product, flavor, data.guides)).slice(0, 4);
   if (!list.length) return '';
   const subject = flavor ? `${product.name} · smak ${flavor.name}` : `modelu ${product.name}`;
   return `
@@ -579,7 +579,7 @@ export function renderArticle(data, guide) {
       url: SITE + `/artykul/${guide.id}/`,
       mainEntityOfPage: SITE + `/artykul/${guide.id}/`,
       publisher: { '@type': 'Organization', name: SITE_NAME, url: VAPEPL },
-      datePublished: '2026-10-15',
+      datePublished: guide.datePublished ?? '2026-01-01',
     },
     ...(rec
       ? [
@@ -617,7 +617,7 @@ export function renderArticle(data, guide) {
     </div>
   </section>
   ${recCard}
-  ${articlesBlock('Wszystkie poradniki')}`;
+  ${articlesBlock(data, 'Wszystkie poradniki', '', [], 12)}`;
   return page({
     title: `${guide.title} | ${SITE_NAME}`,
     description: `${guide.summary} Pełna wersja poradnika na vapepl.com.`,
@@ -750,6 +750,7 @@ export function renderHome(data) {
   </section>
   ${reviewsBlock()}
   ${articlesBlock(
+    data,
     'Wiedza o e-papierosach',
     `Poradniki z <a href="${VAPEPL}" rel="nofollow">vapepl.com</a> — wybrane artykuły z zalecanymi produktami:`,
   )}
@@ -813,7 +814,7 @@ export function renderShop(data) {
       ${data.products.map((p) => productCard(p)).join('')}
     </div>
   </section>
-  ${articlesBlock()}
+  ${articlesBlock(data)}
   ${faqBlock(HOME_FAQ, 4)}`;
   const jsonld = [
     organizationLd(),
@@ -961,7 +962,7 @@ export function renderCategory(data, category) {
   </section>` : ''}
   ${category.kind === 'brand' ? compareTable(products) : ''}
   ${faqBlock(categoryFaqs)}
-  ${articlesBlock()}`;
+  ${articlesBlock(data)}`;
   return page({
     title,
     description: desc,
@@ -990,7 +991,7 @@ export function renderProduct(data, product) {
   const desc = product.shortDescription ||
     `${product.name} — jednorazowy e-papieros ${fmtPuffs(product.puffs)} puffs, ${flavors.length} smaków. W promocji: ${fmtZl(product.price)}.`;
   const faqs = productFaq(product, data);
-  const related = relatedArticlesFor(data, product, null);
+  const related = relatedArticlesFor(data, product, null, data.guides).slice(0, 4);
   const jsonld = [
     organizationLd(),
     crumb.ld,
@@ -1048,7 +1049,7 @@ export function renderProduct(data, product) {
   </section>` : ''}
   ${relatedArticlesBlock(data, product, null, related)}
   ${faqBlock(faqs)}
-  ${articlesBlock('Wszystkie poradniki', '', related)}`;
+  ${articlesBlock(data, 'Wszystkie poradniki', '', related)}`;
   return page({
     title: `${product.name} — ${fmtPuffs(product.puffs)} puffs, ${fmtZl(product.price)} | ${SITE_NAME}`,
     description: desc,
@@ -1077,7 +1078,7 @@ export function renderFlavor(data, product, flavor) {
     product.puffs,
   )} puffs, cena ${fmtZl(product.price)} (w promocji, wcześniej ${fmtZl(product.regularPrice)}). Zakup na vapepl.com.`;
   const faqs = flavorFaq(product, flavor, angle);
-  const related = relatedArticlesFor(data, product, flavor);
+  const related = relatedArticlesFor(data, product, flavor, data.guides).slice(0, 4);
   // 跨模型互推：归一化匹配同口味的其他模型（排除当前模型），逐口味页不同
   const myKey = flavorKey(flavor.name);
   const crossModels = data.products
@@ -1158,7 +1159,7 @@ export function renderFlavor(data, product, flavor) {
   </section>` : ''}
   ${relatedArticlesBlock(data, product, flavor, related)}
   ${faqBlock(faqs)}
-  ${articlesBlock('Wszystkie poradniki', '', related)}`;
+  ${articlesBlock(data, 'Wszystkie poradniki', '', related)}`;
   return page({
     title,
     description: desc,
@@ -1259,7 +1260,7 @@ export function renderFlavorLanding(data, group) {
   </section>
   ${related.length ? relatedArticlesFromList(related) : ''}
   ${faqBlock(faqs)}
-  ${articlesBlock('Wszystkie poradniki', '', related)}`;
+  ${articlesBlock(data, 'Wszystkie poradniki', '', related)}`;
   return page({
     title: `Smak ${group.name} — ${group.models} modeli, od ${fmtZl(group.minPrice)} | ${SITE_NAME}`,
     description: `Smak ${group.name} (${angle}) w ${group.models} modelach, od ${fmtZl(
@@ -1353,7 +1354,7 @@ export function renderPuffsBand(data, band) {
   </section>
   ${compareTable(products)}
   ${faqBlock(faqs)}
-  ${articlesBlock()}`;
+  ${articlesBlock(data)}`;
   return page({
     title: `Jednorazówki ${band.label} — ${products.length} modeli | ${SITE_NAME}`,
     description: `Modele z wydajnością ${band.label}: ${products.length} produktów, porównaj puffs i ceny i kup na vapepl.com.`,
@@ -1503,7 +1504,7 @@ export function render404(data) {
       <a class="btn btn-ghost btn-lg" href="/">Strona główna</a>
     </div>
   </section>
-  ${articlesBlock()}`;
+  ${articlesBlock(data)}`;
   return page({
     title: `Nie znaleziono — ${SITE_NAME}`,
     description: 'Ta podstrona nie istnieje. Wróć do sklepu z jednorazówkami i e-papierosami.',
