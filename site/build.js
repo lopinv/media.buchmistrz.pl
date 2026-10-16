@@ -10,7 +10,7 @@ import {
 } from 'node:fs';
 import { dirname, join, relative, posix } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { SITE, SITE_NAME, GUIDES } from './src/content.js';
+import { SITE, SITE_NAME, CNAME, GUIDES } from './src/content.js';
 import {
   renderHome,
   renderShop,
@@ -116,9 +116,13 @@ writeFileSync(
   `User-agent: *\nAllow: /\nDisallow: /404.html\n\nSitemap: ${SITE}/sitemap.xml\n`,
 );
 
+// GitHub Pages 自定义域名：仓库根 CNAME（内容为域名本身，换行结尾），
+// 随构建产物同步到 gh-pages 分支生效
+writeFileSync(join(DIST, 'CNAME'), CNAME + '\n');
+
 // ---------- 内链相对化（在 distFiles 收集之后执行）----------
-// GitHub Pages 子目录部署（lopinv.github.io/media.buchmistrz.pl/）与本地根目录
-// 预览都要可用：按页面深度把 href="/..."、src="/..." 改写为相对路径。
+// GitHub Pages 自定义域名（github.vapepl.com）与本地根目录预览都要可用：
+// 按页面深度把 href="/..."、src="/..." 改写为相对路径。
 // 绝对 URL（https://cdn…、SITE 前缀）不匹配 'href="/'，不受影响。
 
 // ---------- 构建自检：JSON-LD 合法性 + 站内链接可达性（相对化之后校验）----------

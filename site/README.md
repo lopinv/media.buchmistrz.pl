@@ -29,7 +29,7 @@ node site/build.js    # 构建到 site/dist 并自检（JSON-LD 合法性 + 站�
 node site/preview.mjs # 本地预览 http://127.0.0.1:8080
 ```
 
-`build.js` 会自动做内链相对化（GitHub Pages 子目录 `lopinv.github.io/media.buchmistrz.pl/` 与本地根目录预览都可用），并生成 `sitemap.xml`、`robots.txt`、`.nojekyll`、`404.html`。
+`build.js` 会自动做内链相对化（自定义域名 `github.vapepl.com` 与本地根目录预览都可用），并生成 `sitemap.xml`、`robots.txt`、`.nojekyll`、`404.html`、`CNAME`。
 
 ## 页面
 
@@ -44,4 +44,4 @@ node site/preview.mjs # 本地预览 http://127.0.0.1:8080
 
 ## 域名
 
-当前用默认 GitHub Pages 域名 `https://lopinv.github.io/media.buchmistrz.pl/`（canonical 均基于此前缀）。如需绑定 `media.buchmistrz.pl`，在 `gh-pages` 根加 `CNAME` 并同步改 `src/content.js` 里的 `SITE` 常量后重新构建。
+绑定自定义域名 `https://github.vapepl.com`（`SITE` 常量驱动 canonical/sitemap/OGP/JSON-LD，全部基于此前缀）。`build.js` 生成 `CNAME` 文件，随构建产物同步到 `gh-pages` 根即生效。DNS 侧需在 `vapepl.com` 的解析后台添加 CNAME 记录：`github` → `lopinv.github.io`（GitHub Pages 仓库名），生效前该域名无法解析。GitHub 侧无需额外开关，`CNAME` 文件即声明自定义域名。
