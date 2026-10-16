@@ -218,6 +218,130 @@ export function relatedArticlesFor(data, product, flavor) {
     .map((x) => x.guide);
 }
 
+// ---------- 定制 FAQ 生成器：逐页真实数值，消除页面间文案雷同（AEO 友好） ----------
+const pln = (n) => new Intl.NumberFormat('pl-PL', { minimumFractionDigits: 2 }).format(n) + ' zł';
+const puffsFmt = (n) => new Intl.NumberFormat('pl-PL').format(n);
+
+// 模型页 3 题：puffs（含品牌内对比）/ 口味数 / 促销价
+export function productFaq(product, data) {
+  const siblings = data.products.filter((p) => p.brand === product.brand);
+  const biggest = siblings.reduce((a, b) => ((b.puffs ?? 0) > (a.puffs ?? 0) ? b : a), product);
+  const puffsNote =
+    biggest.slug === product.slug
+      ? ` — to największy model marki ${product.brand} pod względem wydajności`
+      : `; w tej marce większą wydajność oferuje ${biggest.name} (${puffsFmt(biggest.puffs)} puffs)`;
+  const discount =
+    product.onSale && product.regularPrice > product.price
+      ? Math.round((1 - product.price / product.regularPrice) * 100)
+      : null;
+  return [
+    {
+      q: `Ile puffs ma ${product.name}?`,
+      a: `${product.name} oferuje ${puffsFmt(product.puffs)} puffs${puffsNote}.`,
+    },
+    {
+      q: `W ilu smakach dostępny jest ${product.name}?`,
+      a: `Model ma ${product.flavors.length} wariantów smakowych — każdy wariant ma własną stronę, którą porównasz przed zakupem na vapepl.com.`,
+    },
+    {
+      q: `Ile kosztuje ${product.name}?`,
+      a: discount
+        ? `W promocji zapłacisz ${pln(product.price)} zamiast ${pln(product.regularPrice)} — cena niższa o ${discount}%.`
+        : `Cena to ${pln(product.price)}.`,
+    },
+  ];
+}
+
+// 分类页 3 题：品牌页（模型数/价格区间/最大 puffs）与口味页（产品数/价格区间/畅销模型）各一组
+export function categoryFaq(data, category, products) {
+  const minP = products.length ? Math.min(...products.map((p) => p.price)) : null;
+  const maxP = products.length ? Math.max(...products.map((p) => p.price)) : null;
+  if (category.kind === 'brand') {
+    if (!products.length) {
+      return [
+        {
+          q: `Czy w ofercie są produkty marki ${category.name}?`,
+          a: `W tej chwili podgląd nie zawiera modeli ${category.name} — pełną ofertę zobaczysz w sklepie vapepl.com.`,
+        },
+      ];
+    }
+    const biggest = products.reduce((a, b) => ((b.puffs ?? 0) > (a.puffs ?? 0) ? b : a));
+    return [
+      {
+        q: `Ile modeli marki ${category.name} jest w ofercie?`,
+        a: `Marka ${category.name} ma w ofercie ${products.length} modeli: ${products.map((p) => p.name).join(', ')}.`,
+      },
+      {
+        q: `Od jakiej ceny zaczynają się produkty ${category.name}?`,
+        a: `Ceny wynoszą od ${pln(minP)}${minP !== maxP ? ` do ${pln(maxP)}` : ''} — wszystkie modele w promocji.`,
+      },
+      {
+        q: `Który model ${category.name} ma najwięcej puffs?`,
+        a: `${biggest.name} — ${puffsFmt(biggest.puffs)} puffs przy cenie ${pln(biggest.price)}.`,
+      },
+    ];
+  }
+  // 口味分类
+  if (!products.length) {
+    return [
+      {
+        q: `Czy w kategorii ${category.name} są teraz produkty?`,
+        a: `Kategoria ${category.name} jest teraz pusta w podglądzie — pełną listę smaków znajdziesz w sklepie vapepl.com.`,
+      },
+    ];
+  }
+  const top = (data.topSellers ?? [])
+    .map((s) => products.find((p) => p.slug === s))
+    .find(Boolean);
+  const richest = products.reduce((a, b) => (b.flavors.length > a.flavors.length ? b : a));
+  const totalFlavors = products.reduce((s, p) => s + p.flavors.length, 0);
+  const best =
+    top
+      ? {
+          q: `Który model ze smaków ${category.name} sprzedaje się najlepiej?`,
+          a: `Najczęściej wybierany w tej kategorii jest ${top.name} (${pln(top.price)}, ${top.flavors.length} smaków).`,
+        }
+      : {
+          q: `Który model w kategorii ${category.name} ma najwięcej smaków?`,
+          a: `${richest.name} — ${richest.flavors.length} wariantów smakowych, czyli najszerszy wybór w tej kategorii.`,
+        };
+  return [
+    {
+      q: `Ile produktów ma smak ${category.name}?`,
+      a: `Kategoria ${category.name} obejmuje ${products.length} modeli, łącznie ${totalFlavors} wariantów smakowych.`,
+    },
+    {
+      q: `Od jakiej ceny zaczynają się smaki ${category.name}?`,
+      a: `Ceny w kategorii to ${pln(minP)}${minP !== maxP ? `–${pln(maxP)}` : ''} za urządzenie, wszystkie w promocji.`,
+    },
+    best,
+  ];
+}
+
+// 口味页 3 题：口味描述（flavorAngle）/ 品牌原创性 / 该模型促销折扣
+export function flavorFaq(product, flavor, angle) {
+  const discount =
+    product.onSale && product.regularPrice > product.price
+      ? Math.round((1 - product.price / product.regularPrice) * 100)
+      : null;
+  return [
+    {
+      q: `Jak smakuje ${flavor.name} w ${product.name}?`,
+      a: `Smak ${flavor.name} to ${angle}. To jeden z ${product.flavors.length} dostępnych wariantów modelu ${product.name}.`,
+    },
+    {
+      q: `Czy produkty marki ${product.brand} są oryginalne?`,
+      a: `Tak — ${product.brand} to jedna z ${STATS.brandsLabel} marek w ofercie. Wszelkie towary pochodzą z oficjalnych kanałów dystrybucji; weryfikację autentyczności możesz poprosić u obsługi.`,
+    },
+    {
+      q: `Ile kosztuje ${product.name} w smaku ${flavor.name}?`,
+      a: discount
+        ? `W promocji zapłacisz ${pln(product.price)} zamiast ${pln(product.regularPrice)} — rabat ${discount}%. Odbiór Paczkomatem InPost lub kurierem DPD.`
+        : `Cena to ${pln(product.price)}. Odbiór Paczkomatem InPost lub kurierem DPD.`,
+    },
+  ];
+}
+
 export const WHY_US = [
   { icon: 'shield-check', title: 'Gwarancja Jakości' },
   { icon: 'truck', title: 'Szybka Wysyłka' },

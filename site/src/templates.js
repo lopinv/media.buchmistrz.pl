@@ -20,6 +20,9 @@ import {
   flavorAngle,
   recommendProductsFor,
   relatedArticlesFor,
+  productFaq,
+  categoryFaq,
+  flavorFaq,
 } from './content.js';
 
 // ---------- 基础工具 ----------
@@ -450,8 +453,12 @@ export function articleCard(guide) {
 }
 
 // 文章列表模块：全页复用。heading 非空时渲染可视 h2（首页/商品页/文章页），
-// 其余页面用 sr-only 标题避免与"相关文章"区块撞名；intro 为可信 HTML（含链接），不转义
-export function articlesBlock(heading = '', intro = '') {
+// 其余页面用 sr-only 标题避免与"相关文章"区块撞名；intro 为可信 HTML（含链接），不转义；
+// exclude 传入已展示过的相关文章（避免同一页重复出现相同卡片），全空时整块省略
+export function articlesBlock(heading = '', intro = '', exclude = []) {
+  const excluded = new Set(exclude.map((g) => g.id));
+  const list = GUIDES.filter((g) => !excluded.has(g.id));
+  if (list.length === 0) return '';
   const h2 = heading
     ? `<h2 id="guides-title">${esc(heading)}</h2>
         ${intro ? `<p>${intro}</p>` : ''}`
@@ -462,15 +469,16 @@ export function articlesBlock(heading = '', intro = '') {
     <div class="container">
       ${h2}
       <div class="article-grid">
-        ${GUIDES.map((g) => articleCard(g)).join('')}
+        ${list.map((g) => articleCard(g)).join('')}
       </div>
     </div>
   </section>`;
 }
 
 // 商品页 → 相关文章区块（相关文章为空时整块省略）
-export function relatedArticlesBlock(data, product, flavor) {
-  const list = relatedArticlesFor(data, product, flavor);
+// precomputed: 调用方先算好的推荐列表（复用给 articlesBlock 的 exclude，避免重复计算）
+export function relatedArticlesBlock(data, product, flavor, precomputed = null) {
+  const list = precomputed ?? relatedArticlesFor(data, product, flavor);
   if (!list.length) return '';
   const subject = flavor ? `${product.name} · smak ${flavor.name}` : `modelu ${product.name}`;
   return `
@@ -482,6 +490,59 @@ export function relatedArticlesBlock(data, product, flavor) {
       </div>
       <div class="article-grid">
         ${list.map((g) => articleCard(g)).join('')}
+      </div>
+    </div>
+  </section>`;
+}
+
+// 数据条：4 格小卡（图标 + 数值 + 标签），数值由调用处按页型传入 → 页面间数字各不相同
+export function statStrip(items) {
+  if (!items.length) return '';
+  return `
+  <section class="stat-strip" aria-label="W liczbach">
+    <div class="container">
+      ${items
+        .map(
+          (s) => `
+    <div class="stat-item">
+      ${icon(s.icon ?? 'percent')}
+      <b>${esc(s.value)}</b>
+      <span>${esc(s.label)}</span>
+    </div>`,
+        )
+        .join('')}
+    </div>
+  </section>`;
+}
+
+// 品牌分类页模型对比表：puffs/口味数/现价，按 puffs 降序，最大模型行高亮
+export function compareTable(products) {
+  if (products.length < 2) return '';
+  const rows = [...products].sort((a, b) => (b.puffs ?? 0) - (a.puffs ?? 0));
+  const topSlug = rows[0].slug;
+  return `
+  <section class="section section--center" aria-labelledby="compare-title">
+    <div class="container">
+      <h2 id="compare-title">Porównanie modeli</h2>
+      <div class="table-scroll">
+      <table class="compare-table">
+        <thead>
+          <tr><th scope="col">Model</th><th scope="col">Puffs</th><th scope="col">Smaki</th><th scope="col">Cena</th></tr>
+        </thead>
+        <tbody>
+          ${rows
+            .map(
+              (p) => `
+          <tr${p.slug === topSlug ? ' class="is-top"' : ''}>
+            <th scope="row"><a href="/produkt/${esc(p.slug)}/">${esc(p.name)}</a>${p.slug === topSlug ? ' <span class="row-badge">Największy</span>' : ''}</th>
+            <td>${fmtPuffs(p.puffs)}</td>
+            <td>${p.flavors.length}</td>
+            <td>${fmtZl(p.price)}</td>
+          </tr>`,
+            )
+            .join('')}
+        </tbody>
+      </table>
       </div>
     </div>
   </section>`;
@@ -685,11 +746,20 @@ export function renderHome(data) {
 export function renderShop(data) {
   const top = topProducts(data);
   const crumb = breadcrumbs([{ label: 'Sklep', url: '/sklep/' }]);
+  const flavorsTotal = data.products.reduce((s, p) => s + p.flavors.length, 0);
+  const minPrice = Math.min(...data.products.map((p) => p.price));
+  const stats = [
+    { icon: 'leaf', value: String(data.products.length), label: 'modeli w ofercie' },
+    { icon: 'droplet', value: String(flavorsTotal), label: 'smaków do wyboru' },
+    { icon: 'banknote', value: fmtZl(minPrice), label: 'ceny od' },
+    { icon: 'percent', value: '−20%', label: 'rabat ilościowy' },
+  ];
   const body = `
   ${crumb.html}
   <div class="container page-title-row">
     <h1>Sklep — wszystkie ${data.products.length} modeli</h1>
   </div>
+  ${statStrip(stats)}
   ${discountBlock()}
   ${trustStrip()}
   <section class="section section--center" aria-labelledby="top-title">
@@ -748,11 +818,46 @@ export function renderCategory(data, category) {
     { label: 'Sklep', url: '/sklep/' },
     { label: category.name, url: `/kategoria/${category.slug}/` },
   ]);
+  const categoryFaqs = categoryFaq(data, category, products);
   const jsonld = [
     organizationLd(),
     crumb.ld,
     itemListLd(products.map((p) => ({ name: p.name, url: SITE + `/produkt/${p.slug}/` }))),
+    faqLd(categoryFaqs),
   ];
+  // 统计条：分类级数值（产品数/口味数/价格区间/最低单千 puff 成本），逐页不同
+  const stats = products.length
+    ? (() => {
+        const minP = Math.min(...products.map((p) => p.price));
+        const maxP = Math.max(...products.map((p) => p.price));
+        const flavorsTotal = products.reduce((s, p) => s + p.flavors.length, 0);
+        const eff = products
+          .filter((p) => p.puffs > 0)
+          .map((p) => (p.price / p.puffs) * 1000);
+        const bestEff = eff.length ? Math.min(...eff) : null;
+        return [
+          { icon: 'leaf', value: String(products.length), label: category.kind === 'brand' ? 'modeli marki' : 'produktów w smaku' },
+          { icon: 'droplet', value: String(flavorsTotal), label: 'smaków łącznie' },
+          {
+            icon: 'banknote',
+            value:
+              minP === maxP
+                ? fmtZl(minP)
+                : `${fmtZl(minP)} – ${fmtZl(maxP)}`,
+            label: 'zakres cen',
+          },
+          bestEff === null
+            ? { icon: 'percent', value: '—', label: 'zł / 1000 puffs' }
+            : {
+                icon: 'percent',
+                value:
+                  new Intl.NumberFormat('pl-PL', { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(bestEff) +
+                  ' zł',
+                label: 'najtańszy puffs kosztuje',
+              },
+        ];
+      })()
+    : [];
   const body = `
   ${crumb.html}
   <section class="page-hero">
@@ -769,6 +874,9 @@ export function renderCategory(data, category) {
       ${products.length ? products.map((p) => productCard(p)).join('') : '<p>Brak produktów w tej kategorii.</p>'}
     </div>
   </section>
+  ${statStrip(stats)}
+  ${category.kind === 'brand' ? compareTable(products) : ''}
+  ${faqBlock(categoryFaqs)}
   ${articlesBlock()}`;
   return page({
     title,
@@ -797,10 +905,13 @@ export function renderProduct(data, product) {
   const image = product.image ?? '';
   const desc = product.shortDescription ||
     `${product.name} — jednorazowy e-papieros ${fmtPuffs(product.puffs)} puffs, ${flavors.length} smaków. W promocji: ${fmtZl(product.price)}.`;
+  const faqs = productFaq(product, data);
+  const related = relatedArticlesFor(data, product, null);
   const jsonld = [
     organizationLd(),
     crumb.ld,
     productLd({ product, flavor: null, image }),
+    faqLd(faqs),
   ];
   const specs = [
     ['Marka', product.brand],
@@ -851,9 +962,9 @@ export function renderProduct(data, product) {
       </div>
     </div>
   </section>` : ''}
-  ${relatedArticlesBlock(data, product, null)}
-  ${faqBlock(HOME_FAQ, 3)}
-  ${articlesBlock('Wszystkie poradniki')}`;
+  ${relatedArticlesBlock(data, product, null, related)}
+  ${faqBlock(faqs)}
+  ${articlesBlock('Wszystkie poradniki', '', related)}`;
   return page({
     title: `${product.name} — ${fmtPuffs(product.puffs)} puffs, ${fmtZl(product.price)} | ${SITE_NAME}`,
     description: desc,
@@ -881,10 +992,13 @@ export function renderFlavor(data, product, flavor) {
   const desc = `${product.name} w smaku ${flavor.name} — ${angle}. Wydajność ${fmtPuffs(
     product.puffs,
   )} puffs, cena ${fmtZl(product.price)} (w promocji, wcześniej ${fmtZl(product.regularPrice)}). Zakup na vapepl.com.`;
+  const faqs = flavorFaq(product, flavor, angle);
+  const related = relatedArticlesFor(data, product, flavor);
   const jsonld = [
     organizationLd(),
     crumb.ld,
     productLd({ product, flavor, image: product.image ?? '' }),
+    faqLd(faqs),
   ];
   const body = `
   ${crumb.html}
@@ -930,25 +1044,9 @@ export function renderFlavor(data, product, flavor) {
       </div>
     </div>
   </section>
-  ${relatedArticlesBlock(data, product, flavor)}
-  ${faqBlock(
-    [
-      {
-        q: `Jak smakuje ${flavor.name} w ${product.name}?`,
-        a: `Smak ${flavor.name} to ${angle}. To jeden z ${product.flavors.length} dostępnych wariantów modelu ${product.name}.`,
-      },
-      {
-        q: 'Czy produkty są oryginalne?',
-        a: 'Tak — wszystkie produkty pochodzą z oficjalnych kanałów dystrybucji. Weryfikację autentyczności można poprosić u obsługi.',
-      },
-      {
-        q: 'Jak złożyć zamówienie na ten smak?',
-        a: `Kliknij przycisk „Kup smak ${flavor.name}” powyżej — otworzy on kartę produktu na vapepl.com z wybranym wariantem. Odbiór Paczkomatem InPost lub kurierem DPD.`,
-      },
-    ],
-    3,
-  )}
-  ${articlesBlock('Wszystkie poradniki')}`;
+  ${relatedArticlesBlock(data, product, flavor, related)}
+  ${faqBlock(faqs)}
+  ${articlesBlock('Wszystkie poradniki', '', related)}`;
   return page({
     title,
     description: desc,
