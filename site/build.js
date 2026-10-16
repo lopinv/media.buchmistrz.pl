@@ -81,6 +81,44 @@ for (const product of data.products) {
 // 文章页（vapepl.com 精选文章站内镜像）
 for (const guide of data.guides) out(`artykul/${guide.id}/index.html`, renderArticle(data, guide));
 
+// 旧文章 URL 301 重定向：这几个 slug 已被数据驱动文章库取代、不再有站内链接，
+// 但作为历史 URL（外链/搜索收录）保留入口，按「就近匹配」指向新文章或回落 /sklep/。
+// 页面位于 /artykul/<slug>/（相对站点根深度 2），目标用站点根绝对路径书写，
+// 此处换算成与深度匹配的相对写法（根目录预览与 GitHub Pages 子目录双兼容，同 /produkt/ 先例）。
+const LEGACY_ARTICLE_REDIRECTS = [
+  ['najlepsza-jednorazowka-5-scenariuszy', '/artykul/najlepsze-jednorazowki-tornado-lux-i-stag/'],
+  ['randm-tornado-9000-poradnik', '/artykul/jednorazowka-cena-dni-uzycia-tornado-9k-lux-i-stag-bar/'],
+  ['co-zamiast-jednorazowek', '/artykul/liquid-pl-dla-poczatkujacych-dream-lux-i-stag-krok-po-kroku/'],
+  ['iqos-vs-papieros', '/sklep/'],
+  ['e-papieros-vs-papieros', '/sklep/'],
+  ['jednorazowka-50mg', '/sklep/'],
+];
+for (const [slug, target] of LEGACY_ARTICLE_REDIRECTS) {
+  // 深度 2 相对换算：同目录 artykul/ 兄弟用 ../<slug>/，其余用 ../../<target 去根>
+  const relTarget = target.startsWith('/artykul/')
+    ? `../${target.slice('/artykul/'.length)}`
+    : `../../${target.slice(1)}`;
+  out(
+    `artykul/${slug}/index.html`,
+    `<!doctype html>
+<html lang="pl">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta http-equiv="refresh" content="0; url=${relTarget}">
+  <link rel="canonical" href="${SITE}${target}">
+  <meta name="robots" content="noindex">
+  <title>Przekierowanie — ${SITE_NAME}</title>
+  <script>location.replace('${relTarget}');</script>
+</head>
+<body>
+  <p>Przekierowanie… <a href="${relTarget}">Przejdź dalej</a></p>
+</body>
+</html>
+`,
+  );
+}
+
 // 静态资源与辅助文件
 // /produkt/ 直接访问（不带 slug）不是真实路由：重定向到商品列表页，避免落到 404。
 // ../sklep/ 相对写法在 GitHub Pages 子目录与本地根预览下都成立。
