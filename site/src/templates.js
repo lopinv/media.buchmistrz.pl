@@ -568,7 +568,6 @@ export function renderHome(data) {
     slug,
     ...c,
     count: data.categories.find((x) => x.slug === slug)?.count ?? 0,
-    image: data.categories.find((x) => x.slug === slug)?.image ?? null,
   }));
   const heroImage = bySlug.get('stag-bar-6in1-180000-puffs')?.image;
   const jsonld = [
@@ -651,7 +650,6 @@ export function renderHome(data) {
           .map(
             (c) => `
       <a class="flavor-card" href="/kategoria/${esc(c.slug)}/">
-        ${c.image ? `<img src="${esc(c.image)}" alt="" loading="lazy">` : ''}
         ${icon(c.icon)}
         <b>${esc(c.name)}</b>
         <span>${c.count} produktów</span>
@@ -689,12 +687,9 @@ export function renderShop(data) {
   const crumb = breadcrumbs([{ label: 'Sklep', url: '/sklep/' }]);
   const body = `
   ${crumb.html}
-  <section class="page-hero">
-    <div class="container">
-      <h1>Sklep — wszystkie ${data.products.length} modeli</h1>
-      <p>Wybierz model, zobacz smaki i ceny, a zakup sfinalizujesz w <a href="${VAPEPL}" rel="nofollow">vapepl.com</a>. Wszystkie produkty w promocji.</p>
-    </div>
-  </section>
+  <div class="container page-title-row">
+    <h1>Sklep — wszystkie ${data.products.length} modeli</h1>
+  </div>
   ${discountBlock()}
   ${trustStrip()}
   <section class="section section--center" aria-labelledby="top-title">
