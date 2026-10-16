@@ -2,4 +2,4 @@ User-agent: *
 Allow: /
 Disallow: /404.html
 
-Sitemap: https://lopinv.github.io/media.buchmistrz.pl/sitemap.xml
+Sitemap: https://github.vapepl.com/sitemap.xml
