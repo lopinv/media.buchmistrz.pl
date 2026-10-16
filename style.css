@@ -280,6 +280,49 @@ nav.breadcrumbs + .page-hero { padding-top: 0; }
 .trust-item .icon { color: var(--brand); }
 .trust-item b { display: block; font-weight: 700; font-size: 16px; }
 
+/* ---------- 数据条（stat-strip：图标 + 数值 + 标签，页面间数值各不相同） ---------- */
+.stat-strip { padding-block: 26px; border-block: 1px solid var(--line); background: var(--surface); }
+.stat-strip .container { display: grid; grid-template-columns: 1fr; gap: 14px; }
+.stat-item {
+  display: flex; align-items: center; gap: 12px;
+  background: var(--surface-2); border: 1px solid var(--line);
+  border-radius: var(--radius-sm); padding: 14px 16px;
+}
+.stat-item .icon { color: var(--brand); flex-shrink: 0; }
+.stat-item b { font-size: 18px; font-weight: 800; font-variant-numeric: tabular-nums; letter-spacing: -0.01em; }
+.stat-item span { color: var(--ink-mute); font-size: 13px; }
+
+/* ---------- 品牌模型对比表（compare-table） ---------- */
+.compare-table {
+  width: 100%; border-collapse: collapse;
+  background: var(--surface-2); border: 1px solid var(--line);
+  border-radius: var(--radius); overflow: hidden;
+  text-align: left;
+}
+.table-scroll { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+.table-scroll .compare-table { min-width: 560px; }
+.compare-table th, .compare-table td {
+  padding: 14px 16px; border-bottom: 1px solid var(--line);
+  font-variant-numeric: tabular-nums;
+}
+.compare-table thead th {
+  background: var(--surface); color: var(--ink-mute);
+  font-size: 12px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase;
+}
+.compare-table tbody tr:last-child td, .compare-table tbody tr:last-child th { border-bottom: none; }
+.compare-table tbody tr:hover { background: rgba(34, 211, 238, 0.05); }
+.compare-table th[scope="row"] a { color: var(--ink); font-weight: 700; text-decoration: none; }
+.compare-table th[scope="row"] a:hover { color: var(--brand); }
+.compare-table td { color: var(--ink-soft); }
+.compare-table tr.is-top th, .compare-table tr.is-top td { background: rgba(34, 211, 238, 0.06); }
+.compare-table tr.is-top th a { color: var(--brand); }
+.row-badge {
+  display: inline-block; vertical-align: middle; margin-left: 8px;
+  font-size: 10px; font-weight: 800; letter-spacing: 0.08em; text-transform: uppercase;
+  color: var(--accent); border: 1px solid var(--accent);
+  border-radius: 999px; padding: 2px 8px;
+}
+
 /* ---------- 卡片通用（深表面 + hairline + 深阴影 + hover 微升/青描边/光晕）---------- */
 .product-card, .review, .brand-card, .flavor-card, .contact-card {
   box-shadow: var(--shadow-soft);
@@ -596,6 +639,7 @@ a.brand-card:hover, a.flavor-card:hover, a.contact-card:hover,
   .card-actions { flex-direction: row; gap: 8px; }
   .card-actions .btn { flex: 1; padding: 10px 12px; font-size: 15px; }
   .trust-strip .container { grid-template-columns: repeat(2, 1fr); }
+  .stat-strip .container { grid-template-columns: repeat(2, 1fr); }
   .reviews-grid { grid-template-columns: repeat(2, 1fr); }
   .contact-grid { grid-template-columns: repeat(2, 1fr); }
   .top-flavors { grid-template-columns: repeat(2, 1fr); }
@@ -615,6 +659,7 @@ a.brand-card:hover, a.flavor-card:hover, a.contact-card:hover,
   .top-flavors { grid-template-columns: repeat(3, 1fr); }
   .article-grid { grid-template-columns: repeat(3, 1fr); }
   .returns-grid { grid-template-columns: repeat(3, 1fr); }
+  .stat-strip .container { grid-template-columns: repeat(4, 1fr); }
 
   /* 桌面导航：显示顶栏 + 下拉，隐藏汉堡与移动菜单（base 已 display:none，无需 !important） */
   .nav-toggle { display: none; }
