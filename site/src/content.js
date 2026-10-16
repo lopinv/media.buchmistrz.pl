@@ -53,20 +53,160 @@ export const DISCOUNT_TIERS = [
   { qty: '15+ szt.', off: '−20%' },
 ];
 
-export const TOP_FLAVORS = [
-  { name: 'Watermelon Ice', rank: 1 },
-  { name: 'Strawberry Ice', rank: 2 },
-  { name: 'Strawberry Watermelon', rank: 3 },
-  { name: 'Grape Ice', rank: 4 },
-  { name: 'Lemon Lime', rank: 5 },
-  { name: 'Blueberry On Ice', rank: 6 },
-  { name: 'Strawberry Kiwi', rank: 7 },
-  { name: 'Kiwi Passion Fruit Guava', rank: 8 },
-  { name: 'Mixed Berries', rank: 9 },
-  { name: 'Blueberry Raspberry', rank: 10 },
-  { name: 'Mixed Berry', rank: 11 },
-  { name: 'Pink Lemonade', rank: 12 },
+// 口味榜（首页 Top 12）与口味落地页（/smak/<slug>/）都由站内口味频次实时驱动，
+// 不再写死静态榜单：flavorGroups() 按归一化名分组并统计跨产品出现次数。
+
+// 口味归一化键：先解码 HTML 实体（口味名里的 &amp; 等），统一大小写，
+// 再合并 & 号变体（如 'Lemon & Lime' 与 'LEMON LIME' 并为一组）
+export function flavorKey(name) {
+  return String(name)
+    .replace(/&amp;/gi, '&')
+    .replace(/&/g, ' ')
+    .replace(/\s+/g, ' ')
+    .trim()
+    .toLowerCase();
+}
+
+// 归一化键 → 可读展示名（逐词首字母大写）
+export const flavorPretty = (key) =>
+  key
+    .split(' ')
+    .map((w) => w.charAt(0).toUpperCase() + w.slice(1))
+    .join(' ');
+
+// 归一化键 → URL slug
+export function flavorSlug(key) {
+  return key.replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '');
+}
+
+// 口味分组：group = { key, name, slug, count（出现次数）, products（[{product, flavor}]），
+// minPrice, maxPrice, maxPuffs, models }；count >= min 才返回（落地页门槛）
+export function flavorGroups(data, min = 3) {
+  const map = new Map();
+  for (const p of data.products) {
+    for (const f of p.flavors) {
+      const key = flavorKey(f.name);
+      const g = map.get(key) ?? {
+        key,
+        name: flavorPretty(key),
+        slug: flavorSlug(key),
+        count: 0,
+        products: [],
+      };
+      g.count += 1;
+      g.products.push({ product: p, flavor: f });
+      map.set(key, g);
+    }
+  }
+  const groups = [...map.values()]
+    .filter((g) => g.count >= min)
+    .map((g) => {
+      const prices = g.products.map((x) => x.product.price);
+      const puffs = g.products.map((x) => x.product.puffs ?? 0);
+      return {
+        ...g,
+        models: g.products.length,
+        minPrice: Math.min(...prices),
+        maxPrice: Math.max(...prices),
+        maxPuffs: Math.max(...puffs),
+      };
+    });
+  groups.sort((a, b) => b.count - a.count || a.name.localeCompare(b.name, 'pl'));
+  return groups;
+}
+
+// 波兰语复数：model（1）/ modele（2-4）/ modeli（5+），用于数据条与 FAQ 数值
+export function pluralModels(n) {
+  const d = n % 10,
+    h = n % 100;
+  if (d === 1 && h !== 11) return 'model';
+  if (d >= 2 && d <= 4 && (h < 10 || h >= 20)) return 'modele';
+  return 'modeli';
+}
+
+// 波兰语复数：produkt / produkty / produktów（同规则）
+export function pluralProducts(n) {
+  const d = n % 10,
+    h = n % 100;
+  if (d === 1 && h !== 11) return 'produkt';
+  if (d >= 2 && d <= 4 && (h < 10 || h >= 20)) return 'produkty';
+  return 'produktów';
+}
+
+// puffs 分段（合成"品类"，URL 挂在 /kategoria/puffs-<id>/ 下）
+export const PUFF_BANDS = [
+  { id: 'do-20k', label: 'do 20 000 puffs', min: 0, max: 20000 },
+  { id: '20-50k', label: '20 000–50 000 puffs', min: 20000, max: 50000 },
+  { id: '50-100k', label: '50 000–100 000 puffs', min: 50000, max: 100000 },
+  { id: '100k-plus', label: '100 000+ puffs', min: 100000, max: Infinity },
 ];
+
+export function puffBandsFor(data) {
+  return PUFF_BANDS.map((b) => ({
+    ...b,
+    products: data.products.filter(
+      (p) => (p.puffs ?? 0) > b.min && (p.puffs ?? 0) <= b.max,
+    ),
+  }));
+}
+
+// 口味落地页 FAQ（3 题，数值逐页不同）
+export function flavorLandingFaq(group) {
+  const models = [...new Set(group.products.map((x) => x.product.name))];
+  const biggest = group.products.reduce(
+    (a, b) => ((b.product.puffs ?? 0) > (a.product.puffs ?? 0) ? b : a),
+  );
+  return [
+    {
+      q: `W ilu modelach dostępny jest smak ${group.name}?`,
+      a: `Smak ${group.name} oferują ${group.models} ${pluralModels(group.models)}: ${models.join(', ')}. Każdy wariant ma wycenę ${pln(group.minPrice)}–${pln(
+        group.maxPrice,
+      )}.`,
+    },
+    {
+      q: `Od jakiej ceny kupisz smak ${group.name}?`,
+      a: `W promocji ceny wynoszą ${pln(group.minPrice)}${
+        group.minPrice !== group.maxPrice ? `–${pln(group.maxPrice)}` : ''
+      } — zależnie od modelu i jego liczby puffs.`,
+    },
+    {
+      q: `Który model ze smaku ${group.name} ma najwięcej puffs?`,
+      a: `${biggest.product.name} — ${puffsFmt(biggest.product.puffs)} puffs w smaku ${group.name}, cena ${pln(
+        biggest.product.price,
+      )}.`,
+    },
+  ];
+}
+
+// puffs 分段页 FAQ（3 题，段内数值逐段不同）
+export function puffBandFaq(band, products) {
+  const eff = products
+    .filter((p) => p.puffs > 0)
+    .map((p) => ({ p, v: (p.price / p.puffs) * 1000 }));
+  const best = eff.length ? eff.reduce((a, b) => (b.v < a.v ? b : a)) : null;
+  const minP = Math.min(...products.map((p) => p.price));
+  const maxP = Math.max(...products.map((p) => p.price));
+  return [
+    {
+      q: `Ile modeli ma wydajność ${band.label}?`,
+      a: `W tym segmencie jest ${products.length} ${pluralModels(products.length)}: ${products
+        .map((p) => p.name)
+        .join(', ')}.`,
+    },
+    {
+      q: `Od jakiej ceny zaczynają się modele ${band.label}?`,
+      a: `Ceny w segmencie: od ${pln(minP)}${minP !== maxP ? ` do ${pln(maxP)}` : ''} — wszystkie w promocji.`,
+    },
+    {
+      q: `Który model w przedziale ${band.label} ma najlepszy stosunek ceny do puffs?`,
+      a: best
+        ? `${best.p.name} — ${new Intl.NumberFormat('pl-PL', { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(
+            best.v,
+          )} zł za 1 000 puffs, czyli najtańszy puffs w segmencie.`
+        : 'W segmencie brak modeli z deklarowaną liczbą puffs.',
+    },
+  ];
+}
 
 // FAQ strony głównej (AEO: pytanie → 2-3 zdania bezpośredniej odpowiedzi)
 export const HOME_FAQ = [
@@ -269,7 +409,7 @@ export function categoryFaq(data, category, products) {
     return [
       {
         q: `Ile modeli marki ${category.name} jest w ofercie?`,
-        a: `Marka ${category.name} ma w ofercie ${products.length} modeli: ${products.map((p) => p.name).join(', ')}.`,
+        a: `Marka ${category.name} ma w ofercie ${products.length} ${pluralModels(products.length)}: ${products.map((p) => p.name).join(', ')}.`,
       },
       {
         q: `Od jakiej ceny zaczynają się produkty ${category.name}?`,
@@ -308,7 +448,7 @@ export function categoryFaq(data, category, products) {
   return [
     {
       q: `Ile produktów ma smak ${category.name}?`,
-      a: `Kategoria ${category.name} obejmuje ${products.length} modeli, łącznie ${totalFlavors} wariantów smakowych.`,
+      a: `Kategoria ${category.name} obejmuje ${products.length} ${pluralProducts(products.length)}, łącznie ${totalFlavors} wariantów smakowych.`,
     },
     {
       q: `Od jakiej ceny zaczynają się smaki ${category.name}?`,

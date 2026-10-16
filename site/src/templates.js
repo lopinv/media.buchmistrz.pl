@@ -11,7 +11,6 @@ import {
   FLAVOR_CATS,
   REVIEWS,
   DISCOUNT_TIERS,
-  TOP_FLAVORS,
   HOME_FAQ,
   GUIDES,
   WHY_US,
@@ -23,6 +22,14 @@ import {
   productFaq,
   categoryFaq,
   flavorFaq,
+  flavorGroups,
+  flavorKey,
+  pluralModels,
+  pluralProducts,
+  PUFF_BANDS,
+  puffBandsFor,
+  flavorLandingFaq,
+  puffBandFaq,
 } from './content.js';
 
 // ---------- 基础工具 ----------
@@ -630,6 +637,12 @@ export function renderHome(data) {
     ...c,
     count: data.categories.find((x) => x.slug === slug)?.count ?? 0,
   }));
+  // 口味榜数据化：站内口味频次实时排序（flavorGroups 已按频次降序），
+  // 有落地页（≥3 款）的口味名链到 /smak/<slug>/
+  const topFlavors = flavorGroups(data, 1).slice(0, 12).map((g, i) => ({
+    ...g,
+    rank: i + 1,
+  }));
   const heroImage = bySlug.get('stag-bar-6in1-180000-puffs')?.image;
   const jsonld = [
     organizationLd(),
@@ -720,7 +733,18 @@ export function renderHome(data) {
       </div>
       <h3 class="subhead">Najpopularniejsze smaki</h3>
       <ul class="top-flavors">
-        ${TOP_FLAVORS.map((f) => `<li><span class="flavor-rank${f.rank <= 3 ? ` top-${f.rank}` : ''}" aria-hidden="true">${f.rank}</span> ${esc(f.name)}</li>`).join('')}
+        ${topFlavors
+          .map(
+            (f) => `
+      <li>
+        <span class="flavor-rank${f.rank <= 3 ? ` top-${f.rank}` : ''}" aria-hidden="true">${f.rank}</span>
+        ${f.models >= 3
+          ? `<a href="/smak/${esc(f.slug)}/">${esc(f.name)}</a>`
+          : esc(f.name)}
+        <span class="flavor-cnt">${f.models} ${pluralModels(f.models)}</span>
+      </li>`,
+          )
+          .join('')}
       </ul>
     </div>
   </section>
@@ -748,8 +772,9 @@ export function renderShop(data) {
   const crumb = breadcrumbs([{ label: 'Sklep', url: '/sklep/' }]);
   const flavorsTotal = data.products.reduce((s, p) => s + p.flavors.length, 0);
   const minPrice = Math.min(...data.products.map((p) => p.price));
+  const bands = puffBandsFor(data).filter((b) => b.products.length > 0);
   const stats = [
-    { icon: 'leaf', value: String(data.products.length), label: 'modeli w ofercie' },
+    { icon: 'leaf', value: String(data.products.length), label: `${pluralModels(data.products.length)} w ofercie` },
     { icon: 'droplet', value: String(flavorsTotal), label: 'smaków do wyboru' },
     { icon: 'banknote', value: fmtZl(minPrice), label: 'ceny od' },
     { icon: 'percent', value: '−20%', label: 'rabat ilościowy' },
@@ -762,6 +787,18 @@ export function renderShop(data) {
   ${statStrip(stats)}
   ${discountBlock()}
   ${trustStrip()}
+  ${bands.length ? `
+  <div class="container">
+    <h2 class="subhead" id="band-title">Wydajność w puffsach</h2>
+    <div class="flavor-chips">
+      ${bands
+        .map(
+          (b) =>
+            `<a class="flavor-chip" href="/kategoria/puffs-${esc(b.id)}/">${esc(b.label)}</a>`,
+        )
+        .join('')}
+    </div>
+  </div>` : ''}
   <section class="section section--center" aria-labelledby="top-title">
     <div class="container">
       <h2 id="top-title">Bestselleri</h2>
@@ -805,6 +842,31 @@ export function renderCategory(data, category) {
     category.kind === 'brand'
       ? BRANDS[category.slug] ?? { name: category.name, blurb: '' }
       : FLAVOR_CATS[category.slug] ?? { name: category.name, blurb: '' };
+  // 子口味导航：flavor 类分类页内产品口味频次 Top 8，链到口味落地页（有 ≥3 款的才出页）
+  const landingSlugs = new Set(flavorGroups(data, 3).map((g) => g.slug));
+  const subFlavors =
+    category.kind === 'flavor'
+      ? (() => {
+          const freq = new Map();
+          for (const p of products)
+            for (const f of p.flavors) {
+              const key = f.name.trim().toLowerCase().replace(/&/g, ' ');
+              freq.set(key, (freq.get(key) ?? 0) + 1);
+            }
+          return [...freq.entries()]
+            .sort((a, b) => b[1] - a[1])
+            .slice(0, 8)
+            .map(([key, n]) => {
+              const slug = key.replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '');
+              return {
+                key,
+                n,
+                slug,
+                hasLanding: landingSlugs.has(slug),
+              };
+            });
+        })()
+      : [];
   const title =
     category.kind === 'brand'
       ? `Marka ${category.name} — jednorazówki i pody | ${SITE_NAME}`
@@ -839,7 +901,7 @@ export function renderCategory(data, category) {
           .map((p) => (p.price / p.puffs) * 1000);
         const bestEff = eff.length ? Math.min(...eff) : null;
         return [
-          { icon: 'leaf', value: String(products.length), label: category.kind === 'brand' ? 'modeli marki' : 'produktów w smaku' },
+          { icon: 'leaf', value: String(products.length), label: category.kind === 'brand' ? `${pluralModels(products.length)} marki` : `${pluralProducts(products.length)} w smaku` },
           { icon: 'droplet', value: String(flavorsTotal), label: 'smaków łącznie' },
           {
             icon: 'banknote',
@@ -866,7 +928,7 @@ export function renderCategory(data, category) {
   <section class="page-hero">
     <div class="container">
       <h1>${category.kind === 'brand' ? `Marka ${category.name}` : `Smaki: ${category.name}`}</h1>
-      <p>${esc(meta.blurb || `Wybierz model, porównaj smaki i przejdź do zakupu na vapepl.com.`)} W tej kategorii: <strong>${products.length}</strong> produktów${
+      <p>${esc(meta.blurb || `Wybierz model, porównaj smaki i przejdź do zakupu na vapepl.com.`)} W tej kategorii: <strong>${products.length}</strong> ${pluralProducts(products.length)}${
         category.count && products.length !== category.count ? ` (na sklepie ${category.count} w tym smaku)` : ''
       }.</p>
     </div>
@@ -878,6 +940,25 @@ export function renderCategory(data, category) {
     </div>
   </section>
   ${statStrip(stats)}
+  ${subFlavors.length ? `
+  <section class="section section--center" aria-labelledby="subflav-title">
+    <div class="container">
+      <div class="section-head">
+        <h2 id="subflav-title">Często kupowane smaki</h2>
+        <p>Wybrane aromaty dostępne w tej kategorii — kliknij, by porównać warianty.</p>
+      </div>
+      <div class="flavor-chips">
+        ${subFlavors
+          .map(
+            (s) =>
+              s.hasLanding
+                ? `<a class="flavor-chip" href="/smak/${esc(s.slug)}/">${esc(s.key.charAt(0).toUpperCase() + s.key.slice(1))}</a>`
+                : `<span class="flavor-chip is-disabled">${esc(s.key.charAt(0).toUpperCase() + s.key.slice(1))}</span>`,
+          )
+          .join('')}
+      </div>
+    </div>
+  </section>` : ''}
   ${category.kind === 'brand' ? compareTable(products) : ''}
   ${faqBlock(categoryFaqs)}
   ${articlesBlock()}`;
@@ -997,6 +1078,12 @@ export function renderFlavor(data, product, flavor) {
   )} puffs, cena ${fmtZl(product.price)} (w promocji, wcześniej ${fmtZl(product.regularPrice)}). Zakup na vapepl.com.`;
   const faqs = flavorFaq(product, flavor, angle);
   const related = relatedArticlesFor(data, product, flavor);
+  // 跨模型互推：归一化匹配同口味的其他模型（排除当前模型），逐口味页不同
+  const myKey = flavorKey(flavor.name);
+  const crossModels = data.products
+    .filter((p) => p.slug !== product.slug)
+    .filter((p) => p.flavors.some((f) => flavorKey(f.name) === myKey))
+    .slice(0, 8);
   const jsonld = [
     organizationLd(),
     crumb.ld,
@@ -1047,6 +1134,28 @@ export function renderFlavor(data, product, flavor) {
       </div>
     </div>
   </section>
+  ${crossModels.length ? `
+  <section class="section section--center" aria-labelledby="cross-title">
+    <div class="container">
+      <div class="section-head">
+        <h2 id="cross-title">Ten smak w innych modelach</h2>
+        <p>${
+          crossModels.length === 1
+            ? `Smak ${esc(flavor.name)} kupisz też w 1 innym modelu — kliknij, by porównać warianty.`
+            : `Smak ${esc(flavor.name)} kupisz też w ${crossModels.length} innych modelach — kliknij, by porównać warianty.`
+        }</p>
+      </div>
+      <div class="flavor-chips">
+        ${crossModels
+          .map((p) => {
+            const f = p.flavors.find((x) => flavorKey(x.name) === myKey);
+            const tip = `${p.name} · ${f.name} · ${fmtPuffs(p.puffs)} puffs · ${fmtZl(p.price)}`;
+            return `<a class="flavor-chip" href="/produkt/${esc(p.slug)}/${esc(f.slug)}/" title="${esc(tip)}">${esc(p.name)}</a>`;
+          })
+          .join('')}
+      </div>
+    </div>
+  </section>` : ''}
   ${relatedArticlesBlock(data, product, flavor, related)}
   ${faqBlock(faqs)}
   ${articlesBlock('Wszystkie poradniki', '', related)}`;
@@ -1059,6 +1168,199 @@ export function renderFlavor(data, product, flavor) {
     jsonld,
     body,
     lcpImage: product.image ?? '',
+  });
+}
+
+// ---------- 口味落地页（/smak/<slug>/）：跨模型聚合同一口味，直购 + 数据条 + 定制 FAQ ----------
+export function renderFlavorLanding(data, group) {
+  const angle = flavorAngle(group.name);
+  const crumb = breadcrumbs([
+    { label: 'Sklep', url: '/sklep/' },
+    { label: `Smak: ${group.name}`, url: `/smak/${group.slug}/` },
+  ]);
+  // 相关文章：组内各模型的相关文章并集去重，取前 4
+  const relatedUnion = [];
+  for (const { product } of group.products) {
+    for (const g of relatedArticlesFor(data, product, null)) {
+      if (!relatedUnion.some((x) => x.id === g.id)) relatedUnion.push(g);
+    }
+  }
+  const related = relatedUnion.slice(0, 4);
+  const faqs = flavorLandingFaq(group);
+  const jsonld = [
+    organizationLd(),
+    crumb.ld,
+    itemListLd(
+      group.products.map((x) => ({
+        name: `${x.product.name} — ${x.flavor.name}`,
+        url: SITE + `/produkt/${x.product.slug}/${x.flavor.slug}/`,
+      })),
+    ),
+    faqLd(faqs),
+  ];
+  const stats = [
+    { icon: 'leaf', value: String(group.models), label: `${pluralModels(group.models)} z tym smakiem` },
+    { icon: 'droplet', value: String(group.count), label: 'opcji zakupu' },
+    {
+      icon: 'banknote',
+      value:
+        group.minPrice === group.maxPrice
+          ? fmtZl(group.minPrice)
+          : `${fmtZl(group.minPrice)} – ${fmtZl(group.maxPrice)}`,
+      label: 'zakres cen',
+    },
+    { icon: 'percent', value: fmtZl(group.minPrice), label: 'ceny od' },
+  ];
+  const buyCard = (x) => `
+  <article class="product-card flavor-buy">
+    <a class="card-media" href="/produkt/${esc(x.product.slug)}/${esc(x.flavor.slug)}/">
+      ${x.product.image ? `<img src="${esc(x.product.image)}" alt="${esc(x.product.name)} — smak ${esc(x.flavor.name)}" loading="lazy">` : ''}
+    </a>
+    <div class="card-body">
+      <p class="card-brand">${esc(x.product.brand)}</p>
+      <h3 class="card-title"><a href="/produkt/${esc(x.product.slug)}/${esc(x.flavor.slug)}/">${esc(x.product.name)} — ${esc(x.flavor.name)}</a></h3>
+      <p class="card-meta">${fmtPuffs(x.product.puffs)} puffs</p>
+      <p class="card-price"><strong>${fmtZl(x.product.price)}</strong></p>
+      <div class="card-actions">
+        <a class="btn btn-ghost" href="/produkt/${esc(x.product.slug)}/${esc(x.flavor.slug)}/">Szczegóły</a>
+        <a class="btn btn-primary" href="${esc(x.flavor.buyUrl)}" rel="nofollow">Kup</a>
+      </div>
+    </div>
+  </article>`;
+  const body = `
+  ${crumb.html}
+  <section class="page-hero">
+    <div class="container">
+      <h1>Smak: ${esc(group.name)}</h1>
+      <p>${esc(
+        `${group.name} to ${angle}. Dostępny w ${group.models} modelach — porównaj warianty i kup wybrany na vapepl.com.`,
+      )}</p>
+    </div>
+  </section>
+  ${statStrip(stats)}
+  <section class="section section--center" aria-labelledby="buy-title">
+    <div class="container">
+      <div class="section-head">
+        <h2 id="buy-title">Kup smak ${esc(group.name)}</h2>
+        <p>Każdy wariant prowadzi do strony smaku z wybranym wariantem w koszyku vapepl.com.</p>
+      </div>
+      <div class="product-grid">
+        ${group.products.map(buyCard).join('')}
+      </div>
+    </div>
+  </section>
+  <section class="section section--center" aria-labelledby="carriers-title">
+    <div class="container">
+      <h2 id="carriers-title">Modele z tym smakiem</h2>
+      <div class="product-grid">
+        ${[...new Map(group.products.map((x) => [x.product.slug, x.product])).values()].map((p) => productCard(p)).join('')}
+      </div>
+    </div>
+  </section>
+  ${related.length ? relatedArticlesFromList(related) : ''}
+  ${faqBlock(faqs)}
+  ${articlesBlock('Wszystkie poradniki', '', related)}`;
+  return page({
+    title: `Smak ${group.name} — ${group.models} modeli, od ${fmtZl(group.minPrice)} | ${SITE_NAME}`,
+    description: `Smak ${group.name} (${angle}) w ${group.models} modelach, od ${fmtZl(
+      group.minPrice,
+    )}. Porównaj warianty i kup na vapepl.com.`,
+    canonical: SITE + `/smak/${group.slug}/`,
+    ogImage: group.products[0]?.product.image,
+    jsonld,
+    body,
+  });
+}
+
+// 相关文章区块（可传入预先算好的文章列表，避免重复调用评分）
+export function relatedArticlesFromList(list) {
+  if (!list.length) return '';
+  return `
+  <section class="section guides section--center" aria-labelledby="related-guides-title">
+    <div class="container">
+      <div class="section-head">
+        <h2 id="related-guides-title">Zobacz, jak smaki radzą sobie w praktyce</h2>
+        <p>Wybrane artykuły z vapepl.com.</p>
+      </div>
+      <div class="article-grid">
+        ${list.map((g) => articleCard(g)).join('')}
+      </div>
+    </div>
+  </section>`;
+}
+
+// ---------- puffs 段分类页（/kategoria/puffs-<id>/）：按 puffs 区间切"品类" ----------
+export function renderPuffsBand(data, band) {
+  const products = band.products;
+  const crumb = breadcrumbs([
+    { label: 'Sklep', url: '/sklep/' },
+    { label: `Puffs: ${band.label}`, url: `/kategoria/puffs-${band.id}/` },
+  ]);
+  const faqs = puffBandFaq(band, products);
+  const jsonld = [
+    organizationLd(),
+    crumb.ld,
+    itemListLd(products.map((p) => ({ name: p.name, url: SITE + `/produkt/${p.slug}/` }))),
+    faqLd(faqs),
+  ];
+  const stats = products.length
+    ? [
+        { icon: 'leaf', value: String(products.length), label: 'modeli w segmencie' },
+        { icon: 'droplet', value: `${fmtPuffs(Math.min(...products.map((p) => p.puffs)))} – ${fmtPuffs(Math.max(...products.map((p) => p.puffs)))} puffs`, label: 'zakres wydajności' },
+        {
+          icon: 'banknote',
+          value:
+            Math.min(...products.map((p) => p.price)) === Math.max(...products.map((p) => p.price))
+              ? fmtZl(products[0].price)
+              : `${fmtZl(Math.min(...products.map((p) => p.price)))} – ${fmtZl(Math.max(...products.map((p) => p.price)))}`,
+          label: 'zakres cen',
+        },
+        {
+          icon: 'percent',
+          value:
+            (() => {
+              const eff = products
+                .filter((p) => p.puffs > 0)
+                .map((p) => (p.price / p.puffs) * 1000);
+              return eff.length
+                ? new Intl.NumberFormat('pl-PL', { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(Math.min(...eff)) +
+                  ' zł'
+                : '—';
+            })(),
+          label: 'najtańszy puffs kosztuje',
+        },
+      ]
+    : [];
+  const body = `
+  ${crumb.html}
+  <section class="page-hero">
+    <div class="container">
+      <h1>Puffs: ${esc(band.label)}</h1>
+      <p>Wybierz wydajność dopasowaną do Twoich potrzeb — ${esc(
+        band.id === '100k-plus'
+          ? 'najdłużej działające modele, idealne dla osób szukających urządzenia na miesiące.'
+          : band.id === 'do-20k'
+            ? 'kompaktowe, lekkie modele na start i w podróży.'
+            : 'złoty środek: solidna liczba puffs bez kompromisów w rozmiarze.',
+      )}</p>
+    </div>
+  </section>
+  ${statStrip(stats)}
+  <section class="section">
+    <div class="container product-grid">
+      ${products.length ? products.map((p) => productCard(p)).join('') : '<p>Brak produktów w tym segmencie.</p>'}
+    </div>
+  </section>
+  ${compareTable(products)}
+  ${faqBlock(faqs)}
+  ${articlesBlock()}`;
+  return page({
+    title: `Jednorazówki ${band.label} — ${products.length} modeli | ${SITE_NAME}`,
+    description: `Modele z wydajnością ${band.label}: ${products.length} produktów, porównaj puffs i ceny i kup na vapepl.com.`,
+    canonical: SITE + `/kategoria/puffs-${band.id}/`,
+    ogImage: products[0]?.image,
+    jsonld,
+    body,
   });
 }
 

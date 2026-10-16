@@ -10,7 +10,7 @@ import {
 } from 'node:fs';
 import { dirname, join, relative, posix } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { SITE, SITE_NAME, CNAME, GUIDES } from './src/content.js';
+import { SITE, SITE_NAME, CNAME, GUIDES, flavorGroups, puffBandsFor } from './src/content.js';
 import {
   renderHome,
   renderShop,
@@ -21,6 +21,8 @@ import {
   renderReturns,
   render404,
   renderArticle,
+  renderFlavorLanding,
+  renderPuffsBand,
 } from './src/templates.js';
 
 const ROOT = dirname(fileURLToPath(import.meta.url));
@@ -45,6 +47,14 @@ out('404.html', render404(data));
 
 // 分类页
 for (const cat of data.categories) out(`kategoria/${cat.slug}/index.html`, renderCategory(data, cat));
+
+// puffs 段分类页（按 puffs 区间切分，数据驱动，仅出有产品的段）
+for (const band of puffBandsFor(data)) {
+  if (band.products.length) out(`kategoria/puffs-${band.id}/index.html`, renderPuffsBand(data, band));
+}
+
+// 口味落地页（同一口味在 ≥3 款产品中可选才出页，/smak/<slug>/ 独立命名空间）
+for (const group of flavorGroups(data, 3)) out(`smak/${group.slug}/index.html`, renderFlavorLanding(data, group));
 
 // 商品聚合页 + 每个口味变体页
 for (const product of data.products) {
@@ -93,12 +103,16 @@ if (existsSync(FONTS_SRC)) {
 writeFileSync(join(DIST, '.nojekyll'), '');
 
 // 与生成页面一一对应的 sitemap.xml
+const bands = puffBandsFor(data).filter((b) => b.products.length);
+const flavorLanding = flavorGroups(data, 3);
 const urls = [
   SITE + '/',
   SITE + '/sklep/',
   SITE + '/kontakt/',
   SITE + '/zwroty/',
   ...data.categories.map((c) => SITE + `/kategoria/${c.slug}/`),
+  ...bands.map((b) => SITE + `/kategoria/puffs-${b.id}/`),
+  ...flavorLanding.map((g) => SITE + `/smak/${g.slug}/`),
   ...data.products.flatMap((p) => [
     SITE + `/produkt/${p.slug}/`,
     ...p.flavors.map((f) => SITE + `/produkt/${p.slug}/${f.slug}/`),

@@ -404,6 +404,9 @@ a.brand-card:hover, a.flavor-card:hover, a.contact-card:hover,
 .flavor-rank.top-1 { background: rgba(251, 191, 36, 0.14); color: #fde68a; border-color: rgba(251, 191, 36, 0.4); }
 .flavor-rank.top-2 { background: rgba(148, 163, 184, 0.14); color: #cbd5e1; border-color: rgba(148, 163, 184, 0.4); }
 .flavor-rank.top-3 { background: rgba(217, 119, 6, 0.14); color: #fdba74; border-color: rgba(217, 119, 6, 0.4); }
+.top-flavors li a { color: inherit; text-decoration: none; font-weight: 600; }
+.top-flavors li a:hover { color: var(--brand); text-decoration: underline; }
+.flavor-cnt { color: var(--ink-mute); font-size: 12px; margin-left: auto; }
 
 /* 带边框卡片区块：卡片外缘对齐标准内容轨道（1160px），不超出左右内容边 */
 .discount .container, .faq .container {
@@ -564,6 +567,11 @@ a.brand-card:hover, a.flavor-card:hover, a.contact-card:hover,
 .flavor-chip.is-active {
   background: var(--brand); border-color: var(--brand); color: #04141a; font-weight: 700;
 }
+.flavor-chip.is-disabled {
+  cursor: default; color: var(--ink-mute);
+  background: transparent; border-style: dashed;
+}
+.flavor-chip.is-disabled:hover { border-color: var(--line); color: var(--ink-mute); }
 
 /* ---------- 联系（深卡 + SVG 图标）---------- */
 .contact-grid { display: grid; grid-template-columns: 1fr; gap: 16px; margin-bottom: 32px; }
