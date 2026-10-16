@@ -2,7 +2,8 @@
 // 数据来源：README.md（2026-10-15 从 vapepl.com 抓取）与 WooCommerce API 调研
 
 export const SITE = 'https://lopinv.github.io/media.buchmistrz.pl';
-export const SITE_NAME = 'VapePL.COM';
+// 暂时使用项目名作为站点标题（title/OG/品牌名/JSON-LD 组织名），便于与其他站点区分；验证完成后改回
+export const SITE_NAME = 'media.buchmistrz.pl';
 export const VAPEPL = 'https://vapepl.com';
 export const VAPEPL_RETURNS = `${VAPEPL}/refund_returns/`;
 
