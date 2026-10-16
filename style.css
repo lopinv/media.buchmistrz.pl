@@ -555,10 +555,35 @@ a.brand-card:hover, a.flavor-card:hover, a.contact-card:hover,
 .not-found .btn { min-width: 180px; }
 
 /* ---------- 退货政策（文字型页：保持左对齐阅读节奏）---------- */
-.returns .container > p, .returns .container > ul { max-width: 72ch; }
-.returns h2 { margin-top: 28px; }
+/* ---------- 退货政策（条款卡片网格 + 居中节奏） ---------- */
+.returns-grid {
+  display: grid; grid-template-columns: 1fr; gap: 14px;
+  margin-top: 28px; text-align: left;
+}
+.returns-card {
+  background: var(--surface-2);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  padding: 18px;
+  display: flex; flex-direction: column; gap: 8px;
+  transition: transform var(--dur), border-color var(--dur), box-shadow var(--dur);
+}
+.returns-card:hover {
+  transform: translateY(-3px);
+  border-color: rgba(34, 211, 238, 0.45);
+  box-shadow: 0 8px 28px rgba(0, 0, 0, 0.4);
+}
+.returns-card .icon { color: var(--brand); }
+.returns-card h3 { font-size: 16px; margin: 0; }
+.returns-card p { margin: 0; color: var(--ink-soft); font-size: 14px; line-height: 1.6; }
+.returns-card-link {
+  margin-top: auto; color: var(--brand); font-weight: 600; font-size: 14px; text-decoration: none;
+}
+.returns-card-link:hover { text-decoration: underline; }
+.returns .returns-cta {
+  margin: 28px auto 0; padding: 14px 18px; max-width: 56ch; text-align: center;
+}
 .returns-cta {
-  margin-top: 28px; padding: 14px 18px;
   background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius-sm);
 }
 .returns-cta a { color: var(--brand); font-weight: 700; }
@@ -598,6 +623,7 @@ a.brand-card:hover, a.flavor-card:hover, a.contact-card:hover,
   .top-flavors { grid-template-columns: repeat(2, 1fr); }
   .brand-grid, .flavor-grid { grid-template-columns: repeat(2, 1fr); }
   .article-grid { grid-template-columns: repeat(2, 1fr); }
+  .returns-grid { grid-template-columns: repeat(2, 1fr); }
 }
 
 @media (min-width: 960px) {
@@ -611,6 +637,7 @@ a.brand-card:hover, a.flavor-card:hover, a.contact-card:hover,
   .brand-grid, .flavor-grid { grid-template-columns: repeat(4, 1fr); }
   .top-flavors { grid-template-columns: repeat(3, 1fr); }
   .article-grid { grid-template-columns: repeat(3, 1fr); }
+  .returns-grid { grid-template-columns: repeat(3, 1fr); }
 
   /* 桌面导航：显示顶栏 + 下拉，隐藏汉堡与移动菜单（base 已 display:none，无需 !important） */
   .nav-toggle { display: none; }
