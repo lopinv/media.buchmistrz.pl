@@ -10,7 +10,7 @@ import {
 } from 'node:fs';
 import { dirname, join, relative, posix } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { SITE, GUIDES } from './src/content.js';
+import { SITE, SITE_NAME, GUIDES } from './src/content.js';
 import {
   renderHome,
   renderShop,
@@ -58,6 +58,27 @@ for (const product of data.products) {
 for (const guide of GUIDES) out(`artykul/${guide.id}/index.html`, renderArticle(data, guide));
 
 // 静态资源与辅助文件
+// /produkt/ 直接访问（不带 slug）不是真实路由：重定向到商品列表页，避免落到 404。
+// ../sklep/ 相对写法在 GitHub Pages 子目录与本地根预览下都成立。
+out(
+  'produkt/index.html',
+  `<!doctype html>
+<html lang="pl">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta http-equiv="refresh" content="0; url=../sklep/">
+  <link rel="canonical" href="${SITE}/sklep/">
+  <meta name="robots" content="noindex">
+  <title>Przekierowanie do sklepu — ${SITE_NAME}</title>
+  <script>location.replace('../sklep/');</script>
+</head>
+<body>
+  <p>Przekierowanie… <a href="../sklep/">Wejdź do sklepu</a></p>
+</body>
+</html>
+`,
+);
 for (const f of ['style.css', 'script.js']) {
   writeFileSync(join(DIST, f), readFileSync(join(ROOT, 'src', f)));
 }
