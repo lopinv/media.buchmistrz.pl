@@ -999,11 +999,10 @@ export function renderContact(data) {
     </div>
     <div class="container">
       <h2>Pytania o zamówienie</h2>
-      <p>Status zamówienia, fakturę i numer śledzenia znajdziesz w e-mailu potwierdzającym oraz na swoim koncie na <a href="${VAPEPL}" rel="nofollow">vapepl.com</a>. Jeśli potrzebujesz pomocy, najprościej napisać przez WhatsApp lub Telegram.</p>
+      <p>Status zamówienia i numer śledzenia wysyłamy w e-mailu potwierdzającym po nadaniu paczki. Jeśli potrzebujesz pomocy, napisz przez WhatsApp lub Telegram i podaj numer zamówienia — zajmiemy się sprawą zwykle w ciągu jednego dnia roboczego.</p>
     </div>
   </section>
-  ${faqBlock(HOME_FAQ.slice(-2))}
-  ${articlesBlock()}`;
+  ${faqBlock(HOME_FAQ.slice(-2))}`;
   return page({
     title: `Kontakt — ${SITE_NAME}`,
     description: `Skontaktuj się z obsługą: telefon ${CONTACT.phone}, WhatsApp, Telegram ${CONTACT.telegram.label} lub e-mail ${CONTACT.email}. Godziny ${CONTACT.hours}.`,
@@ -1054,7 +1053,7 @@ export function renderReturns(data) {
   <section class="page-hero">
     <div class="container">
       <h1>Polityka zwrotów</h1>
-      <p>Zwroty na <a href="${VAPEPL_RETURNS}" rel="nofollow">vapepl.com</a> — poniżej skrócone zasady obowiązujące w sklepie.</p>
+      <p>Nasze zasady zwrotów i reklamacji w skrócie — wszystkie informacje, których potrzebujesz, znajdziesz na tej stronie.</p>
     </div>
   </section>
   <section class="section returns section--center" aria-labelledby="returns-title">
@@ -1074,13 +1073,11 @@ export function renderReturns(data) {
           )
           .join('')}
       </div>
-      <p class="returns-cta">Pełna treść: <a href="${VAPEPL_RETURNS}" rel="nofollow">Polityka Zwrotów na vapepl.com →</a></p>
     </div>
-  </section>
-  ${articlesBlock()}`;
+  </section>`;
   return page({
     title: `Polityka zwrotów — 14 dni na odstąpienie | ${SITE_NAME}`,
-    description: 'Zwroty w sklepach vapepl.com: 14 dni na odstąpienie od umowy bez podania przyczyny. Wymagania, wyłączenia i zasady rękojmi.',
+    description: 'Polityka zwrotów: 14 dni na odstąpienie od umowy bez podania przyczyny. Wymagania, wyłączenia i zasady rękojmi w jednym miejscu.',
     canonical: SITE + '/zwroty/',
     jsonld,
     body,

@@ -562,13 +562,6 @@ a.brand-card:hover, a.flavor-card:hover, a.contact-card:hover,
   margin-top: auto; color: var(--brand); font-weight: 600; font-size: 14px; text-decoration: none;
 }
 .returns-card-link:hover { text-decoration: underline; }
-.returns .returns-cta {
-  margin: 28px auto 0; padding: 14px 18px; max-width: 56ch; text-align: center;
-}
-.returns-cta {
-  background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius-sm);
-}
-.returns-cta a { color: var(--brand); font-weight: 700; }
 
 /* ---------- 页脚（最深一档，仅版权/链接条）---------- */
 .site-footer { background: #050a14; color: var(--ink-soft); padding-block: 24px; margin-top: 40px; border-top: 1px solid var(--line); }
