@@ -379,17 +379,6 @@ export function trustStrip() {
   </section>`;
 }
 
-export function ctaBanner() {
-  return `
-  <section class="cta-banner" aria-label="Kup na vapepl.com">
-    <div class="container">
-      <h2>Gotowy na zakup?</h2>
-      <p>Zamówienia realizujemy w sklepie <strong>vapepl.com</strong> — polski magazyn, Paczkomaty InPost i kurier DPD.</p>
-      <a class="btn btn-primary btn-lg" href="${VAPEPL}" rel="nofollow">Przejdź do sklepu →</a>
-    </div>
-  </section>`;
-}
-
 export function reviewsBlock() {
   return `
   <section class="section reviews section--center" aria-labelledby="reviews-title">
@@ -556,8 +545,7 @@ export function renderArticle(data, guide) {
     </div>
   </section>
   ${recCard}
-  ${articlesBlock('Wszystkie poradniki')}
-  ${ctaBanner()}`;
+  ${articlesBlock('Wszystkie poradniki')}`;
   return page({
     title: `${guide.title} | ${SITE_NAME}`,
     description: `${guide.summary} Pełna wersja poradnika na vapepl.com.`,
@@ -678,8 +666,7 @@ export function renderHome(data) {
     'Wiedza o e-papierosach',
     `Poradniki z <a href="${VAPEPL}" rel="nofollow">vapepl.com</a> — wybrane artykuły z zalecanymi produktami:`,
   )}
-  ${faqBlock(HOME_FAQ, undefined, true)}
-  ${ctaBanner()}`;
+  ${faqBlock(HOME_FAQ, undefined, true)}`;
   return page({
     title: `Jednorazówki i e-papierosy — ${STATS.productsLabel} modeli, 7 marek | ${SITE_NAME}`,
     description: `Oferta ${STATS.productsLabel} jednorazówek od ${STATS.brandsLabel} marek (ceny od ${fmtZl(
@@ -720,8 +707,7 @@ export function renderShop(data) {
     </div>
   </section>
   ${articlesBlock()}
-  ${faqBlock(HOME_FAQ, 4)}
-  ${ctaBanner()}`;
+  ${faqBlock(HOME_FAQ, 4)}`;
   const jsonld = [
     organizationLd(),
     crumb.ld,
@@ -783,8 +769,7 @@ export function renderCategory(data, category) {
       ${products.length ? products.map((p) => productCard(p)).join('') : '<p>Brak produktów w tej kategorii.</p>'}
     </div>
   </section>
-  ${articlesBlock()}
-  ${ctaBanner()}`;
+  ${articlesBlock()}`;
   return page({
     title,
     description: desc,
@@ -868,8 +853,7 @@ export function renderProduct(data, product) {
   </section>` : ''}
   ${relatedArticlesBlock(data, product, null)}
   ${faqBlock(HOME_FAQ, 3)}
-  ${articlesBlock('Wszystkie poradniki')}
-  ${ctaBanner()}`;
+  ${articlesBlock('Wszystkie poradniki')}`;
   return page({
     title: `${product.name} — ${fmtPuffs(product.puffs)} puffs, ${fmtZl(product.price)} | ${SITE_NAME}`,
     description: desc,
@@ -963,8 +947,7 @@ export function renderFlavor(data, product, flavor) {
     ],
     3,
   )}
-  ${articlesBlock('Wszystkie poradniki')}
-  ${ctaBanner()}`;
+  ${articlesBlock('Wszystkie poradniki')}`;
   return page({
     title,
     description: desc,
@@ -1020,8 +1003,7 @@ export function renderContact(data) {
     </div>
   </section>
   ${faqBlock(HOME_FAQ.slice(-2))}
-  ${articlesBlock()}
-  ${ctaBanner()}`;
+  ${articlesBlock()}`;
   return page({
     title: `Kontakt — ${SITE_NAME}`,
     description: `Skontaktuj się z obsługą: telefon ${CONTACT.phone}, WhatsApp, Telegram ${CONTACT.telegram.label} lub e-mail ${CONTACT.email}. Godziny ${CONTACT.hours}.`,
@@ -1095,8 +1077,7 @@ export function renderReturns(data) {
       <p class="returns-cta">Pełna treść: <a href="${VAPEPL_RETURNS}" rel="nofollow">Polityka Zwrotów na vapepl.com →</a></p>
     </div>
   </section>
-  ${articlesBlock()}
-  ${ctaBanner()}`;
+  ${articlesBlock()}`;
   return page({
     title: `Polityka zwrotów — 14 dni na odstąpienie | ${SITE_NAME}`,
     description: 'Zwroty w sklepach vapepl.com: 14 dni na odstąpienie od umowy bez podania przyczyny. Wymagania, wyłączenia i zasady rękojmi.',

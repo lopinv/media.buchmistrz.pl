@@ -482,24 +482,6 @@ a.brand-card:hover, a.flavor-card:hover, a.contact-card:hover,
 }
 .article-kicker a { color: var(--brand); }
 
-/* ---------- CTA banner（深空蓝渐变 + 青光晕）---------- */
-.cta-banner {
-  position: relative;
-  background:
-    radial-gradient(700px 260px at 50% -40%, var(--glow), transparent 70%),
-    linear-gradient(135deg, #082f49, #1d4ed8);
-  color: #fff; text-align: center;
-  border-block: 1px solid var(--line);
-}
-.cta-banner .container { padding-block: 44px; }
-.cta-banner h2 { font-size: var(--h2); margin: 0 0 8px; }
-.cta-banner p { margin: 0 0 20px; color: #dbeafe; }
-.cta-banner .btn-primary {
-  background: #fff; color: #172554;
-  box-shadow: 0 4px 24px rgba(255, 255, 255, 0.25);
-}
-.cta-banner .btn-primary:hover { background: #f8fafc; }
-
 /* ---------- 页面 hero（深表面顶栏，面包屑并入其中）---------- */
 .page-hero { background: var(--surface); border-bottom: 1px solid var(--line); padding-block: 36px; }
 .page-hero h1 { font-size: clamp(24px, 4vw, 34px); margin: 0 0 8px; }
@@ -628,7 +610,6 @@ a.brand-card:hover, a.flavor-card:hover, a.contact-card:hover,
 
 @media (min-width: 960px) {
   .section { padding-block: 56px; }
-  .cta-banner .container { padding-block: 56px; }
 
   .discount-tiers { grid-template-columns: repeat(4, 1fr); }
   .product-grid { grid-template-columns: repeat(4, 1fr); }
