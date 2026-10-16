@@ -44,6 +44,10 @@ const ICONS = {
   candy: '<circle cx="12" cy="12" r="5"/><path d="M7.5 7.5L4 4m0 5l5-5m9 8l3.5 3.5M20 12l-5 5m5-11l-3.5 3.5"/>',
   leaf: '<path d="M5 20c0-8 4-13 14-14-1 10-6 14-14 14z"/><path d="M5 20c3-5 6-8 10-10"/>',
   star: '<path d="M12 3.5l2.6 5.3 5.9.9-4.3 4.1 1 5.8-5.2-2.7-5.2 2.7 1-5.8L3.5 9.7l5.9-.9L12 3.5z"/>',
+  calendar: '<rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 9.5h18M8 3v4M16 3v4M9.5 14.5l2 2 3.5-4"/>',
+  ban: '<circle cx="12" cy="12" r="8.5"/><path d="M6.2 6.2l11.6 11.6"/>',
+  banknote: '<rect x="2.5" y="6" width="19" height="12" rx="2"/><circle cx="12" cy="12" r="2.5"/><path d="M6 12h.01M18 12h.01"/>',
+  package: '<path d="M3 8l9-4.5L21 8v8l-9 4.5L3 16z"/><path d="M3 8l9 4.5L21 8M12 12.5v8"/>',
 };
 const icon = (name, cls = 'icon') =>
   `<svg class="${cls}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${ICONS[name] ?? ''}</svg>`;
@@ -1030,6 +1034,39 @@ export function renderContact(data) {
 export function renderReturns(data) {
   const crumb = breadcrumbs([{ label: 'Zwroty', url: '/zwroty/' }]);
   const jsonld = [organizationLd(), crumb.ld];
+  const cards = [
+    {
+      icon: 'calendar',
+      title: 'Prawo odstąpienia od umowy',
+      body: `Masz <strong>14 dni</strong> na odstąpienie od umowy bez podania przyczyny. Wymagania: produkt nienaruszony i w oryginalnym opakowaniu oraz dowód zakupu (faktura/rachunek) do zidentyfikowania zamówienia.`,
+    },
+    {
+      icon: 'ban',
+      title: 'Wyłączenia',
+      body: 'Produktom higienicznym (otwarte liquidy, użyte wkłady, otwarte opakowania jednorazówek) prawo odstąpienia nie przysługuje — zasady wynikają z polskiego prawa konsumenckiego.',
+    },
+    {
+      icon: 'banknote',
+      title: 'Zwrot kosztów i termin',
+      body: `Zwrot następuje tą samą metodą płatności w ciągu <strong>14 dni</strong> od otrzymania przesyłki zwrotnej. Koszty zwrotu ponosi kupujący, chyba że błąd jest po stronie sklepu.`,
+    },
+    {
+      icon: 'package',
+      title: 'Wysyłka zwrotna',
+      body: 'Paczkę nadasz <strong>InPost Paczkomatem</strong> lub <strong>DPD Pickup</strong>. W paczce dołącz dowód zakupu i krótką notatkę z powodem zwrotu.',
+    },
+    {
+      icon: 'shield-check',
+      title: 'Rękojmia',
+      body: 'Wadliwy towar rozpatrujemy w ramach rękojmi — zgłoś reklamację ze zdjęciami. Sklep zweryfikuje produkt w terminie 14 dni: naprawa, wymiana lub zwrot.',
+    },
+    {
+      icon: 'phone',
+      title: 'Masz pytania?',
+      body: `Problem z przesyłką zwrotną? Napisz przez WhatsApp lub Telegram (${esc(CONTACT.telegram.label)}) — odpowiadamy zwykle w ciągu jednego dnia roboczego.`,
+      cta: `<a class="returns-card-link" href="/kontakt/">Dane kontaktowe →</a>`,
+    },
+  ];
   const body = `
   ${crumb.html}
   <section class="page-hero">
@@ -1038,23 +1075,23 @@ export function renderReturns(data) {
       <p>Zwroty na <a href="${VAPEPL_RETURNS}" rel="nofollow">vapepl.com</a> — poniżej skrócone zasady obowiązujące w sklepie.</p>
     </div>
   </section>
-  <section class="section returns">
+  <section class="section returns section--center" aria-labelledby="returns-title">
     <div class="container">
-      <h2>Prawo odstąpienia od umowy</h2>
-      <p>Masz <strong>14 dni</strong> na odstąpienie od umowy bez podania przyczyny. Wymagania:</p>
-      <ul>
-        <li>produkt musi być nienaruszony i w oryginalnym opakowaniu,</li>
-        <li>dopiero po zwrocie potwierdzisz, że zachowane są warunki handlowe,</li>
-        <li>dowód zakupu (faktura/rachunek) będzie potrzebny do zidentyfikowania zamówienia.</li>
-      </ul>
-      <h2>Wyłączenia</h2>
-      <p>Względem produktów higienicznych (np. otwarte liquidy, użyte wkłady, otwarte opakowania jednorazówek) prawo odstąpienia nie przysługuje — zasady te wynikają z polskiego prawa konsumenckiego.</p>
-      <h2>Zwrot kosztów i termin</h2>
-      <p>Zwrot następuje tą samą metodą płatności w ciągu <strong>14 dni</strong> od otrzymania przesyłki zwrotnej. Koszty zwrotu ponosi kupujący, chyba że błąd jest po stronie sklepu.</p>
-      <h2>Wysyłka zwrotna</h2>
-      <p>Możesz nadać paczkę <strong>InPost Paczkomatem</strong> lub <strong>DPD Pickup</strong>. W paczce dołącz dowód zakupu i krótką notatkę z powodem zwrotu.</p>
-      <h2>Rękojmia</h2>
-      <p>Wadliwy towar rozpatrujemy w ramach rękojmi — zgłoś reklamację ze zdjęciami. Sklep zweryfikuje produkt w terminie 14 dni i podejmie jedną z trzech akcji: naprawa, wymiana lub zwrot.</p>
+      <h2 id="returns-title">Jak działają zwroty</h2>
+      <p>Skrócone zasady: 14 dni na odstąpienie od umowy, zwrot kosztów i rękojmia w jednym miejscu.</p>
+      <div class="returns-grid">
+        ${cards
+          .map(
+            (c) => `
+        <div class="returns-card">
+          ${icon(c.icon)}
+          <h3>${esc(c.title)}</h3>
+          <p>${c.body}</p>
+          ${c.cta ?? ''}
+        </div>`,
+          )
+          .join('')}
+      </div>
       <p class="returns-cta">Pełna treść: <a href="${VAPEPL_RETURNS}" rel="nofollow">Polityka Zwrotów na vapepl.com →</a></p>
     </div>
   </section>
