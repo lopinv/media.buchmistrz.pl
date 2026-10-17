@@ -814,10 +814,19 @@ export function renderShop(data) {
         .map((s) => `<a class="flavor-chip" href="/scenariusz/${esc(s.id)}/">${esc(s.name)}</a>`)
         .join('')}
       ${priceBands
-        .map((b) => `<a class="flavor-chip is-muted" href="/kategoria/cena-${esc(b.id)}/">${esc(b.label)}</a>`)
+        .map((b) => `<a class="flavor-chip is-muted" href="/kategoria/cena-${b.id}/">${esc(b.label)}</a>`)
         .join('')}
     </div>
   </div>
+  ${comparisonPairsFor(data).length ? `
+  <div class="container">
+    <h2 class="subhead" id="compare-title">Porównania modeli</h2>
+    <div class="flavor-chips">
+      ${comparisonPairsFor(data)
+        .map((p) => `<a class="flavor-chip is-muted" href="${esc(p.url)}">${esc(p.name)}</a>`)
+        .join('')}
+    </div>
+  </div>` : ''}
   <section class="section section--center" aria-labelledby="top-title">
     <div class="container">
       <h2 id="top-title">Bestselleri</h2>
@@ -1010,6 +1019,10 @@ export function renderProduct(data, product) {
     `${product.name} — jednorazowy e-papieros ${fmtPuffs(product.puffs)} puffs, ${flavors.length} smaków. W promocji: ${fmtZl(product.price)}.`;
   const faqs = productFaq(product, data);
   const related = relatedArticlesFor(data, product, null, data.guides).slice(0, 4);
+  // 本站点内该型号参与的对比页（锚定式配对，最多 2–3 对）
+  const comparePairs = comparisonPairsFor(data).filter(
+    (p) => p.a.slug === product.slug || p.b.slug === product.slug,
+  );
   const jsonld = [
     organizationLd(),
     crumb.ld,
@@ -1066,6 +1079,23 @@ export function renderProduct(data, product) {
     </div>
   </section>` : ''}
   ${relatedArticlesBlock(data, product, null, related)}
+  ${comparePairs.length ? `
+  <section class="section section--center" aria-labelledby="compare-title">
+    <div class="container">
+      <div class="section-head">
+        <h2 id="compare-title">Porównaj ${esc(product.name)}</h2>
+        <p>Zobacz, jak ten model wypada w starciu z konkurencją — puffs, cena i smaków w jednym.</p>
+      </div>
+      <div class="flavor-chips">
+        ${comparePairs
+          .map((p) => {
+            const rival = p.a.slug === product.slug ? p.b : p.a;
+            return `<a class="flavor-chip" href="${esc(p.url)}">${esc(product.name)} vs ${esc(rival.name)}</a>`;
+          })
+          .join('')}
+      </div>
+    </div>
+  </section>` : ''}
   ${faqBlock(faqs)}
   ${articlesBlock(data, 'Wszystkie poradniki', '', related)}`;
   return page({
