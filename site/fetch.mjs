@@ -1,15 +1,20 @@
-// site/fetch.mjs — 抓取 vapepl.com 全量商品目录（WooCommerce Store API + 商品页下拉框），
-// 归一化后写入 site/data/products.json。零依赖，需 Node >= 18。
-// 用法: node site/fetch.mjs
-import { mkdirSync, writeFileSync } from 'node:fs';
+// site/fetch.mjs — 抓取 vapepl.com 全量商品目录（WooCommerce Store API + 商品页下拉框）
+// 与全量文章（WP REST /wp/v2/posts），归一化后写入 site/data/。零依赖，需 Node >= 18。
+// 用法: node site/fetch.mjs [--only products|guides]（缺省两者都刷）
+import { mkdirSync, writeFileSync, readFileSync, existsSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { flavorKey, flavorGroups } from './src/content.js';
 
 const API = 'https://vapepl.com/wp-json';
+const VAPEPL = 'https://vapepl.com';
 const UA = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) VapePL-catalog-sync/1.0';
 const ROOT = dirname(fileURLToPath(import.meta.url));
-const OUT = join(ROOT, 'data', 'products.json');
 const BRAND_SLUGS = ['airmez', 'fumot', 'hifancy', 'maskking', 'merrymi', 'stagbar', 'xcor'];
+
+const only = process.argv.find((a) => a.startsWith('--only'))?.split('=')[1]
+  ?? process.argv[process.argv.indexOf('--only') + 1];
+const mode = only === 'products' || only === 'guides' ? only : 'all';
 
 const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 
@@ -19,9 +24,9 @@ async function getJson(url) {
   return res.json();
 }
 
-async function fetchPaged(path) {
+async function fetchPaged(path, maxPages = 20) {
   const items = [];
-  for (let page = 1; page <= 20; page += 1) {
+  for (let page = 1; page <= maxPages; page += 1) {
     const sep = path.includes('?') ? '&' : '?';
     const batch = await getJson(`${API}${path}${sep}per_page=100&page=${page}`);
     if (!Array.isArray(batch) || batch.length === 0) break;
@@ -32,6 +37,7 @@ async function fetchPaged(path) {
   return items;
 }
 
+// ---------- 商品目录 ----------
 const money = (minor) => Number(minor) / 100;
 
 function puffsFromName(name) {
@@ -83,7 +89,7 @@ async function selectFromProductPage(permalink) {
   }
 }
 
-async function main() {
+async function fetchProducts() {
   const [rawProducts, rawCategories, popularity] = await Promise.all([
     fetchPaged('/wc/store/v1/products'),
     fetchPaged('/wc/store/v1/products/categories'),
@@ -188,9 +194,110 @@ async function main() {
     categories,
     products,
   };
-  mkdirSync(dirname(OUT), { recursive: true });
-  writeFileSync(OUT, JSON.stringify(data, null, 2));
+  mkdirSync(dirname(join(ROOT, 'data')), { recursive: true });
+  writeFileSync(join(ROOT, 'data', 'products.json'), JSON.stringify(data, null, 2));
   console.log(`✔ products: ${products.length}, flavors: ${flavorsTotal}, verified buy links: ${verified}`);
+}
+
+// ---------- 文章库（全量抓取 + 相关性打分） ----------
+// 词边界匹配：关键词前后不得是字母/数字（防 MAX 误中 MAXI）
+function hasWord(text, word) {
+  const re = new RegExp(`(^|[^a-z0-9])${word.replace(/[.*+?^${}()|[\]\\/]/g, '\\$&')}($|[^a-z0-9])`, 'i');
+  return re.test(text);
+}
+// 文本归一化：小写 + &amp;/& → 空格 + 压空白（与 flavorKey 同规则，口味词可对齐）
+function normText(s) {
+  return String(s)
+    .replace(/&amp;/gi, '&')
+    .replace(/&/g, ' ')
+    .replace(/\s+/g, ' ')
+    .trim()
+    .toLowerCase();
+}
+
+// 站内模型关键词（18 款的产品名 token，各 +2 分）
+const MODEL_KEYWORDS = [
+  'LUX', 'STAG', 'TYRANT', 'TORNADO', 'DREAM', 'LEOPARD', 'FOX', 'MAX',
+  'CLEAR', 'SUPER', 'SPACE', 'ICEX', 'BLADE', 'HAWAII', 'MATRIX', 'ECO',
+];
+
+async function fetchGuides() {
+  // 站内口味组（归一化组，每个 +1 分；标题命中额外 +5 用于选 flavor 推荐位）
+  const productsFile = join(ROOT, 'data', 'products.json');
+  const products = JSON.parse(readFileSync(productsFile, 'utf8'));
+  const flavorNames = flavorGroups(products, 1).map((g) => g.name.toLowerCase());
+
+  // 全量分页抓取：翻到空页/不足一页为止（当前 4000+ 篇）
+  const posts = [];
+  for (let page = 1; ; page += 1) {
+    const batch = await getJson(`${API}/wp/v2/posts?per_page=100&page=${page}`);
+    if (!Array.isArray(batch) || batch.length === 0) break;
+    posts.push(...batch);
+    if (batch.length < 100) break;
+    await sleep(300);
+  }
+
+  const scored = posts.map((post) => {
+    const title = (post.title?.rendered ?? '').replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim();
+    const excerpt = (post.excerpt?.rendered ?? '').replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim();
+    const text = normText(title + ' ' + excerpt);
+
+    let score = 0;
+    for (const kw of MODEL_KEYWORDS) if (hasWord(text, normText(kw))) score += 2;
+    for (const f of flavorNames) if (f.length > 3 && hasWord(text, f)) score += 1;
+
+    // 推荐位口味：标题里命中的口味加权（+5）优先于 excerpt，取最高分者
+    let flavor = null;
+    let flavorBest = 0;
+    for (const f of flavorNames) {
+      if (f.length <= 3) continue;
+      let s = 0;
+      if (hasWord(title, f)) s += 5;
+      if (hasWord(excerpt, f)) s += 1;
+      if (s > flavorBest) {
+        flavorBest = s;
+        flavor = f;
+      }
+    }
+
+    // 摘要截断 ~160 字（词边界）
+    const summary =
+      excerpt.length > 170
+        ? excerpt.slice(0, 168).replace(/\s+\S*$/, '') + '…'
+        : excerpt;
+
+    return {
+      id: post.slug,
+      title,
+      url: `${VAPEPL}/${post.slug}/`,
+      summary,
+      flavor: flavor ? flavorKey(flavor) : null,
+      datePublished: post.date?.slice(0, 10) ?? null,
+      _score: score,
+    };
+  });
+
+  // 全量命中（score > 0）都进库，按相关性分降序 + 标题 localeCompare 确定性排序
+  const guides = scored
+    .filter((p) => p._score > 0)
+    .sort((a, b) => b._score - a._score || a.title.localeCompare(b.title, 'pl'))
+    .map(({ _score, ...g }) => g);
+
+  writeFileSync(join(ROOT, 'data', 'guides.json'), JSON.stringify(guides, null, 2) + '\n');
+  console.log(`✔ guides: 抓取 ${posts.length} 篇，命中 ${guides.length} 篇 → guides.json`);
+}
+
+async function main() {
+  if (mode === 'products') await fetchProducts();
+  else if (mode === 'guides') {
+    if (!existsSync(join(ROOT, 'data', 'products.json'))) {
+      throw new Error('缺 data/products.json（口味打分依赖它），先跑: node site/fetch.mjs --only products');
+    }
+    await fetchGuides();
+  } else {
+    await fetchProducts();
+    await fetchGuides();
+  }
 }
 
 main().catch((err) => {

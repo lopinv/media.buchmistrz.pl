@@ -406,8 +406,8 @@ export const HOME_FAQ = [
   },
 ];
 
-// ---------- 文章库（site/data/guides.json，由 generate-guides.mjs 生成） ----------
-// 数据驱动：50 篇与站内模型/口味相关的 vapepl.com 文章，每篇带 flavor（归一化口味键）
+// ---------- 文章库（site/data/guides.json，由 fetch.mjs 全量抓取 + 相关性打分生成） ----------
+// 数据驱动：全量命中文章（vapepl.com 模型/口味相关），每篇带 flavor（归一化口味键）
 // 与 datePublished；本文件不再手写文章清单。
 
 // 文章 → 推荐商品：按 guide.flavor（口味键）在站内找提供该口味的模型，

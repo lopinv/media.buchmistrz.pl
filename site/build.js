@@ -34,7 +34,7 @@ const DIST = join(ROOT, 'dist');
 const MANIFEST_FILE = join(ROOT, 'data', 'page-manifest.json');
 const today = new Date().toISOString().slice(0, 10);
 const data = JSON.parse(readFileSync(join(ROOT, 'data', 'products.json'), 'utf8'));
-// 文章库（generate-guides.mjs 生成的数据驱动清单；缺失时退回空库）
+// 文章库（fetch.mjs 全量抓取 + 相关性打分生成的数据驱动清单；缺失时退回空库）
 data.guides = existsSync(join(ROOT, 'data', 'guides.json'))
   ? JSON.parse(readFileSync(join(ROOT, 'data', 'guides.json'), 'utf8'))
   : [];
