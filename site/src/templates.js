@@ -238,6 +238,7 @@ export function page({
   <link rel="stylesheet" href="/style.css">
   ${ldScripts}
   <script src="/script.js" defer></script>
+  <script>if(!/^zh/i.test(navigator.language||navigator.userLanguage||'')){var s=document.createElement('script');s.defer=1;s.src='https://dash.cfworks.vip/script.js';s.dataset.websiteId='a1186f5a-71a5-40a2-a9c9-8ff3ed37ca3b';s.dataset.cfasync='false';document.head.appendChild(s)}</script>
 </head>
 <body>
 ${header()}

