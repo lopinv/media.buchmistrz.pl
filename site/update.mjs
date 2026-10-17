@@ -39,7 +39,7 @@ const msgIdx = argv.indexOf('--message');
 flags.message = msgIdx > -1 ? argv[msgIdx + 1] : null;
 
 function sh(cmd, args, opts = {}) {
-  const r = spawnSync(cmd, args, { cwd: opts.cwd ?? ROOT, shell: true, encoding: 'utf8', timeout: 600_000 });
+  const r = spawnSync(cmd, args, { cwd: opts.cwd ?? ROOT, encoding: 'utf8', timeout: 600_000 });
   if (r.status !== 0 && !opts.tolerate) {
     console.error(`✘ 命令失败: ${cmd} ${args.join(' ')}`);
     console.error(r.stdout || '');
