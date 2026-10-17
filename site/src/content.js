@@ -68,16 +68,14 @@ export function flavorKey(name) {
 }
 
 // 归一化键 → 可读展示名（逐词首字母大写）
-export const flavorPretty = (key) =>
+const flavorPretty = (key) =>
   key
     .split(' ')
     .map((w) => w.charAt(0).toUpperCase() + w.slice(1))
     .join(' ');
 
 // 归一化键 → URL slug
-export function flavorSlug(key) {
-  return key.replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '');
-}
+const flavorSlug = (key) => key.replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '');
 
 // 口味分组：group = { key, name, slug, count（出现次数）, products（[{product, flavor}]），
 // minPrice, maxPrice, maxPuffs, models }；count >= min 才返回（落地页门槛）
@@ -134,7 +132,7 @@ export function pluralProducts(n) {
 }
 
 // puffs 分段（合成"品类"，URL 挂在 /kategoria/puffs-<id>/ 下）
-export const PUFF_BANDS = [
+const PUFF_BANDS = [
   { id: 'do-20k', label: 'do 20 000 puffs', min: 0, max: 20000 },
   { id: '20-30k', label: '20 000–30 000 puffs', min: 20000, max: 30000 },
   { id: '30-50k', label: '30 000–50 000 puffs', min: 30000, max: 50000 },
@@ -214,7 +212,7 @@ export function bandFaq(name, products) {
 // 多仓机型（4w1/6w1）：型号名里的 "NIN1" 仓数
 const tanksOf = (p) => Number(p.name.match(/(\d+)\s*IN\s*1/i)?.[1] ?? 0);
 
-export const SCENARIOS = [
+const SCENARIOS = [
   {
     id: 'budzet',
     name: 'Niski budżet',
@@ -277,7 +275,7 @@ export function scenariosFor(data) {
 }
 
 // ---------- 价格段（数据驱动，/kategoria/cena-<id>/ 下） ----------
-export const PRICE_BANDS = [
+const PRICE_BANDS = [
   { id: 'do-60', label: 'do 60 zł', min: 0, max: 60 },
   { id: '61-75', label: '61–75 zł', min: 60, max: 75 },
   { id: '76-100', label: '76–100 zł', min: 75, max: 100 },
@@ -293,10 +291,10 @@ export function priceBandsFor(data) {
 }
 
 // ---------- 型号对比页（/porownanie/<a>-vs-<b>/）----------
-// 锚定式配对（非全组合 153，防薄页）：畅销榜 top4 两两互比 + 同品牌升级 + 旗舰对垒。
+// 锚定式配对（非全组合 153，防薄页）：畅销模型两两互比 + 同品牌升级 + 旗舰对垒。
 // 每对 = [slugA, slugB, kind, name, blurb]；kind 用于 hero 角标与 FAQ 侧重。
-export const COMPARISON_PAIRS = [
-  // 畅销榜 top4 两两互比（data.topSellers 前 4 实时驱动，slug 解析不到则跳过）
+const COMPARISON_PAIRS = [
+  // 畅销模型两两互比（硬编码 6 对，slug 解析不到型号则自动跳过，故数据驱动出页数）
   ['hifancy-dream-45000-puffs', 'xcor-hawaii-pro-23000-puffs', 'bestseller', 'Hifancy Dream vs XCOR Hawaii Pro', null],
   ['hifancy-dream-45000-puffs', 'xcor-tyrant-23000-puffs', 'bestseller', 'Hifancy Dream vs XCOR Tyrant', null],
   ['hifancy-dream-45000-puffs', 'hifancy-space-50000-puffs', 'bestseller', 'Hifancy Dream vs Hifancy Space', null],
@@ -412,31 +410,59 @@ export const HOME_FAQ = [
 
 // 文章 → 推荐商品：按 guide.flavor（口味键）在站内找提供该口味的模型，
 // 按畅销榜排名取最靠前一款（推荐位落到口味直购页）；无匹配则回退畅销榜首模型页
+// 返回单个推荐对象或 null（不再是数组）
+const flavorRecommendCache = new WeakMap();
 export function recommendProductsFor(data, guide) {
+  let get = flavorRecommendCache.get(data);
+  if (!get) {
+    get = flavorRecommend(data);
+    flavorRecommendCache.set(data, get);
+  }
+  return get((guide.flavor ?? '').trim().toLowerCase());
+}
+
+// 推荐位按口味键惰性预计算（全库仅 59 个口味键 + ''，未知键回退畅销榜首）：
+// 返回 get(flavorKey) 函数，memo 后构建热路径 6.5 万次调用 → 每口味键仅 1 次计算
+function flavorRecommend(data) {
   const bySlug = new Map(data.products.map((p) => [p.slug, p]));
   const popularity = new Map((data.topSellers ?? []).map((slug, i) => [slug, i]));
-  const flavorKeyOf = (guide.flavor ?? '').trim().toLowerCase();
-  const candidates = flavorKeyOf
-    ? [...data.products]
-        .filter((p) => p.flavors.some((f) => flavorKey(f.name) === flavorKeyOf))
-        .map((p) => p.slug)
-        .sort((a, b) => (popularity.get(a) ?? 99) - (popularity.get(b) ?? 99))
-    : [];
-  const pickSlug = candidates[0] ?? (data.topSellers ?? [])[0];
-  const product = bySlug.get(pickSlug);
-  if (!product) return [];
-  const flavor = flavorKeyOf
-    ? product.flavors.find((f) => flavorKey(f.name) === flavorKeyOf) ?? null
-    : null;
-  return [
-    {
+  const flavorProducts = new Map();
+  for (const p of data.products) {
+    for (const f of p.flavors) {
+      const key = flavorKey(f.name);
+      if (!flavorProducts.has(key)) flavorProducts.set(key, []);
+      flavorProducts.get(key).push(p);
+    }
+  }
+  const compute = (flavorKeyOf) => {
+    const candidates = flavorKeyOf
+      ? (flavorProducts.get(flavorKeyOf) ?? [])
+          .map((p) => p.slug)
+          .sort((a, b) => (popularity.get(a) ?? 99) - (popularity.get(b) ?? 99))
+      : [];
+    const pickSlug = candidates[0] ?? (data.topSellers ?? [])[0];
+    const product = bySlug.get(pickSlug);
+    if (!product) return null;
+    const flavor = flavorKeyOf
+      ? product.flavors.find((f) => flavorKey(f.name) === flavorKeyOf) ?? null
+      : null;
+    return {
       product,
       flavor,
       name: flavor ? `${product.name} — ${flavor.name}` : product.name,
       url: flavor ? `/produkt/${product.slug}/${flavor.slug}/` : `/produkt/${product.slug}/`,
       buyUrl: flavor ? flavor.buyUrl : product.permalink,
-    },
-  ];
+    };
+  };
+  const memo = new Map();
+  return (key) => {
+    let rec = memo.get(key);
+    if (rec === undefined) {
+      rec = compute(key || null);
+      memo.set(key, rec);
+    }
+    return rec;
+  };
 }
 
 // 商品（模型页/口味页）→ 相关文章。评分：
@@ -444,23 +470,25 @@ export function recommendProductsFor(data, guide) {
 export function relatedArticlesFor(data, product, flavor, guides = data.guides ?? []) {
   const isTop = data.topSellers?.includes(product.slug);
   const myKey = flavor ? flavorKey(flavor.name) : null;
-  return guides.map((g) => {
+  // 预建下标 Map：排序 tie-break 用 O(1) 查找（替代 guides.indexOf 的 O(n) 比较器）
+  const index = new Map();
+  guides.forEach((g, i) => index.set(g, i));
+  return guides.map((g, i) => {
     const rec = recommendProductsFor(data, g);
-    const r = rec[0];
     let score = 0;
-    if (r && r.product.slug === product.slug) {
+    if (rec?.product?.slug === product.slug) {
       score =
-        r.flavor && myKey && flavorKey(r.flavor.name) === myKey
+        rec.flavor && myKey && flavorKey(rec.flavor.name) === myKey
           ? 3
-          : myKey && !r.flavor
+          : myKey && !rec.flavor
             ? 1.5
             : 1;
     }
     if (isTop) score += 0.5;
-    return { guide: g, score };
+    return { guide: g, score, i };
   })
     .filter((x) => x.score > 0)
-    .sort((a, b) => b.score - a.score || guides.indexOf(a.guide) - guides.indexOf(b.guide))
+    .sort((a, b) => b.score - a.score || a.i - b.i)
     .map((x) => x.guide);
 }
 

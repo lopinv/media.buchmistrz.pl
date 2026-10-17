@@ -25,7 +25,6 @@ import {
   flavorKey,
   pluralModels,
   pluralProducts,
-  PUFF_BANDS,
   puffBandsFor,
   flavorLandingFaq,
   bandFaq,
@@ -302,6 +301,16 @@ export function itemListLd(items) {
   };
 }
 
+// 商品聚合 ItemList（/produkt/<slug>/ 逐条），列表型页共用
+const productItemLd = (products) =>
+  products.map((p) => ({ name: p.name, url: SITE + `/produkt/${p.slug}/` }));
+
+// 列表型页（分类/puffs 段/场景/价格段）共用 JSON-LD 骨架
+// （Organization + Breadcrumb + ItemList + FAQ），消除 4 处逐字重复
+function listPageLd(crumb, products, faqs) {
+  return [organizationLd(), crumb.ld, itemListLd(productItemLd(products)), faqLd(faqs)];
+}
+
 export function organizationLd() {
   return {
     '@context': 'https://schema.org',
@@ -466,10 +475,11 @@ export function articleCard(guide) {
 // 文章列表模块：全页复用，内容来自 data.guides（fetch.mjs 全量抓取 + 相关性打分）。
 // heading 非空时渲染可视 h2（首页/商品页/文章页），其余页面用 sr-only 标题避免与
 // "相关文章"区块撞名；intro 为可信 HTML（含链接），不转义；exclude 排除已展示的
-// 相关文章；limit 限制卡片数（50 篇全渲染会过重），hub 页传 12
-export function articlesBlock(data, heading = '', intro = '', exclude = [], limit = 8) {
+// 相关文章；limit 限制卡片数（全库 1775 篇全渲染会过重），hub 页传 8；
+// pool 传入已按口味/轮转筛好的文章子集（文章页去同质化用）
+export function articlesBlock(data, heading = '', intro = '', exclude = [], limit = 8, pool = null) {
   const excluded = new Set(exclude.map((g) => g.id));
-  const list = (data.guides ?? []).filter((g) => !excluded.has(g.id)).slice(0, limit);
+  const list = (pool ?? data.guides ?? []).filter((g) => !excluded.has(g.id)).slice(0, limit);
   if (list.length === 0) return '';
   const h2 = heading
     ? `<h2 id="guides-title">${esc(heading)}</h2>
@@ -487,18 +497,31 @@ export function articlesBlock(data, heading = '', intro = '', exclude = [], limi
   </section>`;
 }
 
-// 商品页 → 相关文章区块（相关文章为空时整块省略）
-// precomputed: 调用方先算好的推荐列表（复用给 articlesBlock 的 exclude，避免重复计算）
-export function relatedArticlesBlock(data, product, flavor, precomputed = null) {
-  const list = (precomputed ?? relatedArticlesFor(data, product, flavor, data.guides)).slice(0, 4);
+// 文章页去同质化：相关文章选择器（确定性，无 Date/随机）
+// 同口味文章 ≥6 篇时整块换成同口味清单；否则按 guide.id 哈希在无口味文章中
+// 确定性轮转取 12 篇——任意两页的同型卡片组合不同（池 1204 篇 → 100 种组合）
+function articlePoolFor(data, guide) {
+  const guides = data.guides ?? [];
+  if (guide.flavor) {
+    const same = guides.filter((g) => g.flavor === guide.flavor);
+    if (same.length >= 6) return same;
+  }
+  const base = guides.filter((g) => !g.flavor);
+  let h = 0;
+  for (const c of guide.id) h = (h * 31 + c.charCodeAt(0)) | 0;
+  const shift = Math.abs(h) % Math.max(base.length, 1);
+  return base.slice(shift).concat(base.slice(0, shift));
+}
+
+// 相关文章区块（列表 + 标题/导语；列表为空时整块省略，供商品/口味/落地页与文章页复用）
+export function relatedArticlesBlock(list, heading, intro = '') {
   if (!list.length) return '';
-  const subject = flavor ? `${product.name} · smak ${flavor.name}` : `modelu ${product.name}`;
   return `
   <section class="section guides section--center" aria-labelledby="related-guides-title">
     <div class="container">
       <div class="section-head">
-        <h2 id="related-guides-title">Poradnik do ${esc(subject)}</h2>
-        <p>Zobacz, jak ten model radzi sobie w praktyce — wybrane artykuły z vapepl.com.</p>
+        <h2 id="related-guides-title">${esc(heading)}</h2>
+        ${intro ? `<p>${esc(intro)}</p>` : ''}
       </div>
       <div class="article-grid">
         ${list.map((g) => articleCard(g)).join('')}
@@ -561,18 +584,54 @@ export function compareTable(products) {
 }
 
 export function renderArticle(data, guide) {
-  const rec = recommendProductsFor(data, guide)[0];
+  const rec = recommendProductsFor(data, guide);
   const crumb = breadcrumbs([{ label: 'Poradniki', url: '/' }, { label: guide.title, url: `/artykul/${guide.id}/` }]);
+  // 推荐位排名：畅销榜命中时显示位置（#1..#8）
+  const recRank = rec ? (data.topSellers ?? []).indexOf(rec.product.slug) + 1 || null : null;
+  const rankLabel = recRank ? ` ${recRank <= 3 ? '· Bestseller' : ''}` : '';
   const recCard = rec
     ? `
   <section class="section section--center" aria-labelledby="rec-title">
     <div class="container">
-      <h2 id="rec-title">Zalecany produkt</h2>
+      <h2 id="rec-title">Zalecany produkt${rankLabel}</h2>
       <p class="rec-intro">Do tego poradnika pasuje:</p>
-      ${productCard(rec.product, null, { url: rec.url, buyUrl: rec.buyUrl })}
+      ${productCard(rec.product, recRank, { url: rec.url, buyUrl: rec.buyUrl })}
     </div>
   </section>`
     : '';
+  // 数据条：口味款数/选购数/价格区间（逐口味不同）+ 发布日期（44 个不同值）
+  const flavorKeyOf = (guide.flavor ?? '').trim().toLowerCase();
+  const flavorGroup = flavorKeyOf
+    ? flavorGroups(data, 1).find((g) => g.key === flavorKeyOf)
+    : null;
+  const stats = [];
+  if (flavorGroup) {
+    stats.push(
+      {
+        icon: 'leaf',
+        value: String(flavorGroup.models),
+        label: `${pluralModels(flavorGroup.models)} ze smakiem ${flavorGroup.name}`,
+      },
+      { icon: 'droplet', value: String(flavorGroup.count), label: 'opcji zakupu' },
+      {
+        icon: 'banknote',
+        value:
+          flavorGroup.minPrice === flavorGroup.maxPrice
+            ? fmtZl(flavorGroup.minPrice)
+            : `${fmtZl(flavorGroup.minPrice)} – ${fmtZl(flavorGroup.maxPrice)}`,
+        label: 'zakres cen',
+      },
+    );
+  }
+  stats.push({
+    icon: 'calendar',
+    value: guide.datePublished
+      ? new Intl.DateTimeFormat('pl-PL', { day: 'numeric', month: 'long', year: 'numeric' }).format(
+          new Date(`${guide.datePublished}T00:00:00`),
+        )
+      : '',
+    label: 'data publikacji',
+  });
   const jsonld = [
     organizationLd(),
     crumb.ld,
@@ -584,7 +643,7 @@ export function renderArticle(data, guide) {
       url: SITE + `/artykul/${guide.id}/`,
       mainEntityOfPage: SITE + `/artykul/${guide.id}/`,
       publisher: { '@type': 'Organization', name: SITE_NAME, url: VAPEPL },
-      datePublished: guide.datePublished ?? '2026-01-01',
+      datePublished: guide.datePublished,
     },
     ...(rec
       ? [
@@ -621,8 +680,9 @@ export function renderArticle(data, guide) {
       </div>
     </div>
   </section>
+  ${statStrip(stats)}
   ${recCard}
-  ${articlesBlock(data, 'Wszystkie poradniki', '', [], 12)}`;
+  ${articlesBlock(data, flavorGroup ? `Więcej o smaku ${flavorGroup.name}` : 'Wszystkie poradniki', '', [], 12, articlePoolFor(data, guide))}`;
   return page({
     title: `${guide.title} | ${SITE_NAME}`,
     description: `${guide.summary} Pełna wersja poradnika na vapepl.com.`,
@@ -846,7 +906,7 @@ export function renderShop(data) {
   const jsonld = [
     organizationLd(),
     crumb.ld,
-    itemListLd(data.products.map((p) => ({ name: p.name, url: SITE + `/produkt/${p.slug}/` }))),
+    itemListLd(productItemLd(data.products)),
   ];
   return page({
     title: `Sklep z jednorazówkami i e-papierosami — ${data.products.length} modeli | ${SITE_NAME}`,
@@ -912,12 +972,7 @@ export function renderCategory(data, category) {
     { label: category.name, url: `/kategoria/${category.slug}/` },
   ]);
   const categoryFaqs = categoryFaq(data, category, products);
-  const jsonld = [
-    organizationLd(),
-    crumb.ld,
-    itemListLd(products.map((p) => ({ name: p.name, url: SITE + `/produkt/${p.slug}/` }))),
-    faqLd(categoryFaqs),
-  ];
+  const jsonld = listPageLd(crumb, products, categoryFaqs);
   // 统计条：分类级数值（产品数/口味数/价格区间/最低单千 puff 成本），逐页不同
   const stats = products.length
     ? (() => {
@@ -1078,7 +1133,7 @@ export function renderProduct(data, product) {
       </div>
     </div>
   </section>` : ''}
-  ${relatedArticlesBlock(data, product, null, related)}
+  ${relatedArticlesBlock(related, `Poradnik do modelu ${product.name}`, 'Zobacz, jak ten model radzi sobie w praktyce — wybrane artykuły z vapepl.com.')}
   ${comparePairs.length ? `
   <section class="section section--center" aria-labelledby="compare-title">
     <div class="container">
@@ -1205,7 +1260,7 @@ export function renderFlavor(data, product, flavor) {
       </div>
     </div>
   </section>` : ''}
-  ${relatedArticlesBlock(data, product, flavor, related)}
+  ${relatedArticlesBlock(related, `Poradnik do ${product.name} · smak ${flavor.name}`, 'Zobacz, jak ten model radzi sobie w praktyce — wybrane artykuły z vapepl.com.')}
   ${faqBlock(faqs)}
   ${articlesBlock(data, 'Wszystkie poradniki', '', related)}`;
   return page({
@@ -1306,7 +1361,7 @@ export function renderFlavorLanding(data, group) {
       </div>
     </div>
   </section>
-  ${related.length ? relatedArticlesFromList(related) : ''}
+  ${relatedArticlesBlock(related, 'Zobacz, jak smaki radzą sobie w praktyce', 'Wybrane artykuły z vapepl.com.')}
   ${faqBlock(faqs)}
   ${articlesBlock(data, 'Wszystkie poradniki', '', related)}`;
   return page({
@@ -1319,23 +1374,6 @@ export function renderFlavorLanding(data, group) {
     jsonld,
     body,
   });
-}
-
-// 相关文章区块（可传入预先算好的文章列表，避免重复调用评分）
-export function relatedArticlesFromList(list) {
-  if (!list.length) return '';
-  return `
-  <section class="section guides section--center" aria-labelledby="related-guides-title">
-    <div class="container">
-      <div class="section-head">
-        <h2 id="related-guides-title">Zobacz, jak smaki radzą sobie w praktyce</h2>
-        <p>Wybrane artykuły z vapepl.com.</p>
-      </div>
-      <div class="article-grid">
-        ${list.map((g) => articleCard(g)).join('')}
-      </div>
-    </div>
-  </section>`;
 }
 
 // ---------- puffs 段分类页（/kategoria/puffs-<id>/）：按 puffs 区间切"品类" ----------
@@ -1377,6 +1415,15 @@ function bandStats(products, countLabel) {
   ];
 }
 
+// puffs 段页 hero 文案：按段 id 逐段不同（5 段 5 种，消除段间雷同）
+const PUFFS_BAND_COPY = {
+  'do-20k': 'kompaktowe, lekkie modele na start i w podróży — najniższy próg wejścia do oferty.',
+  '20-30k': 'solidny środek: wystarczająco dużo puffs na codzienne użytkowanie, bez przepłacania za największe modele.',
+  '30-50k': 'wysoka wydajność dla regularnych użytkowników — rzadsza wymiana urządzenia i tańszy pojedynczy puff.',
+  '50-100k': 'długodystansowe modele: jeden zakup starcza na tygodnie, koszt puffs wyraźnie spada w dół.',
+  '100k-plus': 'rekordowe pojemności — urządzenia na miesiące, dla osób, które nie chcą zajmować się wymianą.',
+};
+
 export function renderPuffsBand(data, band) {
   const products = band.products;
   const crumb = breadcrumbs([
@@ -1384,25 +1431,14 @@ export function renderPuffsBand(data, band) {
     { label: `Puffs: ${band.label}`, url: `/kategoria/puffs-${band.id}/` },
   ]);
   const faqs = bandFaq(band.label, products);
-  const jsonld = [
-    organizationLd(),
-    crumb.ld,
-    itemListLd(products.map((p) => ({ name: p.name, url: SITE + `/produkt/${p.slug}/` }))),
-    faqLd(faqs),
-  ];
+  const jsonld = listPageLd(crumb, products, faqs);
   const stats = bandStats(products, 'modeli w segmencie');
   const body = `
   ${crumb.html}
   <section class="page-hero">
     <div class="container">
       <h1>Puffs: ${esc(band.label)}</h1>
-      <p>Wybierz wydajność dopasowaną do Twoich potrzeb — ${esc(
-        band.id === '100k-plus'
-          ? 'najdłużej działające modele, idealne dla osób szukających urządzenia na miesiące.'
-          : band.id === 'do-20k'
-            ? 'kompaktowe, lekkie modele na start i w podróży.'
-            : 'złoty środek: solidna liczba puffs bez kompromisów w rozmiarze.',
-      )}</p>
+      <p>Wybierz wydajność dopasowaną do Twoich potrzeb — ${esc(PUFFS_BAND_COPY[band.id] ?? band.label)}.</p>
     </div>
   </section>
   ${statStrip(stats)}
@@ -1432,12 +1468,7 @@ export function renderScenario(data, scenario) {
     { label: scenario.name, url: `/scenariusz/${scenario.id}/` },
   ]);
   const faqs = bandFaq(scenario.name, products);
-  const jsonld = [
-    organizationLd(),
-    crumb.ld,
-    itemListLd(products.map((p) => ({ name: p.name, url: SITE + `/produkt/${p.slug}/` }))),
-    faqLd(faqs),
-  ];
+  const jsonld = listPageLd(crumb, products, faqs);
   const stats = bandStats(products, 'modeli w tym scenariuszu');
   // 数量自适应：n=4 时与旧版逐字一致（保住既有场景页 lastmod），其余场景按实际款数
   const countWord = products.length === 3 ? 'Trzy' : 'Cztery';
@@ -1482,25 +1513,23 @@ export function renderPriceBand(data, band) {
     { label: `Cena: ${band.label}`, url: `/kategoria/cena-${band.id}/` },
   ]);
   const faqs = bandFaq(band.label, products);
-  const jsonld = [
-    organizationLd(),
-    crumb.ld,
-    itemListLd(products.map((p) => ({ name: p.name, url: SITE + `/produkt/${p.slug}/` }))),
-    faqLd(faqs),
-  ];
+  const jsonld = listPageLd(crumb, products, faqs);
   const stats = bandStats(products, 'modeli w tym przedziale');
+  // 价格段页 hero 文案：按段 id 逐段不同（PRICE_BANDS 实际 id，消除段间雷同；
+  // 旧版 'do-70' 是复制 puffs 段时漏改的死分支，5 段全落到同一句）
+  const bandCopy = {
+    'do-60': 'najtańsza półka: sprawdź, ile puffs daje się w tej cenie — start w e-papierosy bez dużego wydatku.',
+    '61-75': 'przystępny budżet z wyraźnie większą liczbą puffs niż najtańsza półka — dobry stosunek ceny do wydajności.',
+    '76-100': 'środkowa półka: model w tej cenie daje solidną liczbę puffs i szerszy wybór smaków.',
+    '101-140': 'wysokie półki wydajności — płacisz więcej, ale koszt pojedynczego puffs spada.',
+    'od-141': 'najwydajniejsze urządzenia w ofercie — rekordowe pojemności, które starczają na miesiące.',
+  };
   const body = `
   ${crumb.html}
   <section class="page-hero">
     <div class="container">
       <h1>Cena: ${esc(band.label)}</h1>
-      <p>Modele w przedziale cenowym ${esc(band.label)} — ${esc(
-        band.id === 'do-70'
-          ? 'najtańsza półka: sprawdź, ile puffs daje się w tej cenie.'
-          : band.id === '71-100'
-            ? 'środkowa półka: najlepszy stosunek ceny do liczby puffs.'
-            : 'najwydajniejsze urządzenia w ofercie — płacisz więcej, ale puffs starcza na miesiące.',
-      )}</p>
+      <p>Modele w przedziale cenowym ${esc(band.label)} — ${esc(bandCopy[band.id] ?? band.label)}.</p>
     </div>
   </section>
   ${statStrip(stats)}

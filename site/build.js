@@ -223,6 +223,8 @@ const distFiles = new Set();
 const htmlFiles = [...distFiles].filter((f) => f.endsWith('.html'));
 
 // 相对化：depth = 页面所在目录层级（index.html→0, x/index.html→1, x/y/index.html→2）
+// 最终字节存入内存 Map，供 manifest 哈希与构建自检复用（一次读盘，不再三遍重读）
+const finalHtml = new Map();
 for (const file of htmlFiles) {
   const depth = file.split('/').filter(Boolean).length - 1;
   const up = '../'.repeat(depth);
@@ -232,6 +234,7 @@ for (const file of htmlFiles) {
   html = html.replaceAll('href="/', `href="${up}`);
   html = html.replaceAll('src="/', `src="${up}`);
   writeFileSync(join(DIST, file), html);
+  finalHtml.set(file, html);
 }
 
 // ---------- 页面清单 + sitemap.xml（必须在内链相对化之后，按最终字节哈希）----------
@@ -247,7 +250,7 @@ const manifest = {};
 let manifestChanged = 0;
 for (const file of htmlFiles) {
   const key = manifestKey(file);
-  const hash = createHash('sha1').update(readFileSync(join(DIST, file))).digest('hex');
+  const hash = createHash('sha1').update(finalHtml.get(file)).digest('hex');
   const prev = prevManifest[key];
   if (prev?.h === hash) manifest[key] = prev;
   else {
@@ -302,7 +305,7 @@ const linkErrors = new Set();
 let objectErrors = 0;
 
 for (const file of htmlFiles) {
-  const html = readFileSync(join(DIST, file), 'utf8');
+  const html = finalHtml.get(file);
   // 模板插值对象未取 .html 时会漏出 "[object Object]"，构建即报错
   if (/\[object Object\]/.test(html)) {
     objectErrors += 1;
