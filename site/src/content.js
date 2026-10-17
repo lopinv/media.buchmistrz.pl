@@ -411,19 +411,31 @@ export const HOME_FAQ = [
 // 文章 → 推荐商品：按 guide.flavor（口味键）在站内找提供该口味的模型，
 // 按畅销榜排名取最靠前一款（推荐位落到口味直购页）；无匹配则回退畅销榜首模型页
 // 返回单个推荐对象或 null（不再是数组）
-const flavorRecommendCache = new WeakMap();
+const recommendIndexCache = new WeakMap();
 export function recommendProductsFor(data, guide) {
-  let get = flavorRecommendCache.get(data);
-  if (!get) {
-    get = flavorRecommend(data);
-    flavorRecommendCache.set(data, get);
-  }
-  return get((guide.flavor ?? '').trim().toLowerCase());
+  return recommendIndex(data).forFlavor((guide.flavor ?? '').trim().toLowerCase());
 }
 
-// 推荐位按口味键惰性预计算（全库仅 59 个口味键 + ''，未知键回退畅销榜首）：
-// 返回 get(flavorKey) 函数，memo 后构建热路径 6.5 万次调用 → 每口味键仅 1 次计算
-function flavorRecommend(data) {
+// 文章页展示用推荐位（去同质化）：有口味 → 口味槽位（同上）；无口味 → 按 guide.id
+// 哈希在畅销榜 8 款间确定性轮转（无 Date/随机），全库文章不再共用同一张兜底卡
+export function articleRecommendFor(data, guide) {
+  const idx = recommendIndex(data);
+  const key = (guide.flavor ?? '').trim().toLowerCase();
+  if (key) {
+    const rec = idx.forFlavor(key);
+    if (rec) return rec;
+  }
+  const tops = idx.topSlugs;
+  if (!tops.length) return null;
+  let h = 0;
+  for (const c of guide.id) h = (h * 31 + c.charCodeAt(0)) | 0;
+  return idx.recForSlug(tops[Math.abs(h) % tops.length], null);
+}
+
+// 推荐位按口味键惰性预计算（仅 59 个站内口味键）；结构一次构建、按 data 缓存
+function recommendIndex(data) {
+  let idx = recommendIndexCache.get(data);
+  if (idx) return idx;
   const bySlug = new Map(data.products.map((p) => [p.slug, p]));
   const popularity = new Map((data.topSellers ?? []).map((slug, i) => [slug, i]));
   const flavorProducts = new Map();
@@ -434,14 +446,8 @@ function flavorRecommend(data) {
       flavorProducts.get(key).push(p);
     }
   }
-  const compute = (flavorKeyOf) => {
-    const candidates = flavorKeyOf
-      ? (flavorProducts.get(flavorKeyOf) ?? [])
-          .map((p) => p.slug)
-          .sort((a, b) => (popularity.get(a) ?? 99) - (popularity.get(b) ?? 99))
-      : [];
-    const pickSlug = candidates[0] ?? (data.topSellers ?? [])[0];
-    const product = bySlug.get(pickSlug);
+  const recForSlug = (slug, flavorKeyOf) => {
+    const product = bySlug.get(slug);
     if (!product) return null;
     const flavor = flavorKeyOf
       ? product.flavors.find((f) => flavorKey(f.name) === flavorKeyOf) ?? null
@@ -454,15 +460,23 @@ function flavorRecommend(data) {
       buyUrl: flavor ? flavor.buyUrl : product.permalink,
     };
   };
-  const memo = new Map();
-  return (key) => {
-    let rec = memo.get(key);
+  const byFlavorMemo = new Map();
+  const forFlavor = (key) => {
+    let rec = byFlavorMemo.get(key);
     if (rec === undefined) {
-      rec = compute(key || null);
-      memo.set(key, rec);
+      const candidates = key
+        ? (flavorProducts.get(key) ?? [])
+            .map((p) => p.slug)
+            .sort((a, b) => (popularity.get(a) ?? 99) - (popularity.get(b) ?? 99))
+        : [];
+      rec = recForSlug(candidates[0] ?? (data.topSellers ?? [])[0], key || null);
+      byFlavorMemo.set(key, rec);
     }
     return rec;
   };
+  idx = { bySlug, forFlavor, recForSlug, topSlugs: data.topSellers ?? [] };
+  recommendIndexCache.set(data, idx);
+  return idx;
 }
 
 // 商品（模型页/口味页）→ 相关文章。评分：

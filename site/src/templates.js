@@ -16,7 +16,7 @@ import {
   CONTACT,
   STATS,
   flavorAngle,
-  recommendProductsFor,
+  articleRecommendFor,
   relatedArticlesFor,
   productFaq,
   categoryFaq,
@@ -498,15 +498,15 @@ export function articlesBlock(data, heading = '', intro = '', exclude = [], limi
 }
 
 // 文章页去同质化：相关文章选择器（确定性，无 Date/随机）
-// 同口味文章 ≥6 篇时整块换成同口味清单；否则按 guide.id 哈希在无口味文章中
-// 确定性轮转取 12 篇——任意两页的同型卡片组合不同（池 1204 篇 → 100 种组合）
+// 同口味文章 ≥6 篇时整块换成同口味清单；否则按 guide.id 哈希在全库（无口味
+// 文章）中确定性轮转取 12 篇——任意两页的同型卡片组合不同，且排除本篇自身
 function articlePoolFor(data, guide) {
   const guides = data.guides ?? [];
   if (guide.flavor) {
-    const same = guides.filter((g) => g.flavor === guide.flavor);
+    const same = guides.filter((g) => g.flavor === guide.flavor && g.id !== guide.id);
     if (same.length >= 6) return same;
   }
-  const base = guides.filter((g) => !g.flavor);
+  const base = guides.filter((g) => !g.flavor && g.id !== guide.id);
   let h = 0;
   for (const c of guide.id) h = (h * 31 + c.charCodeAt(0)) | 0;
   const shift = Math.abs(h) % Math.max(base.length, 1);
@@ -584,7 +584,7 @@ export function compareTable(products) {
 }
 
 export function renderArticle(data, guide) {
-  const rec = recommendProductsFor(data, guide);
+  const rec = articleRecommendFor(data, guide);
   const crumb = breadcrumbs([{ label: 'Poradniki', url: '/' }, { label: guide.title, url: `/artykul/${guide.id}/` }]);
   // 推荐位排名：畅销榜命中时显示位置（#1..#8）
   const recRank = rec ? (data.topSellers ?? []).indexOf(rec.product.slug) + 1 || null : null;
@@ -622,6 +622,10 @@ export function renderArticle(data, guide) {
         label: 'zakres cen',
       },
     );
+  } else if (rec) {
+    // 无口味文章：补推荐商品自身的 puffs/价格两格（逐页数值不同）
+    if (rec.product.puffs) stats.push({ icon: 'droplet', value: `${fmtPuffs(rec.product.puffs)} puffs`, label: rec.name });
+    stats.push({ icon: 'banknote', value: fmtZl(rec.product.price), label: 'cena w promocji' });
   }
   stats.push({
     icon: 'calendar',

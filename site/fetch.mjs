@@ -277,14 +277,15 @@ async function fetchGuides() {
     };
   });
 
-  // 全量命中（score > 0）都进库，按相关性分降序 + 标题 localeCompare 确定性排序
+  // 全量入库（用户要求：4000+ 篇全部出页，不做相关性过滤）；
+  // 相关性分仍保留用途：库内排序（高分靠前，文章页"全部文章"模块展示前 N 篇的质量由排序保证）
+  // 与 flavor 推荐位选择；按分降序 + 标题 localeCompare 确定性排序
   const guides = scored
-    .filter((p) => p._score > 0)
     .sort((a, b) => b._score - a._score || a.title.localeCompare(b.title, 'pl'))
     .map(({ _score, ...g }) => g);
 
   writeFileSync(join(ROOT, 'data', 'guides.json'), JSON.stringify(guides, null, 2) + '\n');
-  console.log(`✔ guides: 抓取 ${posts.length} 篇，命中 ${guides.length} 篇 → guides.json`);
+  console.log(`✔ guides: 抓取 ${posts.length} 篇，全量入库 ${guides.length} 篇（相关 ${scored.filter((p) => p._score > 0).length} 篇排前）→ guides.json`);
 }
 
 async function main() {
