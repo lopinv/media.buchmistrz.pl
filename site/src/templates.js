@@ -31,6 +31,8 @@ import {
   bandFaq,
   scenariosFor,
   priceBandsFor,
+  comparisonPairsFor,
+  comparisonFaq,
 } from './content.js';
 
 // ---------- 基础工具 ----------
@@ -860,7 +862,7 @@ export function renderCategory(data, category) {
       ? BRANDS[category.slug] ?? { name: category.name, blurb: '' }
       : FLAVOR_CATS[category.slug] ?? { name: category.name, blurb: '' };
   // 子口味导航：flavor 类分类页内产品口味频次 Top 8，链到口味落地页（有 ≥3 款的才出页）
-  const landingSlugs = new Set(flavorGroups(data, 3).map((g) => g.slug));
+  const landingSlugs = new Set(flavorGroups(data, 2).map((g) => g.slug));
   const subFlavors =
     category.kind === 'flavor'
       ? (() => {
@@ -1407,6 +1409,8 @@ export function renderScenario(data, scenario) {
     faqLd(faqs),
   ];
   const stats = bandStats(products, 'modeli w tym scenariuszu');
+  // 数量自适应：n=4 时与旧版逐字一致（保住既有场景页 lastmod），其余场景按实际款数
+  const countWord = products.length === 3 ? 'Trzy' : 'Cztery';
   const body = `
   ${crumb.html}
   <section class="page-hero">
@@ -1419,8 +1423,8 @@ export function renderScenario(data, scenario) {
   <section class="section section--center" aria-labelledby="top4-title">
     <div class="container">
       <div class="section-head">
-        <h2 id="top4-title">Nasze top 4 — ${esc(scenario.name.toLowerCase())}</h2>
-        <p>Cztery modele wybrane pod ten scenariusz, w kolejności rekomendowanej.</p>
+        <h2 id="top4-title">Nasze top ${products.length} — ${esc(scenario.name.toLowerCase())}</h2>
+        <p>${countWord} modele wybrane pod ten scenariusz, w kolejności rekomendowanej.</p>
       </div>
       <div class="product-grid">
         ${products.map((p, i) => productCard(p, i + 1)).join('')}
@@ -1431,7 +1435,7 @@ export function renderScenario(data, scenario) {
   ${faqBlock(faqs)}
   ${articlesBlock(data, 'Wszystkie poradniki')}`;
   return page({
-    title: `${scenario.name} — top 4 modeli | ${SITE_NAME}`,
+    title: `${scenario.name} — top ${products.length} modeli | ${SITE_NAME}`,
     description: `${scenario.name}: ${products.map((p) => p.name).join(', ')}. Porównaj i kup na vapepl.com.`,
     canonical: SITE + `/scenariusz/${scenario.id}/`,
     ogImage: products[0]?.image,
@@ -1483,6 +1487,109 @@ export function renderPriceBand(data, band) {
     description: `Modele w przedziale ${band.label}: ${products.length} produktów w promocji. Porównaj i kup na vapepl.com.`,
     canonical: SITE + `/kategoria/cena-${band.id}/`,
     ogImage: products[0]?.image,
+    jsonld,
+    body,
+  });
+}
+
+// ---------- 型号对比页（/porownanie/<a>-vs-<b>/）：X vs Y 参数矩阵 + 数值化 FAQ ----------
+// 矩阵为"指标为行、两款为列"的转置表，胜者列在指标行打 row-badge，避免与 compareTable 复用样式冲突
+const effPer1000 = (p) => (p.puffs > 0 ? (p.price / p.puffs) * 1000 : null);
+
+function comparisonMatrix(pair) {
+  const { a, b } = pair;
+  // 每项指标给两侧打胜者标记（'more' 越大越好，'less' 越小越好，'tie' 无胜者）
+  const rows = [
+    { label: 'Puffs', fa: a.puffs ?? 0, fb: b.puffs ?? 0, better: 'more', fmt: fmtPuffs, unit: 'puffs' },
+    { label: 'Cena', fa: a.price, fb: b.price, better: 'less', fmt: fmtZl },
+    { label: 'Smaki', fa: a.flavors.length, fb: b.flavors.length, better: 'more', fmt: (n) => String(n), unit: 'smaków' },
+    {
+      label: 'Zł / 1000 puffs',
+      fa: effPer1000(a),
+      fb: effPer1000(b),
+      better: 'less',
+      fmt: (n) =>
+        n == null
+          ? '—'
+          : new Intl.NumberFormat('pl-PL', { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(n) + ' zł',
+    },
+  ];
+  const badge = (isWin, note) => (isWin ? `<span class="row-badge">${esc(note)}</span>` : '');
+  const win = (row) =>
+    row.fa === row.fb ? null : row.better === 'more' ? (row.fa > row.fb ? 'a' : 'b') : row.fa < row.fb ? 'a' : 'b';
+  return `
+  <div class="table-scroll">
+  <table class="compare-table">
+    <thead>
+      <tr><th scope="col">Parametr</th><th scope="col">${esc(a.name)}</th><th scope="col">${esc(b.name)}</th></tr>
+    </thead>
+    <tbody>
+      ${rows
+        .map((row) => {
+          const w = win(row);
+          const note = w === 'a' ? 'Lepiej' : w === 'b' ? 'Lepiej' : 'Remis';
+          return `
+          <tr>
+            <th scope="row">${esc(row.label)}</th>
+            <td>${esc(row.fmt(row.fa))}${badge(w === 'a', note)}</td>
+            <td>${esc(row.fmt(row.fb))}${badge(w === 'b', note)}</td>
+          </tr>`;
+        })
+        .join('')}
+    </tbody>
+  </table>
+  </div>`;
+}
+
+export function renderComparison(data, pair) {
+  const { a, b } = pair;
+  const crumb = breadcrumbs([
+    { label: 'Sklep', url: '/sklep/' },
+    { label: pair.name, url: pair.url },
+  ]);
+  const faqs = comparisonFaq(pair);
+  const jsonld = [
+    organizationLd(),
+    crumb.ld,
+    faqLd(faqs),
+    itemListLd([
+      { name: a.name, url: SITE + `/produkt/${a.slug}/` },
+      { name: b.name, url: SITE + `/produkt/${b.slug}/` },
+    ]),
+  ];
+  const body = `
+  ${crumb.html}
+  <section class="page-hero">
+    <div class="container">
+      <h1>${esc(pair.name)} — który lepszy?</h1>
+      <p>${esc(pair.blurb)}</p>
+    </div>
+  </section>
+  <section class="section section--center" aria-labelledby="cmp-title">
+    <div class="container">
+      <div class="section-head">
+        <h2 id="cmp-title">${esc(a.name)} a ${esc(b.name)} w liczbach</h2>
+      </div>
+      ${comparisonMatrix(pair)}
+    </div>
+  </section>
+  <section class="section section--center" aria-labelledby="cards-title">
+    <div class="container">
+      <div class="section-head">
+        <h2 id="cards-title">Sprawdź w sklepie</h2>
+      </div>
+      <div class="product-grid">
+        ${[a, b].map((p, i) => productCard(p, i + 1)).join('')}
+      </div>
+    </div>
+  </section>
+  ${faqBlock(faqs)}
+  ${articlesBlock(data, 'Wszystkie poradniki')}`;
+  return page({
+    title: `${pair.name} — porównanie | ${SITE_NAME}`,
+    description: `${pair.name}: puffs, ceny i smaków w jednym. Sprawdź, który model ma lepszy stosunek ceny do wydajności.`,
+    canonical: SITE + pair.url,
+    ogImage: a.image,
     jsonld,
     body,
   });

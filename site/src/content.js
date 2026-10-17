@@ -136,7 +136,8 @@ export function pluralProducts(n) {
 // puffs 分段（合成"品类"，URL 挂在 /kategoria/puffs-<id>/ 下）
 export const PUFF_BANDS = [
   { id: 'do-20k', label: 'do 20 000 puffs', min: 0, max: 20000 },
-  { id: '20-50k', label: '20 000–50 000 puffs', min: 20000, max: 50000 },
+  { id: '20-30k', label: '20 000–30 000 puffs', min: 20000, max: 30000 },
+  { id: '30-50k', label: '30 000–50 000 puffs', min: 30000, max: 50000 },
   { id: '50-100k', label: '50 000–100 000 puffs', min: 50000, max: 100000 },
   { id: '100k-plus', label: '100 000+ puffs', min: 100000, max: Infinity },
 ];
@@ -210,6 +211,9 @@ export function bandFaq(name, products) {
 
 // ---------- 使用场景（数据驱动 top 4，各场景命中集互异） ----------
 // sort 返回得分（越大越靠前）；blurb 为该场景的 hero 文案
+// 多仓机型（4w1/6w1）：型号名里的 "NIN1" 仓数
+const tanksOf = (p) => Number(p.name.match(/(\d+)\s*IN\s*1/i)?.[1] ?? 0);
+
 export const SCENARIOS = [
   {
     id: 'budzet',
@@ -239,22 +243,46 @@ export const SCENARIOS = [
       'Lubisz próbować wielu wariantów? Te cztery modele oferują najszerszy wybór smaków — od owocowych po deserowe.',
     score: (p) => (p.flavors?.length ?? 0) * 1000 + (p.puffs ?? 0) / 1000,
   },
+  {
+    id: 'bestseller',
+    name: 'Bestsellery sklepu',
+    blurb:
+      'Najchętniej kupowane urządzenia w całej ofercie — ranking oparty na realnych, bieżących wynikach sprzedaży na vapepl.com. Top 4, które testuje najwięcej klientów.',
+    score: (p, data) => (data.topSellers?.indexOf(p.slug) ?? 99) * 100 - p.price,
+  },
+  {
+    id: 'promocja',
+    name: 'Największe oszczędności',
+    blurb:
+      'Chcesz wygrać najwięcej przy aktualnej promocji? Te cztery modele mają najwyższą różnicę między ceną regularną a obniżoną — sprawdzisz, ile złotych realnie oszczędzasz.',
+    score: (p) => ((p.regularPrice ?? p.price) - p.price) * 100 + (p.puffs ?? 0) / 1000,
+  },
+  {
+    id: '4w1',
+    name: 'Wiele smaków w jednym',
+    blurb:
+      'Preferujesz kilka aromatów bez kupowania kilku urządzeń? Modele wielkomodułowe (4w1, 6w1) dają Ci kilka niezależnych smaków w jednej obudowie — przełączaj bez mieszania aromatów.',
+    score: (p) => tanksOf(p) * 1000 + (p.puffs ?? 0) / 1000,
+    pick: 3, // tylko 3 modele wielkomodułowe w ofercie — limit zgodny z realną liczbą
+  },
 ];
 
 export function scenariosFor(data) {
   return SCENARIOS.map((s) => ({
     ...s,
     products: [...data.products]
-      .sort((a, b) => (s.score(b) ?? 0) - (s.score(a) ?? 0))
-      .slice(0, 4),
+      .sort((a, b) => (s.score(b, data) ?? 0) - (s.score(a, data) ?? 0))
+      .slice(0, s.pick ?? 4),
   }));
 }
 
 // ---------- 价格段（数据驱动，/kategoria/cena-<id>/ 下） ----------
 export const PRICE_BANDS = [
-  { id: 'do-70', label: 'do 70 zł', min: 0, max: 70 },
-  { id: '71-100', label: '71–100 zł', min: 70, max: 100 },
-  { id: 'od-101', label: 'od 101 zł', min: 100, max: Infinity },
+  { id: 'do-60', label: 'do 60 zł', min: 0, max: 60 },
+  { id: '61-75', label: '61–75 zł', min: 60, max: 75 },
+  { id: '76-100', label: '76–100 zł', min: 75, max: 100 },
+  { id: '101-140', label: '101–140 zł', min: 100, max: 140 },
+  { id: 'od-141', label: 'od 141 zł', min: 140, max: Infinity },
 ];
 
 export function priceBandsFor(data) {
@@ -262,6 +290,84 @@ export function priceBandsFor(data) {
     ...b,
     products: data.products.filter((p) => p.price > b.min && p.price <= b.max),
   }));
+}
+
+// ---------- 型号对比页（/porownanie/<a>-vs-<b>/）----------
+// 锚定式配对（非全组合 153，防薄页）：畅销榜 top4 两两互比 + 同品牌升级 + 旗舰对垒。
+// 每对 = [slugA, slugB, kind, name, blurb]；kind 用于 hero 角标与 FAQ 侧重。
+export const COMPARISON_PAIRS = [
+  // 畅销榜 top4 两两互比（data.topSellers 前 4 实时驱动，slug 解析不到则跳过）
+  ['hifancy-dream-45000-puffs', 'xcor-hawaii-pro-23000-puffs', 'bestseller', 'Hifancy Dream vs XCOR Hawaii Pro', null],
+  ['hifancy-dream-45000-puffs', 'xcor-tyrant-23000-puffs', 'bestseller', 'Hifancy Dream vs XCOR Tyrant', null],
+  ['hifancy-dream-45000-puffs', 'hifancy-space-50000-puffs', 'bestseller', 'Hifancy Dream vs Hifancy Space', null],
+  ['xcor-hawaii-pro-23000-puffs', 'xcor-tyrant-23000-puffs', 'bestseller', 'XCOR Hawaii Pro vs XCOR Tyrant', null],
+  ['xcor-hawaii-pro-23000-puffs', 'hifancy-space-50000-puffs', 'bestseller', 'XCOR Hawaii Pro vs Hifancy Space', null],
+  ['xcor-tyrant-23000-puffs', 'hifancy-space-50000-puffs', 'bestseller', 'XCOR Tyrant vs Hifancy Space', null],
+  // 同品牌升级（小 puff → 大 puff 同厂）
+  ['xcor-hawaii-pro-23000-puffs', 'xcor-max-50000-puffs', 'upgrade', 'XCOR Hawaii Pro vs XCOR Max', null],
+  ['xcor-tyrant-23000-puffs', 'xcor-max-50000-puffs', 'upgrade', 'XCOR Tyrant vs XCOR Max', null],
+  // 旗舰对垒（跨品牌旗舰 / 同级对拼）
+  ['stag-bar-6in1-180000-puffs', 'airmez-fox-4in1-120000-puffs', 'flagship', 'Stagbar 6in1 vs AiRMEZ Fox 4in1', null],
+  ['fumot-eco-4in1-80000-puffs', 'hifancy-clear-80000-puffs', 'flagship', 'Fumot ECO vs Hifancy Clear', null],
+  ['merrymi-blade-30000-puffs', 'airmez-matrix-pro-30000-puffs', 'flagship', 'MerryMi Blade vs AiRMEZ Matrix Pro', null],
+  ['fumot-leopard-40000-puffs', 'hifancy-dream-45000-puffs', 'flagship', 'Fumot Leopard vs Hifancy Dream', null],
+];
+
+// 把配对解析成带商品对象的结构；slug 解析不到型号的对自动跳过（数据驱动）。
+export function comparisonPairsFor(data) {
+  const bySlug = new Map(data.products.map((p) => [p.slug, p]));
+  return COMPARISON_PAIRS.map(([slugA, slugB, kind, name, blurb]) => {
+    const a = bySlug.get(slugA);
+    const b = bySlug.get(slugB);
+    if (!a || !b) return null;
+    // URL slug 按字母序确定（保证确定性构建，同一对始终同 URL）
+    const [first, second] = slugA < slugB ? [a, b] : [b, a];
+    return {
+      kind,
+      name,
+      blurb: blurb ?? defaultComparisonBlurb(kind, first, second),
+      a,
+      b,
+      slug: `${first.slug}-vs-${second.slug}`,
+      url: `/porownanie/${first.slug}-vs-${second.slug}/`,
+    };
+  }).filter(Boolean);
+}
+
+// 默认 blurb（数据驱动数值）：价差 + 谁的 puffs 更高
+function defaultComparisonBlurb(kind, first, second) {
+  const dPrice = Math.abs(first.price - second.price);
+  const bigger = (first.puffs ?? 0) >= (second.puffs ?? 0) ? first : second;
+  const kindWord =
+    kind === 'upgrade' ? 'upgrade' : kind === 'flagship' ? 'flagship' : 'bestseller';
+  return `Porównujemy ${first.name} i ${second.name} — dwa modele ${kindWord} z naszej oferty. ${bigger.name} ma więcej puffs (${puffsFmt(bigger.puffs)}), a różnica cenowa to ${pln(dPrice)}. Który wybierasz?`;
+}
+
+// 对比页 FAQ：3 题数值化（价差 / puffs 差 / 单价胜者）——沿用 bandFaq 的"数值逐页不同"反重复策略
+export function comparisonFaq(pair) {
+  const { a, b } = pair;
+  const eff = (p) => (p.puffs > 0 ? (p.price / p.puffs) * 1000 : Infinity);
+  const bestEff = eff(a) <= eff(b) ? a : b;
+  const morePuffs = (a.puffs ?? 0) >= (b.puffs ?? 0) ? a : b;
+  const cheaper = a.price <= b.price ? a : b;
+  return [
+    {
+      q: `Ile kosztuje różnica między ${a.name} a ${b.name}?`,
+      a: `${a.name} kosztuje ${pln(a.price)}, a ${b.name} ${pln(b.price)}. Różnica to ${pln(
+        Math.abs(a.price - b.price),
+      )} — ${cheaper.name} jest tańszy.`,
+    },
+    {
+      q: `Który ma więcej puffs: ${a.name} czy ${b.name}?`,
+      a: `${morePuffs.name} oferuje ${puffsFmt(morePuffs.puffs)} puffs, co przy średnim użyciu (ok. 400 puffów dziennie) starczy na dłużej niż ${Math.min(a.puffs ?? 0, b.puffs ?? 0)} puffs rywala.`,
+    },
+    {
+      q: `Który ma lepszy stosunek ceny do wydajności?`,
+      a: `${bestEff.name} — ${new Intl.NumberFormat('pl-PL', { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(
+        eff(bestEff),
+      )} zł za 1 000 puffs, czyli tańszy pojedynczy puff niż w drugiej opcji.`,
+    },
+  ];
 }
 
 // FAQ strony głównej (AEO: pytanie → 2-3 zdania bezpośredniej odpowiedzi)

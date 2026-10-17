@@ -12,7 +12,7 @@ const VAPEPL = 'https://vapepl.com';
 const UA = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) VapePL-guides-sync/1.0';
 const ROOT = dirname(fileURLToPath(import.meta.url));
 const OUT = join(ROOT, 'data', 'guides.json');
-const TOP_N = 50;
+const TOP_N = 100;
 
 const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 
@@ -108,6 +108,11 @@ function main() {
 
     const guides = top.map(({ _score, ...g }) => g);
     writeFileSync(OUT, JSON.stringify(guides, null, 2) + '\n');
+    // 质量线检查：SHOW_SCORES=1 时打印选中尾部的相关性分（判断是否需加 MIN_SCORE 截断）
+    if (process.env.SHOW_SCORES) {
+      const withScore = top.map((g, i) => ({ title: g.title.slice(0, 60), rank: i + 1, _score: g._score }));
+      for (const row of withScore.slice(-15)) console.log(`${row.rank}. (${row._score}) ${row.title}`);
+    }
     console.log(`✔ 抓取 ${posts.length} 篇，命中 ${scored.filter((p) => p._score > 0).length} 篇，写入 ${guides.length} 篇 → guides.json`);
   })().catch((err) => {
     console.error(err);

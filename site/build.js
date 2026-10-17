@@ -11,7 +11,7 @@ import {
 import { dirname, join, relative, posix } from 'node:path';
 import { createHash } from 'node:crypto';
 import { fileURLToPath } from 'node:url';
-import { SITE, SITE_NAME, CNAME, flavorGroups, puffBandsFor, scenariosFor, priceBandsFor } from './src/content.js';
+import { SITE, SITE_NAME, CNAME, flavorGroups, puffBandsFor, scenariosFor, priceBandsFor, comparisonPairsFor } from './src/content.js';
 import {
   renderHome,
   renderShop,
@@ -26,6 +26,7 @@ import {
   renderPuffsBand,
   renderScenario,
   renderPriceBand,
+  renderComparison,
 } from './src/templates.js';
 
 const ROOT = dirname(fileURLToPath(import.meta.url));
@@ -63,15 +64,18 @@ for (const band of puffBandsFor(data)) {
 }
 
 // 口味落地页（同一口味在 ≥3 款产品中可选才出页，/smak/<slug>/ 独立命名空间）
-for (const group of flavorGroups(data, 3)) out(`smak/${group.slug}/index.html`, renderFlavorLanding(data, group));
+for (const group of flavorGroups(data, 2)) out(`smak/${group.slug}/index.html`, renderFlavorLanding(data, group));
 
 // 价格段页（按价格区间切分，数据驱动，仅出有产品的段）
 for (const band of priceBandsFor(data)) {
   if (band.products.length) out(`kategoria/cena-${band.id}/index.html`, renderPriceBand(data, band));
 }
 
-// 使用场景页（4 个数据驱动场景，top 4 命中集互异）
+// 使用场景页（数据驱动场景，命中集互异）
 for (const s of scenariosFor(data)) out(`scenariusz/${s.id}/index.html`, renderScenario(data, s));
+
+// 型号对比页（锚定式配对 /porownanie/<a>-vs-<b>/）
+for (const pair of comparisonPairsFor(data)) out(`porownanie/${pair.slug}/index.html`, renderComparison(data, pair));
 
 // 商品聚合页 + 每个口味变体页
 for (const product of data.products) {
@@ -110,6 +114,39 @@ for (const [slug, target] of LEGACY_ARTICLE_REDIRECTS) {
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta http-equiv="refresh" content="0; url=${relTarget}">
   <link rel="canonical" href="${SITE}${target}">
+  <meta name="robots" content="noindex">
+  <title>Przekierowanie — ${SITE_NAME}</title>
+  <script>location.replace('${relTarget}');</script>
+  <script>if(!/^zh/i.test(navigator.language||navigator.userLanguage||'')){var s=document.createElement('script');s.defer=1;s.src='https://dash.cfworks.vip/script.js';s.dataset.websiteId='a1186f5a-71a5-40a2-a9c9-8ff3ed37ca3b';s.dataset.cfasync='false';document.head.appendChild(s)}</script>
+</head>
+<body>
+  <p>Przekierowanie… <a href="${relTarget}">Przejdź dalej</a></p>
+</body>
+</html>
+`,
+  );
+}
+
+// 旧分段 URL 301 重定向：分段细化后旧段被新段取代（puffs-20-50k→20-30k/30-50k 等），
+// 保留历史入口指向重叠度最大的新段，避免旧 URL 404。位于 /kategoria/（深度 2），
+// 同目录兄弟段用 ../<newSlug>/ 相对写法（根预览与 GitHub Pages 子目录双兼容）。
+const LEGACY_BAND_REDIRECTS = [
+  ['puffs-20-50k', 'puffs-20-30k'],
+  ['cena-do-70', 'cena-do-60'],
+  ['cena-71-100', 'cena-76-100'],
+  ['cena-od-101', 'cena-101-140'],
+];
+for (const [oldSlug, newSlug] of LEGACY_BAND_REDIRECTS) {
+  const relTarget = `../${newSlug}/`;
+  out(
+    `kategoria/${oldSlug}/index.html`,
+    `<!doctype html>
+<html lang="pl">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta http-equiv="refresh" content="0; url=${relTarget}">
+  <link rel="canonical" href="${SITE}/kategoria/${newSlug}/">
   <meta name="robots" content="noindex">
   <title>Przekierowanie — ${SITE_NAME}</title>
   <script>location.replace('${relTarget}');</script>
@@ -243,7 +280,9 @@ const entries = [
     entry(`/kategoria/cena-${b.id}/`, { changefreq: 'weekly', priority: 0.6 })),
   ...scenariosFor(data).map((s) =>
     entry(`/scenariusz/${s.id}/`, { changefreq: 'weekly', priority: 0.6 })),
-  ...flavorGroups(data, 3).map((g) =>
+  ...comparisonPairsFor(data).map((p) =>
+    entry(`/porownanie/${p.slug}/`, { changefreq: 'monthly', priority: 0.6 })),
+  ...flavorGroups(data, 2).map((g) =>
     entry(`/smak/${g.slug}/`, { changefreq: 'weekly', priority: 0.6 })),
   ...data.products.flatMap((p) => [
     entry(`/produkt/${p.slug}/`, { changefreq: 'weekly', priority: 0.7 }),
