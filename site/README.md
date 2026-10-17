@@ -7,9 +7,13 @@
 ```
 site/
 ├── fetch.mjs           # 抓取 vapepl.com 商品目录 → data/products.json
-├── build.js            # 构建：data + 模板 → dist/
+├── generate-guides.mjs # 抓取 WP 文章按相关性取 top-N → data/guides.json
+├── update.mjs          # 一键更新流水线（刷数据→双构建验证→提交 main→同步 gh-pages）
+├── build.js            # 构建：data + 模板 → dist/（含 manifest 内容哈希 + sitemap lastmod）
 ├── preview.mjs         # 本地预览 dist
 ├── data/products.json  # 商品数据（18 模型 / 220 口味变体，全量购买链接已实测）
+├── data/guides.json    # 文章库（top-100 相关性筛选）
+├── data/page-manifest.json # 每页 SHA-1 + 最后内容变更日期（构建自动回写，驱动 sitemap lastmod）
 └── src/
     ├── content.js      # 静态文案与站点常量（品牌/评价/FAQ/折扣/联系）
     ├── templates.js    # HTML 模板 + SEO/OGP/JSON-LD 生成
@@ -24,10 +28,18 @@ site/
 需 Node ≥ 18（本机 mise 已装 22），零第三方依赖。
 
 ```bash
-node site/fetch.mjs   # 重新抓取商品数据（可选，products.json 已提交）
-node site/build.js    # 构建到 site/dist 并自检（JSON-LD 合法性 + 站内链接可达）
-node site/preview.mjs # 本地预览 http://127.0.0.1:8080
+node site/update.mjs             # 一键：刷商品+文章数据 → 双构建验证 → 提交 main → 同步 gh-pages（本地）
+node site/update.mjs --no-data   # 改完文案/模板后，只重走构建+验证+提交（不刷数据）
+node site/update.mjs --push      # 在上面基础上，推送前 dry-run 后实际推送 main+gh-pages
+
+# 底层命令（update.mjs 组合的就是它们）：
+node site/fetch.mjs              # 重新抓取商品数据 → data/products.json
+node site/generate-guides.mjs    # 重新抓取文章 → data/guides.json（TOP_N=100）
+node site/build.js               # 构建到 site/dist 并自检（JSON-LD + 内链 + manifest + sitemap lastmod）
+node site/preview.mjs            # 本地预览 http://127.0.0.1:8080
 ```
+
+`update.mjs` 的安全红线：工作区有未提交改动默认拒绝（`--allow-dirty` 放行且提交范围随之扩大）；两遍构建逐字节比对，模板引入非确定性输入会在此中断；数据与清单均未变则跳过提交；gh-pages 同步后强制校验 `.gitignore` 仍在树中。
 
 `build.js` 会自动做内链相对化（自定义域名 `github.vapepl.com` 与本地根目录预览都可用），并生成 `sitemap.xml`、`robots.txt`、`.nojekyll`、`404.html`、`CNAME`。
 
