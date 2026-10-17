@@ -475,9 +475,9 @@ export function articleCard(guide) {
 // 文章列表模块：全页复用，内容来自 data.guides（fetch.mjs 全量抓取 + 相关性打分）。
 // heading 非空时渲染可视 h2（首页/商品页/文章页），其余页面用 sr-only 标题避免与
 // "相关文章"区块撞名；intro 为可信 HTML（含链接），不转义；exclude 排除已展示的
-// 相关文章；limit 限制卡片数（全库 1775 篇全渲染会过重），hub 页传 8；
+// 相关文章；limit 默认 12（全库 1775 篇全渲染会过重）；
 // pool 传入已按口味/轮转筛好的文章子集（文章页去同质化用）
-export function articlesBlock(data, heading = '', intro = '', exclude = [], limit = 8, pool = null) {
+export function articlesBlock(data, heading = '', intro = '', exclude = [], limit = 12, pool = null) {
   const excluded = new Set(exclude.map((g) => g.id));
   const list = (pool ?? data.guides ?? []).filter((g) => !excluded.has(g.id)).slice(0, limit);
   if (list.length === 0) return '';
