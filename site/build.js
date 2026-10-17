@@ -271,7 +271,6 @@ const pageLastmod = (key) => manifest[key]?.m ?? (data.fetchedAt ?? today).slice
 const entry = (key, { changefreq, priority }) =>
   `  <url>\n    <loc>${SITE}${key}</loc>\n    <lastmod>${pageLastmod(key)}</lastmod>\n    <changefreq>${changefreq}</changefreq>\n    <priority>${priority}</priority>\n  </url>`;
 const entries = [
-  entry('/', { changefreq: 'daily', priority: 1.0 }),
   entry('/sklep/', { changefreq: 'weekly', priority: 0.9 }),
   entry('/kontakt/', { changefreq: 'monthly', priority: 0.3 }),
   entry('/zwroty/', { changefreq: 'monthly', priority: 0.3 }),
