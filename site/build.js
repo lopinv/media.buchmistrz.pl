@@ -9,6 +9,7 @@ import {
   existsSync,
 } from 'node:fs';
 import { dirname, join, relative, posix } from 'node:path';
+import { createHash } from 'node:crypto';
 import { fileURLToPath } from 'node:url';
 import { SITE, SITE_NAME, CNAME, flavorGroups, puffBandsFor, scenariosFor, priceBandsFor } from './src/content.js';
 import {
@@ -29,6 +30,8 @@ import {
 
 const ROOT = dirname(fileURLToPath(import.meta.url));
 const DIST = join(ROOT, 'dist');
+const MANIFEST_FILE = join(ROOT, 'data', 'page-manifest.json');
+const today = new Date().toISOString().slice(0, 10);
 const data = JSON.parse(readFileSync(join(ROOT, 'data', 'products.json'), 'utf8'));
 // 文章库（generate-guides.mjs 生成的数据驱动清单；缺失时退回空库）
 data.guides = existsSync(join(ROOT, 'data', 'guides.json'))
@@ -156,48 +159,6 @@ if (existsSync(FONTS_SRC)) {
 }
 writeFileSync(join(DIST, '.nojekyll'), '');
 
-// 与生成页面一一对应的 sitemap.xml（带 lastmod/changefreq/priority，Google 友好）
-// lastmod：目录/文章页用数据源时间戳（抓取日期、文章发布日期），框架页用构建日期
-const bands = puffBandsFor(data).filter((b) => b.products.length);
-const priceBands = priceBandsFor(data).filter((b) => b.products.length);
-const scenarios = scenariosFor(data);
-const flavorLanding = flavorGroups(data, 3);
-const buildDate = new Date().toISOString().slice(0, 10);
-const catalogDate = (data.fetchedAt ?? buildDate).slice(0, 10);
-// url + 属性 → <url> 条目
-const entry = (loc, { lastmod, changefreq, priority }) =>
-  `  <url>\n    <loc>${loc}</loc>\n    <lastmod>${lastmod}</lastmod>\n    <changefreq>${changefreq}</changefreq>\n    <priority>${priority}</priority>\n  </url>`;
-const entries = [
-  entry(SITE + '/', { lastmod: buildDate, changefreq: 'daily', priority: 1.0 }),
-  entry(SITE + '/sklep/', { lastmod: catalogDate, changefreq: 'weekly', priority: 0.9 }),
-  entry(SITE + '/kontakt/', { lastmod: buildDate, changefreq: 'monthly', priority: 0.3 }),
-  entry(SITE + '/zwroty/', { lastmod: buildDate, changefreq: 'monthly', priority: 0.3 }),
-  ...data.categories.map((c) =>
-    entry(SITE + `/kategoria/${c.slug}/`, { lastmod: catalogDate, changefreq: 'weekly', priority: 0.7 })),
-  ...bands.map((b) =>
-    entry(SITE + `/kategoria/puffs-${b.id}/`, { lastmod: catalogDate, changefreq: 'weekly', priority: 0.6 })),
-  ...priceBands.map((b) =>
-    entry(SITE + `/kategoria/cena-${b.id}/`, { lastmod: catalogDate, changefreq: 'weekly', priority: 0.6 })),
-  ...scenarios.map((s) =>
-    entry(SITE + `/scenariusz/${s.id}/`, { lastmod: catalogDate, changefreq: 'weekly', priority: 0.6 })),
-  ...flavorLanding.map((g) =>
-    entry(SITE + `/smak/${g.slug}/`, { lastmod: catalogDate, changefreq: 'weekly', priority: 0.6 })),
-  ...data.products.flatMap((p) => [
-    entry(SITE + `/produkt/${p.slug}/`, { lastmod: catalogDate, changefreq: 'weekly', priority: 0.7 }),
-    ...p.flavors.map((f) =>
-      entry(SITE + `/produkt/${p.slug}/${f.slug}/`, { lastmod: catalogDate, changefreq: 'weekly', priority: 0.5 })),
-  ]),
-  ...data.guides.map((g) =>
-    entry(SITE + `/artykul/${g.id}/`, {
-      lastmod: g.datePublished ?? catalogDate,
-      changefreq: 'monthly',
-      priority: 0.4,
-    })),
-];
-writeFileSync(
-  join(DIST, 'sitemap.xml'),
-  `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n${entries.join('\n')}\n</urlset>\n`,
-);
 writeFileSync(
   join(DIST, 'robots.txt'),
   `User-agent: *\nAllow: /\nDisallow: /404.html\n\nSitemap: ${SITE}/sitemap.xml\n`,
@@ -235,6 +196,67 @@ for (const file of htmlFiles) {
   html = html.replaceAll('src="/', `src="${up}`);
   writeFileSync(join(DIST, file), html);
 }
+
+// ---------- 页面清单 + sitemap.xml（必须在内链相对化之后，按最终字节哈希）----------
+// 每个页面的 SHA-1 与 data/page-manifest.json 比对：内容未变则沿用旧 lastmod，
+// 让重复构建不向搜索引擎谎报"全站今天改过"；内容变化/新增 URL 才落今日日期。
+const manifestKey = (f) =>
+  f === 'index.html' ? '/' : `/${f.replace(/index\.html$/, '').replace(/\\/g, '/')}`;
+let prevManifest = {};
+if (existsSync(MANIFEST_FILE)) {
+  prevManifest = JSON.parse(readFileSync(MANIFEST_FILE, 'utf8'));
+}
+const manifest = {};
+let manifestChanged = 0;
+for (const file of htmlFiles) {
+  const key = manifestKey(file);
+  const hash = createHash('sha1').update(readFileSync(join(DIST, file))).digest('hex');
+  const prev = prevManifest[key];
+  if (prev?.h === hash) manifest[key] = prev;
+  else {
+    manifest[key] = { h: hash, m: today };
+    manifestChanged += 1;
+  }
+}
+// 按 key 排序回写（LF / UTF-8 无 BOM），保证清单本身的 git diff 稳定
+const manifestSorted = Object.fromEntries(
+  Object.keys(manifest)
+    .sort()
+    .map((k) => [k, manifest[k]]),
+);
+writeFileSync(MANIFEST_FILE, `${JSON.stringify(manifestSorted, null, 2)}\n`);
+
+// sitemap：lastmod 逐 URL 取清单戳（内容真实变更日期），changefreq/priority 维持原有分档
+const pageLastmod = (key) => manifest[key]?.m ?? (data.fetchedAt ?? today).slice(0, 10);
+const entry = (key, { changefreq, priority }) =>
+  `  <url>\n    <loc>${SITE}${key}</loc>\n    <lastmod>${pageLastmod(key)}</lastmod>\n    <changefreq>${changefreq}</changefreq>\n    <priority>${priority}</priority>\n  </url>`;
+const entries = [
+  entry('/', { changefreq: 'daily', priority: 1.0 }),
+  entry('/sklep/', { changefreq: 'weekly', priority: 0.9 }),
+  entry('/kontakt/', { changefreq: 'monthly', priority: 0.3 }),
+  entry('/zwroty/', { changefreq: 'monthly', priority: 0.3 }),
+  ...data.categories.map((c) =>
+    entry(`/kategoria/${c.slug}/`, { changefreq: 'weekly', priority: 0.7 })),
+  ...puffBandsFor(data).filter((b) => b.products.length).map((b) =>
+    entry(`/kategoria/puffs-${b.id}/`, { changefreq: 'weekly', priority: 0.6 })),
+  ...priceBandsFor(data).filter((b) => b.products.length).map((b) =>
+    entry(`/kategoria/cena-${b.id}/`, { changefreq: 'weekly', priority: 0.6 })),
+  ...scenariosFor(data).map((s) =>
+    entry(`/scenariusz/${s.id}/`, { changefreq: 'weekly', priority: 0.6 })),
+  ...flavorGroups(data, 3).map((g) =>
+    entry(`/smak/${g.slug}/`, { changefreq: 'weekly', priority: 0.6 })),
+  ...data.products.flatMap((p) => [
+    entry(`/produkt/${p.slug}/`, { changefreq: 'weekly', priority: 0.7 }),
+    ...p.flavors.map((f) =>
+      entry(`/produkt/${p.slug}/${f.slug}/`, { changefreq: 'weekly', priority: 0.5 })),
+  ]),
+  ...data.guides.map((g) =>
+    entry(`/artykul/${g.id}/`, { changefreq: 'monthly', priority: 0.4 })),
+];
+writeFileSync(
+  join(DIST, 'sitemap.xml'),
+  `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap-0.9">\n${entries.join('\n')}\n</urlset>\n`,
+);
 
 let jsonLdErrors = 0;
 const linkErrors = new Set();
@@ -277,6 +299,7 @@ for (const file of htmlFiles) {
 console.log(
   [
     `✔ HTML 页面: ${htmlFiles.length}`,
+    `✔ 内容变更: ${manifestChanged}/${Object.keys(manifestSorted).length} 页`,
     `✔ dist 文件总数: ${distFiles.size}`,
     jsonLdErrors ? `✘ JSON-LD 错误: ${jsonLdErrors}` : '✔ JSON-LD 全部合法',
     linkErrors.size ? `✘ 断链 ${linkErrors.size} 处: ${[...linkErrors].slice(0, 10).join(', ')}` : '✔ 站内链接全部可达',
