@@ -8,7 +8,8 @@
 site/
 ├── fetch.mjs           # 抓取 vapepl.com 商品目录 → data/products.json
 ├── generate-guides.mjs # 抓取 WP 文章按相关性取 top-N → data/guides.json
-├── update.mjs          # 一键更新流水线（刷数据→双构建验证→提交 main→同步 gh-pages）
+├── generate-readme.mjs # 从 data/ 再生成根 README.md 的 9 个数据块（标记区机制）
+├── update.mjs          # 一键更新流水线（刷数据→再生成根 README→双构建验证→提交 main→同步 gh-pages）
 ├── build.js            # 构建：data + 模板 → dist/（含 manifest 内容哈希 + sitemap lastmod）
 ├── preview.mjs         # 本地预览 dist
 ├── data/products.json  # 商品数据（18 模型 / 220 口味变体，全量购买链接已实测）
@@ -28,18 +29,21 @@ site/
 需 Node ≥ 18（本机 mise 已装 22），零第三方依赖。
 
 ```bash
-node site/update.mjs             # 一键：刷商品+文章数据 → 双构建验证 → 提交 main → 同步 gh-pages（本地）
-node site/update.mjs --no-data   # 改完文案/模板后，只重走构建+验证+提交（不刷数据）
+node site/update.mjs             # 一键：刷商品+文章数据 → 再生成根 README 数据块 → 双构建验证 → 提交 main → 同步 gh-pages（本地）
+node site/update.mjs --no-data   # 改完文案/模板后，只重走构建+验证+提交（不刷数据；根 README 数据块仍会再生成）
 node site/update.mjs --push      # 在上面基础上，推送前 dry-run 后实际推送 main+gh-pages
 
 # 底层命令（update.mjs 组合的就是它们）：
 node site/fetch.mjs              # 重新抓取商品数据 → data/products.json
 node site/generate-guides.mjs    # 重新抓取文章 → data/guides.json（TOP_N=100）
+node site/generate-readme.mjs    # 从 data/ 再生成根 README.md 的 9 个数据块（标记区机制，幂等）
 node site/build.js               # 构建到 site/dist 并自检（JSON-LD + 内链 + manifest + sitemap lastmod）
 node site/preview.mjs            # 本地预览 http://127.0.0.1:8080
 ```
 
-`update.mjs` 的安全红线：工作区有未提交改动默认拒绝（`--allow-dirty` 放行且提交范围随之扩大）；两遍构建逐字节比对，模板引入非确定性输入会在此中断；数据与清单均未变则跳过提交；gh-pages 同步后强制校验 `.gitignore` 仍在树中。
+**根 README.md 的 9 个数据块**（徽章/统计条/品牌卡/产品表/畅销榜/口味卡/口味榜/文章列表/数据日期）由 `generate-readme.mjs` 从 `data/` 生成，块用 `<!-- @gen:<name> -->` … `<!-- @/gen:<name> -->` 标记围住；标记外的段落（FAQ、评价、订单、关于、联系）手工维护，生成器不碰。改 `data/products.json` 或 `data/guides.json` 后跑 `node site/generate-readme.mjs`（或直接跑 `update.mjs`，它会自动带上），内容没变则不写盘。
+
+`update.mjs` 的安全红线：工作区有未提交改动（`site/` 与根 `README.md` 范围）默认拒绝（`--allow-dirty` 放行且提交范围随之扩大）；两遍构建逐字节比对，模板引入非确定性输入会在此中断；数据、清单与文档均未变则跳过提交；gh-pages 同步后强制校验 `.gitignore` 仍在树中。
 
 `build.js` 会自动做内链相对化（自定义域名 `github.vapepl.com` 与本地根目录预览都可用），并生成 `sitemap.xml`、`robots.txt`、`.nojekyll`、`404.html`、`CNAME`。
 

@@ -1,19 +1,20 @@
-// site/update.mjs — 一键更新流水线：刷数据 → 双构建验证 → 提交 main → 同步 gh-pages → （可选）推送
+// site/update.mjs — 一键更新流水线：刷数据 → 再生成派生文档 → 双构建验证 → 提交 main → 同步 gh-pages → （可选）推送
 // 零依赖，需 Node >= 18。git 写操作默认只做本地提交，--push 才实际推送。
 //
 // 用法：
-//   node site/update.mjs                 # 刷商品+文章数据，构建+验证+本地提交 main/gh-pages（不推送）
-//   node site/update.mjs --no-data       # 改完文案/模板后只重走构建+验证+提交（不刷数据）
+//   node site/update.mjs                 # 刷商品+文章数据，再生成根 README 数据块，构建+验证+本地提交（不推送）
+//   node site/update.mjs --no-data       # 改完文案/模板后只重走构建+验证+提交（不刷数据，派生文档仍会再生成）
 //   node site/update.mjs --only products # 只刷商品数据；--only guides 只刷文章
 //   node site/update.mjs --push          # 推送前额外 dry-run，最后实际推送
 //   node site/update.mjs --dry-run       # 只到构建验证为止，不提交
 //   node site/update.mjs --message "msg" # 自定义 main 提交信息
-//   node site/update.mjs --allow-dirty   # 工作区有改动时放行（提交范围扩大为 site/ 全部改动）
+//   node site/update.mjs --allow-dirty   # 工作区有改动时放行（提交范围扩大为 site/ + README.md 全部改动）
 //
 // 安全行为：
-// - 工作区有未提交改动时默认拒绝（--allow-dirty 放行，且提交范围随之扩大），防把无关改动卷进自动提交
+// - 工作区有未提交改动（site/ 与根 README.md 范围内）默认拒绝（--allow-dirty 放行，且提交范围随之扩大）
 // - 两遍构建逐字节比对（Node 内哈希，跨平台），不一致即中断（模板引入非确定性输入会在此暴露）
-// - 数据与清单均未变化 → 跳过 main 提交，无空提交
+// - 派生文档（site/data/page-manifest.json、根 README.md 数据块）由脚本再生成，内容未变则不写盘 → 无空提交
+// - 数据与清单与文档均未变化 → 跳过 main 提交
 // - gh-pages 同步后强制校验 .gitignore 仍在树中（历史两次部署事故的防线）
 import { spawnSync } from 'node:child_process';
 import { cpSync, readFileSync, readdirSync, rmSync } from 'node:fs';
@@ -49,8 +50,11 @@ function sh(cmd, args, opts = {}) {
   return { out: (r.stdout || '').trim(), err: r.stderr || '', ok: r.status === 0 };
 }
 
+// 脏检查与提交范围：site/（源码+数据+清单）与根 README.md（派生文档）
+const TRACKED = ['site', 'README.md'];
+
 function changedFiles() {
-  const { out } = sh('git', ['status', '--porcelain', 'site']);
+  const { out } = sh('git', ['status', '--porcelain', ...TRACKED]);
   // porcelain 行格式：XY<space><path>；取 2 字符状态后的路径（rename 时取新名）
   return out
     .split('\n')
@@ -83,6 +87,11 @@ function refreshData() {
     const after = sh('git', ['status', '--porcelain', dataFile]).out;
     console.log(`  ${dataFile}: ${before === after ? '未变化' : '已更新'}`);
   }
+}
+
+// 派生文档再生成（根 README 数据块）：数据未变则不写盘，构建/清单零扰动
+function regenerateDocs() {
+  sh('node', ['site/generate-readme.mjs']);
 }
 
 function buildOnce() {
@@ -126,12 +135,17 @@ function verifyDeterministic() {
 }
 
 function commitMain(changedPages) {
-  // 放行脏工作区时，提交范围扩大为 site/ 全部改动（源码/数据/清单一起进）
+  // 提交范围：数据 + 清单 + 根 README 派生块；放行脏工作区时扩大为 TRACKED 内全部改动
   const files = flags.allowDirty
     ? changedFiles()
-    : ['site/data/products.json', 'site/data/guides.json', 'site/data/page-manifest.json'].filter(fileChanged);
+    : [
+        'site/data/products.json',
+        'site/data/guides.json',
+        'site/data/page-manifest.json',
+        'README.md',
+      ].filter(fileChanged);
   if (!files.length) {
-    console.log('— 数据与清单均未变化，跳过 main 提交');
+    console.log('— 数据、清单与文档均未变化，跳过 main 提交');
     return false;
   }
   const subject = flags.message ?? `chore(site): refresh data + rebuild, ${changedPages} pages re-stamped`;
@@ -176,6 +190,8 @@ if (!flags.noData) {
   console.log('▶ 刷新数据源');
   refreshData();
 }
+console.log('▶ 再生成派生文档（根 README 数据块）');
+regenerateDocs();
 console.log('▶ 双构建验证');
 const first = buildOnce();
 verifyDeterministic();
