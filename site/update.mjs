@@ -184,7 +184,8 @@ if (flags.dryRun) {
   process.exit(0);
 }
 const mainCommitted = commitMain(first.changed);
-if (mainCommitted) deployGhPages();
+// 部署始终尝试（幂等）：main 无新提交但 gh-pages 落后时也要同步；无变化时脚本内部跳过
+deployGhPages();
 if (flags.push) pushAll();
 else console.log('— 未加 --push：仅本地提交，核对后自行 git push origin main gh-pages');
 console.log('✔ 流水线完成');
