@@ -534,7 +534,7 @@ Kupując kilka sztuk tego samego produktu, automatycznie otrzymujesz rabat progo
 
 <sub>© 2014–2026 VapePL.COM · BuchMistrz · Sprzedaż wyłącznie dla osób 18+</sub><br>
 <!-- @gen:dateline -->
-<sub>• Dane zebrane: 15 października 2026 • <a href="https://vapepl.com">vapepl.com</a> · Zwroty i reklamacje: <a href="https://vapepl.com/refund_returns/">Polityka Zwrotów</a></sub>
+<sub>• Dane zebrane: 17 października 2026 • <a href="https://vapepl.com">vapepl.com</a> · Zwroty i reklamacje: <a href="https://vapepl.com/refund_returns/">Polityka Zwrotów</a></sub>
 <!-- @/gen:dateline -->
 
 </div>

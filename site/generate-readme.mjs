@@ -180,8 +180,10 @@ if (data.fetchedAt) {
   ];
   blocksDate = `<sub>• Dane zebrane: ${d.getUTCDate()} ${MONTHS[d.getUTCMonth()]} ${d.getUTCFullYear()} • <a href="https://vapepl.com">vapepl.com</a> · Zwroty i reklamacje: <a href="https://vapepl.com/refund_returns/">Polityka Zwrotów</a></sub>`;
 }
+// dateline 必须并入 blocks 才会进入替换循环；fetchedAt 缺失时保持 null，循环按内容跳过（保留现有人工行）
+blocks.dateline = blocksDate;
 
-// ---------- 替换标记区（dateline 无变化时跳过，避免把现有行覆盖成空） ----------
+// ---------- 替换标记区（dateline 内容为 null 时跳过，避免把现有行覆盖成空） ----------
 let readme = readFileSync(README, 'utf8');
 const missing = [];
 for (const [name, content] of Object.entries(blocks)) {
