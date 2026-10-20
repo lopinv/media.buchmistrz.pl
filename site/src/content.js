@@ -9,6 +9,9 @@ export const VAPEPL = 'https://vapepl.com';
 export const VAPEPL_RETURNS = `${VAPEPL}/refund_returns/`;
 // 商品/分类图统一托管域（GitHub Pages media 分支经 jsDelivr 分发），preconnect 用
 export const IMG_CDN = 'https://cdn.jsdelivr.net';
+// og:image 兜底图：无自有社交图的页面（kontakt/zwroty/无推荐文章的文章页）统一回退
+// 旗舰产品图，保证每个可索引页面都带社交预览图
+export const FALLBACK_OG_IMAGE = `${IMG_CDN}/gh/lopinv/media.buchmistrz.pl@media/static/assets/uploads/stag-bar-6in1-180000-180k-puffs.jpg`;
 
 // 品牌卡用字母字标瓦片（首字母），不再用动物 emoji
 export const BRANDS = {
@@ -57,14 +60,17 @@ export const DISCOUNT_TIERS = [
 // 不再写死静态榜单：flavorGroups() 按归一化名分组并统计跨产品出现次数。
 
 // 口味归一化键：先解码 HTML 实体（口味名里的 &amp; 等），统一大小写，
-// 再合并 & 号变体（如 'Lemon & Lime' 与 'LEMON LIME' 并为一组）
+// 再合并 & 号变体（如 'Lemon & Lime' 与 'LEMON LIME' 并为一组）；
+// 另归一源站已知拼写错误（'Tobacoo' → 'tobacco'），避免同一口味分裂成两组
 export function flavorKey(name) {
-  return String(name)
+  let key = String(name)
     .replace(/&amp;/gi, '&')
     .replace(/&/g, ' ')
     .replace(/\s+/g, ' ')
     .trim()
     .toLowerCase();
+  key = key.replace(/\btobacoo\b/g, 'tobacco');
+  return key;
 }
 
 // 归一化键 → 可读展示名（逐词首字母大写）
@@ -111,6 +117,34 @@ export function flavorGroups(data, min = 3) {
     });
   groups.sort((a, b) => b.count - a.count || a.name.localeCompare(b.name, 'pl'));
   return groups;
+}
+
+// ---------- 口味 → 四种口味分类归类（首页口味陈列墙用，纯函数、确定性） ----------
+// 口味变体本身不带分类字段，而 categoryMembers 的口味分类映射到产品模型层级且
+// 大量重叠，无法按模型归属归纳口味。这里用一个确定性关键词归类器：
+// 命中分类词→该分类；未命中→默认 fruity（站内最大分类）。
+// 仅用于展示分组，不产生新 URL。
+const FLAVOR_CAT_RULES = [
+  { cat: 'menthol-ice', words: ['ice', 'menthol', 'mint', 'cool', 'chłodz', 'lod', 'lód', 'polarna', 'frost', 'polarny'] },
+  { cat: 'tobacco', words: ['tobacco', 'tytoni', 'tytoń', 'tabak', 'shisha', 'classic', 'klasycz', 'cigar'] },
+  {
+    cat: 'sweet-candy',
+    words: [
+      'cola', 'candy', 'cake', 'dessert', 'bubble', 'vanilla', 'vanil', 'caramel', 'karmel',
+      'choco', 'czekolad', 'guma', 'gum', 'słodk', 'slodk', 'honey', 'miód', 'miod',
+      'cream', 'krem', 'mlecz', 'milk', 'custard', 'pudding', 'waffle', 'gofr', 'syrop', 'sirup',
+    ],
+  },
+];
+
+// 返回 FLAVOR_CATS 的 key（fruity / menthol-ice / sweet-candy / tobacco）
+export function flavorCatFor(flavorName) {
+  const lower = String(flavorName ?? '').toLowerCase();
+  if (!lower) return 'fruity';
+  for (const rule of FLAVOR_CAT_RULES) {
+    if (rule.words.some((w) => lower.includes(w))) return rule.cat;
+  }
+  return 'fruity';
 }
 
 // 波兰语复数：model（1）/ modele（2-4）/ modeli（5+），用于数据条与 FAQ 数值

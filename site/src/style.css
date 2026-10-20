@@ -1,8 +1,9 @@
-/* site/src/style.css — 深色科技营销主题（mobile-first，全站单一内容轨道 1200px）
-   设计体系：
-   - 深空蓝黑底（--bg）+ 细网格纹理 + 霓虹青强调（--brand）；卡片 = 深表面 + hairline + 深阴影
-   - 区块节奏：网格底区块为主；营销区块标题居中对称（.section--center）
-   - 卡片 hover：微升 + 青描边 + 光晕 + 图片 zoom；全站 :focus-visible 青焦点环
+/* site/src/style.css — 深色企业营销主题（mobile-first，全站单一内容轨道 1200px）
+   设计体系（营销型 + 工具型 + 企业站）：
+   - 深空蓝黑底（--bg）+ 细网格纹理 + 霓虹青强调（--brand）；卡片 = 深表面 + hairline + 微升 hover
+   - 少圆角：卡片 3px、子元素 2px、徽章/chip 方角——发丝线 + 直角传递企业感
+   - 区块节奏：营销区块标题居中对称（.section--center）；区块间发丝线分隔
+   - 漏斗结构：每页按 认知(Hero) → 决策加速(优惠) → 信任 → 购买推荐 → 探索 → 社会证明 → 内容 → 异议(FAQ)
    - 无"套娃"二级限宽：卡片内内容通栏，左右边缘 = 容器边缘（1160px 内容轨） */
 
 @font-face {
@@ -24,6 +25,7 @@
 }
 
 :root {
+  color-scheme: dark;
   --bg: #070b14;
   --surface: #0e1524;
   --surface-2: #141d31;
@@ -36,10 +38,10 @@
   --accent: #fbbf24;
   --danger: #fb7185;
   --glow: rgba(34, 211, 238, 0.35);
-  --radius: 14px;
-  --radius-sm: 10px;
-  --shadow: 0 12px 40px rgba(0, 0, 0, 0.45);
-  --shadow-soft: 0 2px 12px rgba(0, 0, 0, 0.35);
+  --radius: 3px;
+  --radius-sm: 2px;
+  --shadow: 0 10px 32px rgba(0, 0, 0, 0.4);
+  --shadow-soft: 0 2px 8px rgba(0, 0, 0, 0.3);
   --maxw: 1200px;
   --h2: clamp(22px, 3.5vw, 30px);
   --dur: 150ms;
@@ -70,7 +72,9 @@ img { max-width: 100%; height: auto; display: block; }
 h1, h2, h3 { text-wrap: balance; }
 
 /* 价格与规格表数字对齐 */
-.card-price strong, .product-price strong, .specs td {
+.card-price strong, .product-price strong, .specs td,
+.compare-table td, .compare-table th, .stat-item b, .hero-stats b,
+.tier-off, .stat-value, .discount-tier b, .flavor-cnt {
   font-variant-numeric: tabular-nums;
 }
 
@@ -143,7 +147,7 @@ h1, h2, h3 { text-wrap: balance; }
 .has-sub > .nav-link { padding: 8px 4px; }
 .nav-dropdown {
   position: absolute; top: 100%; left: 0; z-index: 45;
-  background: var(--surface-2); border: 1px solid var(--line); border-radius: 12px;
+  background: var(--surface-2); border: 1px solid var(--line); border-radius: var(--radius);
   box-shadow: var(--shadow); min-width: 180px; padding: 8px;
   visibility: hidden; opacity: 0; transform: translateY(6px);
   transition: opacity var(--dur), transform var(--dur), visibility var(--dur);
@@ -152,7 +156,7 @@ h1, h2, h3 { text-wrap: balance; }
 .has-sub:hover > .nav-dropdown, .has-sub:focus-within > .nav-dropdown {
   visibility: visible; opacity: 1; transform: translateY(0);
 }
-.nav-dropdown .nav-sub { display: block; padding: 7px 10px; border-radius: 8px; }
+.nav-dropdown .nav-sub { display: block; padding: 7px 10px; border-radius: var(--radius-sm); }
 .nav-dropdown .nav-sub:hover { background: rgba(34, 211, 238, 0.08); color: var(--ink); }
 /* 移动菜单：同渐显机制 */
 .mobile-menu {
@@ -180,21 +184,21 @@ h1, h2, h3 { text-wrap: balance; }
   transition: transform var(--dur), box-shadow var(--dur), background-color var(--dur), border-color var(--dur), color var(--dur);
 }
 .btn:active { transform: translateY(1px); }
-/* 主操作：霓虹青实底 + 深色文字 + 光晕 */
+/* 主操作：霓虹青实底 + 深色文字 */
 .btn-primary {
   background: var(--brand); color: #04141a;
-  box-shadow: 0 4px 20px var(--glow);
+  box-shadow: 0 2px 12px rgba(34, 211, 238, 0.25);
 }
 .btn-primary:hover { background: #5ee2ef; }
 .btn-ghost { background: transparent; color: var(--ink); border-color: var(--line); }
 .btn-ghost:hover { border-color: var(--brand); color: var(--brand); }
 .btn-lg { padding: 14px 24px; font-size: 16px; }
-/* 页头促销按钮：琥珀描边科技感 */
+/* 页头促销按钮：琥珀描边企业感 */
 .btn-cta {
   background: rgba(251, 191, 36, 0.12); color: var(--accent);
   border-color: rgba(251, 191, 36, 0.4);
 }
-.btn-cta:hover { background: var(--accent); color: #1a1305; box-shadow: 0 4px 18px rgba(251, 191, 36, 0.35); }
+.btn-cta:hover { background: var(--accent); color: #1a1305; box-shadow: 0 2px 12px rgba(251, 191, 36, 0.3); }
 
 /* ---------- 区块体系 ----------
    .section          默认网格底（--bg），44px 垂直节奏（桌面 56px）
@@ -208,11 +212,12 @@ h1, h2, h3 { text-wrap: balance; }
   letter-spacing: -0.01em;
   margin: 0 0 20px;
 }
-.section { padding-block: 44px; }
 .section--center, .section--center h2, .section--center h3 { text-align: center; }
 .section--center p { max-width: 56ch; margin-inline: auto; }
 .section-head p { color: var(--ink-soft); margin: 0 auto 24px; max-width: 56ch; }
 .subhead { margin: 36px 0 16px; font-size: 20px; }
+/* 区块分隔发丝线 */
+.section { border-top: 1px solid rgba(148, 163, 184, 0.07); }
 
 /* 面包屑：深表面并入 page-hero，合并为顶部单块（底部发丝线由 page-hero 提供） */
 .breadcrumbs { background: var(--surface); padding: 12px 0; }
@@ -289,7 +294,7 @@ nav.breadcrumbs + .page-hero { padding-top: 0; }
   border-radius: var(--radius-sm); padding: 14px 16px;
 }
 .stat-item .icon { color: var(--brand); flex-shrink: 0; }
-.stat-item b { font-size: 18px; font-weight: 800; font-variant-numeric: tabular-nums; letter-spacing: -0.01em; }
+.stat-item b { font-size: 18px; font-weight: 800; letter-spacing: -0.01em; }
 .stat-item span { color: var(--ink-mute); font-size: 13px; }
 
 /* ---------- 品牌模型对比表（compare-table） ---------- */
@@ -300,7 +305,7 @@ nav.breadcrumbs + .page-hero { padding-top: 0; }
   text-align: left;
 }
 .table-scroll { overflow-x: auto; -webkit-overflow-scrolling: touch; }
-.table-scroll .compare-table { min-width: 560px; }
+.table-scroll .compare-table { min-width: 640px; }
 .compare-table th, .compare-table td {
   padding: 14px 16px; border-bottom: 1px solid var(--line);
   font-variant-numeric: tabular-nums;
@@ -320,10 +325,10 @@ nav.breadcrumbs + .page-hero { padding-top: 0; }
   display: inline-block; vertical-align: middle; margin-left: 8px;
   font-size: 10px; font-weight: 800; letter-spacing: 0.08em; text-transform: uppercase;
   color: var(--accent); border: 1px solid var(--accent);
-  border-radius: 999px; padding: 2px 8px;
+  border-radius: var(--radius-sm); padding: 2px 8px;
 }
 
-/* ---------- 卡片通用（深表面 + hairline + 深阴影 + hover 微升/青描边/光晕）---------- */
+/* ---------- 卡片通用（深表面 + hairline + 微升 hover）---------- */
 .product-card, .review, .brand-card, .flavor-card, .contact-card {
   box-shadow: var(--shadow-soft);
   transition: transform var(--dur), box-shadow var(--dur), border-color var(--dur);
@@ -331,7 +336,7 @@ nav.breadcrumbs + .page-hero { padding-top: 0; }
 a.brand-card:hover, a.flavor-card:hover, a.contact-card:hover,
 .product-card:hover {
   transform: translateY(-2px);
-  box-shadow: 0 0 0 1px var(--glow), var(--shadow);
+  box-shadow: 0 0 0 1px rgba(34, 211, 238, 0.3), var(--shadow);
   border-color: var(--brand);
 }
 
@@ -354,14 +359,14 @@ a.brand-card:hover, a.flavor-card:hover, a.contact-card:hover,
 .card-badge {
   position: absolute; top: 10px; left: 10px; z-index: 2;
   background: var(--danger); color: #1f0a12; font-weight: 800; font-size: 13px;
-  padding: 4px 10px; border-radius: 999px;
+  padding: 4px 10px; border-radius: var(--radius-sm);
 }
 .card-rank {
   position: absolute; top: 10px; right: 10px; z-index: 2;
   background: rgba(7, 11, 20, 0.85); color: var(--ink);
   border: 1px solid var(--line);
   font-weight: 800; font-size: 13px;
-  padding: 4px 10px; border-radius: 999px;
+  padding: 4px 10px; border-radius: var(--radius-sm);
 }
 .card-body { padding: 12px 14px; display: flex; flex-direction: column; gap: 4px; flex: 1; }
 .card-brand { font-size: 11px; text-transform: uppercase; letter-spacing: 0.08em; color: var(--brand); margin: 0; font-weight: 600; }
@@ -386,19 +391,43 @@ a.brand-card:hover, a.flavor-card:hover, a.contact-card:hover,
 .brand-initial {
   display: grid; place-items: center; width: 44px; height: 44px;
   background: linear-gradient(135deg, rgba(34, 211, 238, 0.18), rgba(59, 130, 246, 0.18));
-  border: 1px solid var(--line); border-radius: 12px;
+  border: 1px solid var(--line); border-radius: var(--radius-sm);
   font-size: 20px; font-weight: 800; color: var(--brand);
 }
 .brand-card b, .flavor-card b { font-size: 16px; font-weight: 700; }
 .brand-card span, .flavor-card span { color: var(--ink-soft); font-size: 13px; }
 .flavor-card .icon { color: var(--brand); }
 
+/* ---------- 口味陈列墙（首页全量口味按四分类分组） ---------- */
+.flavor-wall { margin-top: 32px; display: grid; gap: 24px; }
+.flavor-wall-group {
+  background: var(--surface); border: 1px solid var(--line);
+  border-radius: var(--radius); padding: 20px;
+}
+.flavor-wall-head { display: flex; align-items: center; gap: 10px; margin-bottom: 6px; }
+.flavor-wall-head .icon { color: var(--brand); }
+.flavor-wall-head h3 { font-size: 18px; margin: 0; font-weight: 700; }
+.flavor-wall-head .flavor-wall-count { color: var(--ink-mute); font-size: 13px; margin-left: auto; font-variant-numeric: tabular-nums; }
+.flavor-wall-blurb { color: var(--ink-soft); font-size: 13px; margin: 0 0 14px; }
+.flavor-wall-chips { display: flex; flex-wrap: wrap; gap: 8px; }
+.flavor-wall-chip {
+  display: inline-flex; align-items: center; gap: 6px;
+  background: var(--surface-2); border: 1px solid var(--line);
+  border-radius: var(--radius-sm); padding: 6px 12px;
+  font-size: 13px; font-weight: 600; text-decoration: none; color: var(--ink-soft);
+  transition: border-color var(--dur), color var(--dur), background-color var(--dur);
+}
+.flavor-wall-chip:hover { border-color: var(--brand); color: var(--brand); }
+.flavor-wall-chip.is-plain { cursor: default; }
+.flavor-wall-chip.is-plain:hover { border-color: var(--line); color: var(--ink-soft); }
+.flavor-wall-chip .flavor-cnt { color: var(--ink-mute); font-size: 11px; font-variant-numeric: tabular-nums; }
+
 .top-flavors { list-style: none; padding: 0; display: grid; grid-template-columns: 1fr; gap: 10px 24px; margin: 12px 0 0; }
 .top-flavors li { color: var(--ink-soft); display: flex; align-items: center; gap: 8px; }
 /* 排名数字 chip：前三金银铜色，其余 muted */
 .flavor-rank {
   display: inline-grid; place-items: center; width: 26px; height: 26px; flex: none;
-  border-radius: 8px; font-size: 12px; font-weight: 800;
+  border-radius: var(--radius-sm); font-size: 12px; font-weight: 800;
   background: var(--surface-2); color: var(--ink-mute); border: 1px solid var(--line);
 }
 .flavor-rank.top-1 { background: rgba(251, 191, 36, 0.14); color: #fde68a; border-color: rgba(251, 191, 36, 0.4); }
@@ -434,12 +463,12 @@ a.brand-card:hover, a.flavor-card:hover, a.contact-card:hover,
   display: flex; flex-direction: column; align-items: center; gap: 2px;
 }
 .tier-qty { font-size: 14px; color: var(--ink-soft); font-weight: 600; }
-.tier-off { font-size: 28px; font-weight: 800; color: var(--danger); line-height: 1.2; font-variant-numeric: tabular-nums; }
+.tier-off { font-size: 28px; font-weight: 800; color: var(--danger); line-height: 1.2; }
 /* 最高档：更深底 + 琥珀描边 + 光晕，徽章骑在上缘 */
 .discount-tier.is-featured {
   background: #0a0e18;
   border-color: rgba(251, 191, 36, 0.55);
-  box-shadow: 0 0 0 1px rgba(251, 191, 36, 0.25), 0 8px 32px rgba(251, 191, 36, 0.12);
+  box-shadow: 0 0 0 1px rgba(251, 191, 36, 0.25), 0 4px 20px rgba(251, 191, 36, 0.1);
 }
 .discount-tier.is-featured .tier-qty { color: var(--ink-soft); }
 .discount-tier.is-featured .tier-off {
@@ -450,7 +479,7 @@ a.brand-card:hover, a.flavor-card:hover, a.contact-card:hover,
   position: absolute; top: -11px; left: 50%; transform: translateX(-50%);
   background: var(--accent); color: #1a1305;
   font-size: 11px; font-weight: 800; letter-spacing: 0.02em;
-  padding: 3px 10px; border-radius: 999px; white-space: nowrap;
+  padding: 3px 10px; border-radius: var(--radius-sm); white-space: nowrap;
 }
 .discount-cta { margin-top: 20px; }
 .discount-cta .btn { min-width: 180px; display: inline-block; }
@@ -514,12 +543,30 @@ a.brand-card:hover, a.flavor-card:hover, a.contact-card:hover,
   border-color: rgba(34, 211, 238, 0.45);
   box-shadow: 0 8px 28px rgba(0, 0, 0, 0.4);
 }
-.article-title { font-size: 17px; line-height: 1.35; margin: 0; }
+/* 文章卡 meta 行：分类/日期（美化后的元信息层） */
+.article-meta {
+  display: flex; align-items: center; gap: 8px; flex-wrap: wrap;
+  font-size: 12px; color: var(--ink-mute); margin: 0 0 2px;
+}
+.article-meta .article-meta-kind {
+  font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em;
+  color: var(--brand);
+}
+.article-meta .article-meta-sep { color: rgba(148, 163, 184, 0.4); }
+.article-meta .icon-sm { width: 13px; height: 13px; }
+.article-title { font-size: 18px; line-height: 1.35; margin: 0; }
 .article-title a { color: var(--ink); text-decoration: none; }
 .article-title a:hover { color: var(--brand); }
-.article-summary { color: var(--ink-soft); font-size: 14px; line-height: 1.6; margin: 0; flex: 1; }
-.article-actions { display: flex; gap: 8px; flex-wrap: wrap; }
+.article-summary {
+  color: var(--ink-soft); font-size: 14px; line-height: 1.6; margin: 0; flex: 1;
+  display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;
+}
+.article-actions { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
 .article-actions .btn { padding: 8px 14px; font-size: 13px; }
+.article-external {
+  color: var(--ink-mute); font-size: 13px; text-decoration: none; font-weight: 600;
+}
+.article-external:hover { color: var(--brand); }
 .rec-intro { color: var(--ink-soft); margin-bottom: 18px; }
 .article-kicker {
   color: var(--ink-mute); font-size: 13px; font-weight: 600;
@@ -535,6 +582,10 @@ a.brand-card:hover, a.flavor-card:hover, a.contact-card:hover,
 /* /sklep/ 页：移除整块 hero 后，h1 收成紧凑标题行（保留语义，去掉重视觉） */
 .page-title-row { padding: 24px 0 0; }
 .page-title-row h1 { font-size: clamp(24px, 4vw, 34px); margin: 0; }
+
+/* /sklep/ 工具型导航区（chips 组）：区块化节奏，首组贴 stat-strip，其余组间距 */
+.tools { margin-bottom: 40px; }
+.tools:first-of-type { margin-top: 32px; }
 
 /* ---------- 商品详情 ---------- */
 .product-layout { display: grid; grid-template-columns: 1fr; gap: 28px; }
@@ -559,7 +610,7 @@ a.brand-card:hover, a.flavor-card:hover, a.contact-card:hover,
 
 .flavor-chips { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 14px; }
 .flavor-chip {
-  background: var(--surface); border: 1px solid var(--line); border-radius: 999px;
+  background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius-sm);
   padding: 8px 16px; font-size: 14px; font-weight: 600; text-decoration: none; color: var(--ink-soft);
   transition: border-color var(--dur), color var(--dur), background-color var(--dur);
 }
@@ -593,7 +644,6 @@ a.brand-card:hover, a.flavor-card:hover, a.contact-card:hover,
 }
 .not-found .btn { min-width: 180px; }
 
-/* ---------- 退货政策（文字型页：保持左对齐阅读节奏）---------- */
 /* ---------- 退货政策（条款卡片网格 + 居中节奏） ---------- */
 .returns-grid {
   display: grid; grid-template-columns: 1fr; gap: 14px;
@@ -671,6 +721,9 @@ a.brand-card:hover, a.flavor-card:hover, a.contact-card:hover,
   .article-grid { grid-template-columns: repeat(3, 1fr); }
   .returns-grid { grid-template-columns: repeat(3, 1fr); }
   .stat-strip .container { grid-template-columns: repeat(4, 1fr); }
+  /* 口味墙：桌面两栏分组 */
+  .flavor-wall { grid-template-columns: repeat(2, 1fr); }
+  .flavor-wall { margin-top: 40px; }
 
   /* 桌面导航：显示顶栏 + 下拉，隐藏汉堡与移动菜单（base 已 display:none，无需 !important） */
   .nav-toggle { display: none; }

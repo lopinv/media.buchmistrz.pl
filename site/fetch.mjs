@@ -273,6 +273,8 @@ async function fetchGuides() {
       summary,
       flavor: flavor ? flavorKey(flavor) : null,
       datePublished: post.date?.slice(0, 10) ?? null,
+      // dateModified 供文章页 Article 结构化数据使用（AEO：内容新鲜度信号）
+      dateModified: post.modified?.slice(0, 10) ?? post.date?.slice(0, 10) ?? null,
       _score: score,
     };
   });

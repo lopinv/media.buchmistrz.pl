@@ -6,9 +6,11 @@ import {
   VAPEPL,
   VAPEPL_RETURNS,
   IMG_CDN,
+  FALLBACK_OG_IMAGE,
   BRANDS,
   BRAND_ORDER,
   FLAVOR_CATS,
+  flavorCatFor,
   REVIEWS,
   DISCOUNT_TIERS,
   HOME_FAQ,
@@ -211,13 +213,17 @@ export function page({
   const ldScripts = jsonld
     .map((o) => `<script type="application/ld+json">${JSON.stringify(o)}</script>`)
     .join('\n');
-  const image = ogImage || '';
+  // og:image 兜底：未传图的页面（kontakt/zwroty/无推荐文章的文章页）回退旗舰产品图，
+  // 保证每个可索引页面都有社交预览图；webp/avif 部分社交客户端不解析，统一换成 jpg 兜底
+  const image = /\.(webp|avif)(\?|$)/i.test(ogImage || '') || !ogImage ? FALLBACK_OG_IMAGE : ogImage;
   return `<!doctype html>
 <html lang="pl">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <link rel="preconnect" href="${IMG_CDN}">
+  <link rel="dns-prefetch" href="${IMG_CDN}">
+  <link rel="preload" as="font" type="font/woff2" crossorigin href="/fonts/InterVariable-latin.woff2">
   ${lcpImage ? `<link rel="preload" as="image" fetchpriority="high" href="${esc(lcpImage)}">` : ''}
   <title>${esc(title)}</title>
   <meta name="description" content="${esc(description)}">
@@ -227,15 +233,15 @@ export function page({
   <meta property="og:title" content="${esc(title)}">
   <meta property="og:description" content="${esc(description)}">
   <meta property="og:url" content="${esc(canonical)}">
-  ${image ? `<meta property="og:image" content="${esc(image)}">\n  <meta property="og:image:width" content="1200">\n  <meta property="og:image:height" content="630">\n` : ''}
-  <meta name="twitter:card" content="${image ? 'summary_large_image' : 'summary'}">
+  <meta property="og:image" content="${esc(image)}">
+  <meta name="twitter:card" content="summary_large_image">
   <meta name="twitter:title" content="${esc(title)}">
   <meta name="twitter:description" content="${esc(description)}">
-  ${image ? `<meta name="twitter:image" content="${esc(image)}">\n` : ''}
+  <meta name="twitter:image" content="${esc(image)}">
   <meta name="robots" content="${noFollow ? 'noindex, follow' : 'index, follow'}">
   <meta name="theme-color" content="#070b14">
   <meta name="format-detection" content="telephone=yes">
-  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='8' fill='%2322d3ee'/><text x='16' y='22' font-family='sans-serif' font-size='18' font-weight='800' fill='%2304141a' text-anchor='middle'>V</text></svg>">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='3' fill='%2322d3ee'/><text x='16' y='22' font-family='sans-serif' font-size='18' font-weight='800' fill='%2304141a' text-anchor='middle'>V</text></svg>">
   <link rel="stylesheet" href="/style.css">
   ${ldScripts}
   <script src="/script.js" defer></script>
@@ -436,7 +442,7 @@ export function productCard(product, rank, target = null) {
     ${rank ? `<span class="card-rank" aria-label="Pozycja ${rank}">#${rank}</span>` : ''}
     ${pct ? `<span class="card-badge">-${pct}%</span>` : ''}
     <a class="card-media" href="${esc(cardUrl)}">
-      ${product.image ? `<img src="${esc(product.image)}" alt="${esc(product.name)}" loading="lazy">` : ''}
+      ${product.image ? `<img src="${esc(product.image)}" alt="${esc(product.name)}" width="600" height="600" loading="lazy">` : ''}
     </a>
     <div class="card-body">
       <p class="card-brand">${esc(product.brand)}</p>
@@ -459,15 +465,35 @@ export function flavorChip(product, flavor, active = false) {
 }
 
 // ---------- 文章（vapepl.com 精选文章镜像 + 关联推荐） ----------
-// 文章卡片：站内文章页链接 + 外跳 vapepl.com 阅读原文（nofollow）
+// 文章卡：meta 行（口味/通用标签 + 发布日期）→ 标题 → 两行摘要（line-clamp）→
+// 「Czytaj」主按钮 + 纯文本外跳原文链接（降低双按钮视觉噪音）
+const articleMeta = (guide) => {
+  const parts = [];
+  if (guide.flavor) parts.push(`<span class="article-meta-kind">Smak: ${esc(guide.flavor)}</span>`);
+  else parts.push(`<span class="article-meta-kind">Poradnik</span>`);
+  if (guide.datePublished) {
+    const d = new Date(`${guide.datePublished}T00:00:00`);
+    if (!Number.isNaN(d.getTime())) {
+      const formatted = new Intl.DateTimeFormat('pl-PL', {
+        day: 'numeric',
+        month: 'long',
+        year: 'numeric',
+      }).format(d);
+      parts.push(`<span class="article-meta-sep" aria-hidden="true">·</span><span>${esc(formatted)}</span>`);
+    }
+  }
+  return parts.join(' ');
+};
+
 export function articleCard(guide) {
   return `
   <article class="article-card">
+    <p class="article-meta">${articleMeta(guide)}</p>
     <h3 class="article-title"><a href="/artykul/${esc(guide.id)}/">${esc(guide.title)}</a></h3>
     <p class="article-summary">${esc(guide.summary)}</p>
     <div class="article-actions">
       <a class="btn btn-ghost" href="/artykul/${esc(guide.id)}/">Czytaj</a>
-      <a class="btn btn-ghost" href="${esc(guide.url)}" rel="nofollow" target="_blank">Pełna wersja →</a>
+      <a class="article-external" href="${esc(guide.url)}" rel="nofollow" target="_blank">Pełna wersja na vapepl.com →</a>
     </div>
   </article>`;
 }
@@ -530,6 +556,52 @@ export function relatedArticlesBlock(list, heading, intro = '') {
   </section>`;
 }
 
+// ---------- 首页口味陈列墙（全部口味按四种分类分组全列） ----------
+// 数据源：flavorGroups(data, 1)（站内口味频次）；分组：flavorCatFor() 关键词归类器（确定性）。
+// 有 /smak/<slug>/ 落地页（≥2 款产品）的口味渲染为链接 chip，其余为纯文本 chip。
+// 组合包商品（一个 SKU 塞多个口味）在源站被存成整串口味列表，名字长达 100+ 字符，
+// 属于"多变体包"而非单一口味名——陈列这类名字会把 chip 墙撑坏，故展示层过滤：
+// 名称 > 30 字符的组不进口味墙（它们仍保留在 /smak/ 数据流与分类页子口味导航中）。
+// 仅首页使用，不产生新 URL。
+const WALL_NAME_MAX = 30;
+
+export function flavorWall(data) {
+  const groups = flavorGroups(data, 1).filter((g) => g.name.length <= WALL_NAME_MAX);
+  // 已存在落地页的 slug 集合（与 build.js 出页门槛 flavorGroups(data, 2) 一致）
+  const landingSlugs = new Set(flavorGroups(data, 2).map((g) => g.slug));
+  const byCat = new Map(Object.keys(FLAVOR_CATS).map((k) => [k, []]));
+  for (const g of groups) {
+    const cat = flavorCatFor(g.name);
+    byCat.get(cat)?.push(g);
+  }
+  const sections = [...byCat.entries()]
+    .filter(([, list]) => list.length > 0)
+    .map(([catSlug, list]) => {
+      const cat = FLAVOR_CATS[catSlug];
+      return `
+    <div class="flavor-wall-group">
+      <div class="flavor-wall-head">
+        ${icon(cat.icon)}
+        <h3>${esc(cat.name)}</h3>
+        <span class="flavor-wall-count">${list.length} ${list.length === 1 ? 'smak' : 'smaków'}</span>
+      </div>
+      <p class="flavor-wall-blurb">${esc(cat.blurb)}</p>
+      <div class="flavor-wall-chips">
+        ${list
+          .map(
+            (g) =>
+              landingSlugs.has(g.slug)
+                ? `<a class="flavor-wall-chip" href="/smak/${esc(g.slug)}/">${esc(g.name)}<span class="flavor-cnt">${g.models}</span></a>`
+                : `<span class="flavor-wall-chip is-plain">${esc(g.name)}<span class="flavor-cnt">${g.models}</span></span>`,
+          )
+          .join('')}
+      </div>
+    </div>`;
+    })
+    .join('');
+  return sections;
+}
+
 // 数据条：4 格小卡（图标 + 数值 + 标签），数值由调用处按页型传入 → 页面间数字各不相同
 export function statStrip(items) {
   if (!items.length) return '';
@@ -550,11 +622,17 @@ export function statStrip(items) {
   </section>`;
 }
 
-// 品牌分类页模型对比表：puffs/口味数/现价，按 puffs 降序，最大模型行高亮
+// 品牌分类页模型对比表：puffs/口味数/现价/每千 puffs 成本，按 puffs 降序，最大模型行高亮
 export function compareTable(products) {
   if (products.length < 2) return '';
   const rows = [...products].sort((a, b) => (b.puffs ?? 0) - (a.puffs ?? 0));
   const topSlug = rows[0].slug;
+  const effFmt = (p) =>
+    p.puffs > 0
+      ? new Intl.NumberFormat('pl-PL', { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(
+          (p.price / p.puffs) * 1000,
+        ) + ' zł'
+      : '—';
   return `
   <section class="section section--center" aria-labelledby="compare-title">
     <div class="container">
@@ -562,7 +640,7 @@ export function compareTable(products) {
       <div class="table-scroll">
       <table class="compare-table">
         <thead>
-          <tr><th scope="col">Model</th><th scope="col">Puffs</th><th scope="col">Smaki</th><th scope="col">Cena</th></tr>
+          <tr><th scope="col">Model</th><th scope="col">Puffs</th><th scope="col">Smaki</th><th scope="col">Cena</th><th scope="col">Zł / 1000 puffs</th></tr>
         </thead>
         <tbody>
           ${rows
@@ -573,6 +651,7 @@ export function compareTable(products) {
             <td>${fmtPuffs(p.puffs)}</td>
             <td>${p.flavors.length}</td>
             <td>${fmtZl(p.price)}</td>
+            <td>${effFmt(p)}</td>
           </tr>`,
             )
             .join('')}
@@ -648,6 +727,8 @@ export function renderArticle(data, guide) {
       mainEntityOfPage: SITE + `/artykul/${guide.id}/`,
       publisher: { '@type': 'Organization', name: SITE_NAME, url: VAPEPL },
       datePublished: guide.datePublished,
+      ...(guide.dateModified ? { dateModified: guide.dateModified } : {}),
+      ...(rec ? { image: rec.product.image } : {}),
     },
     ...(rec
       ? [
@@ -706,12 +787,6 @@ export function renderHome(data) {
     ...c,
     count: data.categories.find((x) => x.slug === slug)?.count ?? 0,
   }));
-  // 口味榜数据化：站内口味频次实时排序（flavorGroups 已按频次降序），
-  // 有落地页（≥3 款）的口味名链到 /smak/<slug>/
-  const topFlavors = flavorGroups(data, 1).slice(0, 12).map((g, i) => ({
-    ...g,
-    rank: i + 1,
-  }));
   const heroImage = bySlug.get('stag-bar-6in1-180000-puffs')?.image;
   const jsonld = [
     organizationLd(),
@@ -747,7 +822,7 @@ export function renderHome(data) {
       </div>
       ${heroImage ? `
       <figure class="hero-media">
-        <img src="${esc(heroImage)}" alt="STAG BAR 6IN1 180000 puffs — flagowy model 6 w 1" fetchpriority="high">
+        <img src="${esc(heroImage)}" alt="STAG BAR 6IN1 180000 puffs — flagowy model 6 w 1" width="800" height="600" fetchpriority="high">
         <figcaption>Flagowiec STAG BAR 6IN1 — do 180 000 puffs w jednym urządzeniu</figcaption>
       </figure>` : ''}
     </div>
@@ -757,8 +832,8 @@ export function renderHome(data) {
   <section class="section section--center" aria-labelledby="top-title">
     <div class="container">
       <div class="section-head">
-        <h2 id="top-title">Topowe trendy</h2>
-        <p>Najczęściej kupowane modele — z miejscami na podium.</p>
+        <h2 id="top-title">Bestsellery — co kupują inni</h2>
+        <p>Ranking oparty na realnych wynikach sprzedaży na vapepl.com. Miejsca na podium aktualizujemy z każdą aktualizacją danych.</p>
       </div>
       <div class="product-grid">
         ${top.map((p, i) => productCard(p, i + 1)).join('')}
@@ -785,9 +860,12 @@ export function renderHome(data) {
       </div>
     </div>
   </section>
-  <section class="section flavors section--center" aria-labelledby="flavor-title">
+  <section class="section flavors section--center" aria-labelledby="flavors-title">
     <div class="container">
-      <h2 id="flavor-title">Kategorie smaków</h2>
+      <div class="section-head">
+        <h2 id="flavors-title">Kategorie smaków</h2>
+        <p>Cztery kategorie obejmują wszystkie aromaty w ofercie — wybierz kierunek, a potem konkretny smak z pełnej listy poniżej.</p>
+      </div>
       <div class="flavor-grid">
         ${flavorCats
           .map(
@@ -800,21 +878,10 @@ export function renderHome(data) {
           )
           .join('')}
       </div>
-      <h3 class="subhead">Najpopularniejsze smaki</h3>
-      <ul class="top-flavors">
-        ${topFlavors
-          .map(
-            (f) => `
-      <li>
-        <span class="flavor-rank${f.rank <= 3 ? ` top-${f.rank}` : ''}" aria-hidden="true">${f.rank}</span>
-        ${f.models >= 3
-          ? `<a href="/smak/${esc(f.slug)}/">${esc(f.name)}</a>`
-          : esc(f.name)}
-        <span class="flavor-cnt">${f.models} ${pluralModels(f.models)}</span>
-      </li>`,
-          )
-          .join('')}
-      </ul>
+      <h3 class="subhead">Wszystkie smaki w ofercie</h3>
+      <div class="flavor-wall">
+        ${flavorWall(data)}
+      </div>
     </div>
   </section>
   ${reviewsBlock()}
@@ -860,7 +927,7 @@ export function renderShop(data) {
   ${discountBlock()}
   ${trustStrip()}
   ${bands.length ? `
-  <div class="container">
+  <div class="container tools">
     <h2 class="subhead" id="band-title">Wydajność w puffsach</h2>
     <div class="flavor-chips">
       ${bands
@@ -871,19 +938,19 @@ export function renderShop(data) {
         .join('')}
     </div>
   </div>` : ''}
-  <div class="container">
+  <div class="container tools">
     <h2 class="subhead" id="filter-title">Przeglądaj według</h2>
     <div class="flavor-chips">
       ${scenarios
         .map((s) => `<a class="flavor-chip" href="/scenariusz/${esc(s.id)}/">${esc(s.name)}</a>`)
         .join('')}
       ${priceBands
-        .map((b) => `<a class="flavor-chip is-muted" href="/kategoria/cena-${b.id}/">${esc(b.label)}</a>`)
+        .map((b) => `<a class="flavor-chip is-muted" href="/kategoria/cena-${esc(b.id)}/">${esc(b.label)}</a>`)
         .join('')}
     </div>
   </div>
   ${comparisonPairsFor(data).length ? `
-  <div class="container">
+  <div class="container tools">
     <h2 class="subhead" id="compare-title">Porównania modeli</h2>
     <div class="flavor-chips">
       ${comparisonPairsFor(data)
@@ -893,7 +960,10 @@ export function renderShop(data) {
   </div>` : ''}
   <section class="section section--center" aria-labelledby="top-title">
     <div class="container">
-      <h2 id="top-title">Bestselleri</h2>
+      <div class="section-head">
+        <h2 id="top-title">Bestsellery — co kupują inni</h2>
+        <p>Ranking oparty na realnych wynikach sprzedaży na vapepl.com.</p>
+      </div>
       <div class="product-grid">
         ${top.map((p, i) => productCard(p, i + 1)).join('')}
       </div>
@@ -905,8 +975,8 @@ export function renderShop(data) {
       ${data.products.map((p) => productCard(p)).join('')}
     </div>
   </section>
-  ${articlesBlock(data)}
-  ${faqBlock(HOME_FAQ, 4)}`;
+  ${faqBlock(HOME_FAQ, 4)}
+  ${articlesBlock(data)}`;
   const jsonld = [
     organizationLd(),
     crumb.ld,
@@ -1101,7 +1171,7 @@ export function renderProduct(data, product) {
   <section class="section product-detail">
     <div class="container product-layout">
       <figure class="product-media">
-        ${product.image ? `<img src="${esc(product.image)}" alt="${esc(product.name)}" fetchpriority="high">` : ''}
+        ${product.image ? `<img src="${esc(product.image)}" alt="${esc(product.name)}" width="800" height="600" fetchpriority="high">` : ''}
         <figcaption>${esc(product.name)}</figcaption>
       </figure>
       <div class="product-info">
@@ -1203,7 +1273,7 @@ export function renderFlavor(data, product, flavor) {
   <section class="section product-detail">
     <div class="container product-layout">
       <figure class="product-media">
-        ${product.image ? `<img src="${esc(product.image)}" alt="${esc(product.name)} — smak ${esc(flavor.name)}" fetchpriority="high">` : ''}
+        ${product.image ? `<img src="${esc(product.image)}" alt="${esc(product.name)} — smak ${esc(flavor.name)}" width="800" height="600" fetchpriority="high">` : ''}
         <figcaption>${esc(product.name)} · smak ${esc(flavor.name)}</figcaption>
       </figure>
       <div class="product-info">
@@ -1322,7 +1392,7 @@ export function renderFlavorLanding(data, group) {
   const buyCard = (x) => `
   <article class="product-card flavor-buy">
     <a class="card-media" href="/produkt/${esc(x.product.slug)}/${esc(x.flavor.slug)}/">
-      ${x.product.image ? `<img src="${esc(x.product.image)}" alt="${esc(x.product.name)} — smak ${esc(x.flavor.name)}" loading="lazy">` : ''}
+      ${x.product.image ? `<img src="${esc(x.product.image)}" alt="${esc(x.product.name)} — smak ${esc(x.flavor.name)}" width="600" height="600" loading="lazy">` : ''}
     </a>
     <div class="card-body">
       <p class="card-brand">${esc(x.product.brand)}</p>
