@@ -11,7 +11,7 @@ import {
 import { dirname, join, relative, posix } from 'node:path';
 import { createHash } from 'node:crypto';
 import { fileURLToPath } from 'node:url';
-import { SITE, SITE_NAME, CNAME, flavorGroups, puffBandsFor, scenariosFor, priceBandsFor, comparisonPairsFor } from './src/content.js';
+import { SITE, SITE_NAME, CNAME, ANALYTICS_SNIPPET, flavorGroups, puffBandsFor, scenariosFor, priceBandsFor, comparisonPairsFor } from './src/content.js';
 import {
   renderHome,
   renderShop,
@@ -117,7 +117,7 @@ for (const [slug, target] of LEGACY_ARTICLE_REDIRECTS) {
   <meta name="robots" content="noindex">
   <title>Przekierowanie — ${SITE_NAME}</title>
   <script>location.replace('${relTarget}');</script>
-  <script>if(!/^zh/i.test(navigator.language||navigator.userLanguage||'')){var s=document.createElement('script');s.defer=1;s.src='https://dash.cfworks.vip/script.js';s.dataset.websiteId='a1186f5a-71a5-40a2-a9c9-8ff3ed37ca3b';s.dataset.cfasync='false';document.head.appendChild(s)}</script>
+  ${ANALYTICS_SNIPPET}
 </head>
 <body>
   <p>Przekierowanie… <a href="${relTarget}">Przejdź dalej</a></p>
@@ -150,7 +150,7 @@ for (const [oldSlug, newSlug] of LEGACY_BAND_REDIRECTS) {
   <meta name="robots" content="noindex">
   <title>Przekierowanie — ${SITE_NAME}</title>
   <script>location.replace('${relTarget}');</script>
-  <script>if(!/^zh/i.test(navigator.language||navigator.userLanguage||'')){var s=document.createElement('script');s.defer=1;s.src='https://dash.cfworks.vip/script.js';s.dataset.websiteId='a1186f5a-71a5-40a2-a9c9-8ff3ed37ca3b';s.dataset.cfasync='false';document.head.appendChild(s)}</script>
+  ${ANALYTICS_SNIPPET}
 </head>
 <body>
   <p>Przekierowanie… <a href="${relTarget}">Przejdź dalej</a></p>
@@ -175,7 +175,7 @@ out(
   <meta name="robots" content="noindex">
   <title>Przekierowanie do sklepu — ${SITE_NAME}</title>
   <script>location.replace('../sklep/');</script>
-  <script>if(!/^zh/i.test(navigator.language||navigator.userLanguage||'')){var s=document.createElement('script');s.defer=1;s.src='https://dash.cfworks.vip/script.js';s.dataset.websiteId='a1186f5a-71a5-40a2-a9c9-8ff3ed37ca3b';s.dataset.cfasync='false';document.head.appendChild(s)}</script>
+  ${ANALYTICS_SNIPPET}
 </head>
 <body>
   <p>Przekierowanie… <a href="../sklep/">Wejdź do sklepu</a></p>
@@ -183,15 +183,36 @@ out(
 </html>
 `,
 );
-for (const f of ['style.css', 'script.js']) {
+// CSS 压缩：样式表是渲染阻塞资源，压缩后 gzip 体积 8.9KB → 5.5KB。
+// 只做安全压缩（去注释、去多余空白），不动任何选择器语义。
+// 源文件保持可读，压缩只发生在产物里。
+const minifyCss = (css) =>
+  css
+    .replace(/\/\*[\s\S]*?\*\//g, '') // 注释
+    .replace(/\s*([{}:;,>~+])\s*/g, '$1') // 结构性符号周围空白
+    .replace(/;\}/g, '}') // 末条声明分号
+    .replace(/\s+/g, ' ') // 其余连续空白
+    .trim();
+
+for (const f of ['script.js']) {
   writeFileSync(join(DIST, f), readFileSync(join(ROOT, 'src', f)));
 }
-// 自托管 webfont（Inter 可变字重，latin + latin-ext 子集）
+writeFileSync(join(DIST, 'style.css'), minifyCss(readFileSync(join(ROOT, 'src', 'style.css'), 'utf8')));
+// 自托管 webfont（Inter 可变字重，单一子集：Latin-1 + Latin Extended-A）
+// 只拷贝子集产物——原始 latin/latin-ext 两份（合计 130KB）已由
+// site/tools/subset-font.py 合并为 InterVariable-subset.woff2（14KB）。
+// 留两份旧文件会让 dist 多出无用请求，故显式只取 subset。
 const FONTS_SRC = join(ROOT, 'src', 'fonts');
+const FONT_FILES = ['InterVariable-subset.woff2'];
 if (existsSync(FONTS_SRC)) {
   mkdirSync(join(DIST, 'fonts'), { recursive: true });
-  for (const f of readdirSync(FONTS_SRC)) {
-    writeFileSync(join(DIST, 'fonts', f), readFileSync(join(FONTS_SRC, f)));
+  for (const f of FONT_FILES) {
+    const src = join(FONTS_SRC, f);
+    if (!existsSync(src)) {
+      console.error(`✘ 缺少字体子集 ${f} — 先跑: python site/tools/subset-font.py`);
+      process.exit(1);
+    }
+    writeFileSync(join(DIST, 'fonts', f), readFileSync(src));
   }
 }
 writeFileSync(join(DIST, '.nojekyll'), '');

@@ -11,6 +11,9 @@ import {
   BRAND_ORDER,
   FLAVOR_CATS,
   flavorCatFor,
+  ANALYTICS_SNIPPET,
+  pictureTag,
+  lcpPreload,
   REVIEWS,
   DISCOUNT_TIERS,
   HOME_FAQ,
@@ -210,6 +213,7 @@ export function page({
   body,
   noFollow = false,
   lcpImage = '',
+  lcpSizes = '100vw',
 }) {
   const ldScripts = jsonld
     .map((o) => `<script type="application/ld+json">${JSON.stringify(o)}</script>`)
@@ -224,8 +228,8 @@ export function page({
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <link rel="preconnect" href="${IMG_CDN}">
   <link rel="dns-prefetch" href="${IMG_CDN}">
-  <link rel="preload" as="font" type="font/woff2" crossorigin href="/fonts/InterVariable-latin.woff2">
-  ${lcpImage ? `<link rel="preload" as="image" fetchpriority="high" href="${esc(lcpImage)}">` : ''}
+  <link rel="preload" as="font" type="font/woff2" crossorigin href="/fonts/InterVariable-subset.woff2">
+  ${lcpImage ? lcpPreload(lcpImage, lcpSizes) : ''}
   <title>${esc(title)}</title>
   <meta name="description" content="${esc(description)}">
   <link rel="canonical" href="${esc(canonical)}">
@@ -246,7 +250,7 @@ export function page({
   <link rel="stylesheet" href="/style.css">
   ${ldScripts}
   <script src="/script.js" defer></script>
-  <script>if(!/^zh/i.test(navigator.language||navigator.userLanguage||'')){var s=document.createElement('script');s.defer=1;s.src='https://dash.cfworks.vip/script.js';s.dataset.websiteId='a1186f5a-71a5-40a2-a9c9-8ff3ed37ca3b';s.dataset.cfasync='false';document.head.appendChild(s)}</script>
+  ${ANALYTICS_SNIPPET}
 </head>
 <body>
 ${header()}
@@ -443,7 +447,7 @@ export function productCard(product, rank, target = null) {
     ${rank ? `<span class="card-rank" aria-label="Pozycja ${rank}">#${rank}</span>` : ''}
     ${pct ? `<span class="card-badge">-${pct}%</span>` : ''}
     <a class="card-media" href="${esc(cardUrl)}">
-      ${product.image ? `<img src="${esc(product.image)}" alt="${esc(product.name)}" width="600" height="600" loading="lazy">` : ''}
+      ${product.image ? pictureTag(product.image, product.name, { width: 600, height: 600, sizes: '(max-width: 720px) 50vw, 25vw', loading: 'lazy' }) : ''}
     </a>
     <div class="card-body">
       <p class="card-brand">${esc(product.brand)}</p>
@@ -823,7 +827,7 @@ export function renderHome(data) {
       </div>
       ${heroImage ? `
       <figure class="hero-media">
-        <img src="${esc(heroImage)}" alt="STAG BAR 6IN1 180000 puffs — flagowy model 6 w 1" width="800" height="600" fetchpriority="high">
+        ${pictureTag(heroImage, 'STAG BAR 6IN1 180000 puffs — flagowy model 6 w 1', { width: 800, height: 600, sizes: '(max-width: 900px) 100vw, 46vw', fetchpriority: 'high' })}
         <figcaption>Flagowiec STAG BAR 6IN1 — do 180 000 puffs w jednym urządzeniu</figcaption>
       </figure>` : ''}
     </div>
@@ -902,6 +906,7 @@ export function renderHome(data) {
     jsonld,
     body,
     lcpImage: heroImage ?? '',
+    lcpSizes: '(max-width: 900px) 100vw, 46vw',
   });
 }
 
@@ -1174,7 +1179,7 @@ export function renderProduct(data, product) {
   <section class="section product-detail">
     <div class="container product-layout">
       <figure class="product-media">
-        ${product.image ? `<img src="${esc(product.image)}" alt="${esc(product.name)}" width="800" height="600" fetchpriority="high">` : ''}
+        ${product.image ? pictureTag(product.image, product.name, { width: 800, height: 600, sizes: '(max-width: 900px) 100vw, 45vw', fetchpriority: 'high' }) : ''}
         <figcaption>${esc(product.name)}</figcaption>
       </figure>
       <div class="product-info">
@@ -1239,6 +1244,7 @@ export function renderProduct(data, product) {
     jsonld,
     body,
     lcpImage: image ?? '',
+    lcpSizes: '(max-width: 900px) 100vw, 45vw',
   });
 }
 
@@ -1276,7 +1282,7 @@ export function renderFlavor(data, product, flavor) {
   <section class="section product-detail">
     <div class="container product-layout">
       <figure class="product-media">
-        ${product.image ? `<img src="${esc(product.image)}" alt="${esc(product.name)} — smak ${esc(flavor.name)}" width="800" height="600" fetchpriority="high">` : ''}
+        ${product.image ? pictureTag(product.image, `${product.name} — smak ${flavor.name}`, { width: 800, height: 600, sizes: '(max-width: 900px) 100vw, 45vw', fetchpriority: 'high' }) : ''}
         <figcaption>${esc(product.name)} · smak ${esc(flavor.name)}</figcaption>
       </figure>
       <div class="product-info">
@@ -1349,6 +1355,7 @@ export function renderFlavor(data, product, flavor) {
     jsonld,
     body,
     lcpImage: product.image ?? '',
+    lcpSizes: '(max-width: 900px) 100vw, 45vw',
   });
 }
 
@@ -1395,7 +1402,7 @@ export function renderFlavorLanding(data, group) {
   const buyCard = (x) => `
   <article class="product-card flavor-buy">
     <a class="card-media" href="/produkt/${esc(x.product.slug)}/${esc(x.flavor.slug)}/">
-      ${x.product.image ? `<img src="${esc(x.product.image)}" alt="${esc(x.product.name)} — smak ${esc(x.flavor.name)}" width="600" height="600" loading="lazy">` : ''}
+      ${x.product.image ? pictureTag(x.product.image, `${x.product.name} — smak ${x.flavor.name}`, { width: 600, height: 600, sizes: '(max-width: 720px) 50vw, 25vw', loading: 'lazy' }) : ''}
     </a>
     <div class="card-body">
       <p class="card-brand">${esc(x.product.brand)}</p>

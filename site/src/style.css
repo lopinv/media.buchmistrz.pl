@@ -6,22 +6,32 @@
    - 漏斗结构：每页按 认知(Hero) → 决策加速(优惠) → 信任 → 购买推荐 → 探索 → 社会证明 → 内容 → 异议(FAQ)
    - 无"套娃"二级限宽：卡片内内容通栏，左右边缘 = 容器边缘（1160px 内容轨） */
 
+/* 单一子集字体（Latin-1 + Latin Extended-A，site/tools/subset-font.py 生成）：
+   原先分 latin(47KB) + latin-ext(83KB) 两份，合计 130KB 且预加载只命中 latin 一份，
+   波兰语正文落在 latin-ext → 第二次字体请求迟到 758ms → 字体替换回流（CLS 0.285）。
+   合并为一份后：一次请求、预加载即命中，130KB → 14KB。 */
 @font-face {
   font-family: 'Inter';
   font-style: normal;
   font-weight: 100 900;
   font-display: swap;
-  src: url('./fonts/InterVariable-latin.woff2') format('woff2');
-  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+032A, U+20AC, U+2122;
+  src: url('./fonts/InterVariable-subset.woff2') format('woff2');
+  /* 覆盖 Latin-1 + Latin Extended-A（含波兰语 ą ć ę ł ń ó ś ź ż） */
+  unicode-range: U+0000-00FF, U+0100-017F, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+2000-206F, U+20AC, U+2122, U+2212, U+2190-2193;
 }
+
+/* 度量对齐的回退字体：Inter 的 hhea 指标为 ascent 1984/2048=96.88%、descent 494/2048=24.12%、
+   lineGap 0。系统回退字体（Arial/Segoe UI）指标不同，字体到位那一刻会改变行盒高度 → 布局位移。
+   覆写回退字体的 ascent/descent/line-gap 与 Inter 对齐，字体替换时行盒高度不变，CLS 归零。 */
 @font-face {
-  font-family: 'Inter';
+  font-family: 'Inter Fallback';
   font-style: normal;
   font-weight: 100 900;
-  font-display: swap;
-  /* 波兰语字符（ą ę ł ń ó ś ź ż）等 */
-  src: url('./fonts/InterVariable-latin-ext.woff2') format('woff2');
-  unicode-range: U+0100-02AF, U+1E00-1EFF, U+2020, U+20A0-20AB, U+20AD-20CF, U+2113, U+2C60-2C7F, U+A720-A7FF;
+  src: local('Arial'), local('Segoe UI'), local('Helvetica'), local('Liberation Sans');
+  ascent-override: 96.88%;
+  descent-override: 24.12%;
+  line-gap-override: 0%;
+  size-adjust: 100%;
 }
 
 :root {
@@ -54,7 +64,7 @@ html { scroll-behavior: smooth; }
 
 body {
   margin: 0;
-  font-family: 'Inter', system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
+  font-family: 'Inter', 'Inter Fallback', system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
   color: var(--ink);
   line-height: 1.6;
   -webkit-font-smoothing: antialiased;

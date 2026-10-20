@@ -1,5 +1,6 @@
 // site/src/content.js — 静态营销文案与站点常量（波兰语面向终端用户）
 // 数据来源：README.md（2026-10-15 从 vapepl.com 抓取）与 WooCommerce API 调研
+import { readFileSync } from 'node:fs';
 
 export const SITE = 'https://github.vapepl.com';
 // 自定义域名（GitHub Pages CNAME 文件内容，构建时写入 dist 根）
@@ -12,6 +13,79 @@ export const IMG_CDN = 'https://cdn.jsdelivr.net';
 // og:image 兜底图：无自有社交图的页面（kontakt/zwroty/无推荐文章的文章页）统一回退
 // 旗舰产品图，保证每个可索引页面都带社交预览图
 export const FALLBACK_OG_IMAGE = `${IMG_CDN}/gh/lopinv/media.buchmistrz.pl@media/static/assets/uploads/stag-bar-6in1-180000-180k-puffs.jpg`;
+
+// 访问统计（umami）：全站注入一次，站点 ID 固定。
+// 用 requestIdleCallback 延后到浏览器空闲时才加载——统计脚本不属于首屏渲染路径，
+// 早加载只会和 LCP/字体抢带宽（实测第三方脚本首字节 5.7s）。
+// 中文环境跳过（与原实现一致：避免本地开发/中文访问被计入统计）。
+export const ANALYTICS_SNIPPET = `<script>(function(){if(/^zh/i.test(navigator.language||navigator.userLanguage||''))return;var load=function(){var s=document.createElement('script');s.defer=1;s.src='https://dash.cfworks.vip/script.js';s.dataset.websiteId='a1186f5a-71a5-40a2-a9c9-8ff3ed37ca3b';s.dataset.cfasync='false';document.head.appendChild(s)};if(window.requestIdleCallback)requestIdleCallback(load,{timeout:3000});else setTimeout(load,1500)})()</script>`;
+
+// ---------- 图片变体（WebP + srcset） ----------
+// site/tools/optimize-images.py 按显示尺寸为每张站内图片生成 WebP/JPEG 多档变体，
+// 变体清单随仓库走（site/data/media/image-variants.json），页面据此输出 <picture>。
+// 原图普遍远大于显示尺寸（hero 2000² 显示 560px、产品图 2480² 显示 275px），
+// 不做变体时 LCP 图单张就要 315KB。
+const VARIANTS = (() => {
+  try {
+    const url = new URL('../data/media/image-variants.json', import.meta.url);
+    return JSON.parse(readFileSync(url, 'utf8'));
+  } catch {
+    return {};
+  }
+})();
+
+const CDN_BASE = `${IMG_CDN}/gh/lopinv/media.buchmistrz.pl@media/`;
+
+const escAttr = (s) =>
+  String(s ?? '').replaceAll('&', '&amp;').replaceAll('<', '&lt;').replaceAll('>', '&gt;').replaceAll('"', '&quot;');
+
+// 输出 <picture>：WebP 优先，回退 JPEG，两者都带 srcset 让浏览器按 DPR/宽度选档。
+// 没有变体的图片退化为普通 <img>（保持 og:image 等场景可用原图）。
+export function pictureTag(src, alt, { width, height, sizes, loading, fetchpriority, className } = {}) {
+  const parts = String(src ?? '').split('/');
+  const name = parts[parts.length - 1] ?? '';
+  const entry = VARIANTS[name];
+  const attrs = [
+    width ? `width="${width}"` : '',
+    height ? `height="${height}"` : '',
+    sizes ? `sizes="${escAttr(sizes)}"` : '',
+    loading ? `loading="${loading}"` : '',
+    fetchpriority ? `fetchpriority="${fetchpriority}"` : '',
+    'decoding="async"',
+    className ? `class="${escAttr(className)}"` : '',
+  ]
+    .filter(Boolean)
+    .join(' ');
+
+  if (!entry) {
+    return `<img src="${escAttr(src)}" alt="${escAttr(alt)}" ${attrs}>`;
+  }
+  const widths = Object.keys(entry.widths).map(Number).sort((a, b) => a - b);
+  const webpSet = widths.map((w) => `${CDN_BASE}${entry.widths[w].webp} ${w}w`).join(', ');
+  const jpgSet = widths.map((w) => `${CDN_BASE}${entry.widths[w].jpg} ${w}w`).join(', ');
+  const widest = widths[widths.length - 1];
+  return `<picture>
+    <source type="image/webp" srcset="${webpSet}" sizes="${escAttr(sizes ?? '100vw')}">
+    <source type="image/jpeg" srcset="${jpgSet}" sizes="${escAttr(sizes ?? '100vw')}">
+    <img src="${CDN_BASE}${entry.widths[widest].jpg}" srcset="${jpgSet}" sizes="${escAttr(sizes ?? '100vw')}" alt="${escAttr(alt)}" ${attrs}>
+  </picture>`;
+}
+
+// LCP 图预加载：必须与 <picture> 里浏览器实际会选的档位完全一致，
+// 否则预加载一张、页面再取一张 → 双倍下载。
+// type="image/webp" + imagesrcset：支持 WebP 的浏览器命中预加载（复用），
+// 不支持的浏览器因类型不匹配而跳过预加载、走 <source> 的 JPEG 档 —— 两侧都不会重复下载。
+export function lcpPreload(src, sizes = '100vw') {
+  const parts = String(src ?? '').split('/');
+  const name = parts[parts.length - 1] ?? '';
+  const entry = VARIANTS[name];
+  if (!entry) {
+    return `<link rel="preload" as="image" fetchpriority="high" href="${escAttr(src)}">`;
+  }
+  const widths = Object.keys(entry.widths).map(Number).sort((a, b) => a - b);
+  const webpSet = widths.map((w) => `${CDN_BASE}${entry.widths[w].webp} ${w}w`).join(', ');
+  return `<link rel="preload" as="image" type="image/webp" fetchpriority="high" imagesrcset="${webpSet}" imagesizes="${escAttr(sizes)}">`;
+}
 
 // 品牌卡用字母字标瓦片（首字母），不再用动物 emoji
 export const BRANDS = {
