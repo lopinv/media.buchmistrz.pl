@@ -99,6 +99,11 @@ function regenerateDocs() {
   const zl = (n) => new Intl.NumberFormat('pl-PL', { minimumFractionDigits: 2 }).format(n) + ' zł';
   const puffs = (n) => new Intl.NumberFormat('pl-PL').format(n);
   const esc = (s) => String(s ?? '').replaceAll('&', '&amp;').replaceAll('<', '&lt;').replaceAll('>', '&gt;');
+  // API 返回的名称已带 HTML 实体（"Menthol &amp; Ice"），先解码再统一转义，避免 &amp;amp; 双重转义
+  const dec = (s) => String(s ?? '').replaceAll('&amp;', '&').replaceAll('&#038;', '&');
+  // 波兰语复数：1 → produkt / 2-4 → produkty / 5+ → produktów
+  const productNoun = (n) => (n === 1 ? 'produkt' : n >= 2 && n <= 4 ? 'produkty' : 'produktów');
+  const articleNoun = (n) => (n === 1 ? 'artykuł' : n >= 2 && n <= 4 ? 'artykuły' : 'artykułów');
 
   // 品牌 key（products.json 的 brand 字段全小写后前 3 字母即可归一，已对 7 品牌核实）
   const BRAND_ORDER = ['airmez', 'fumot', 'hifancy', 'maskking', 'merrymi', 'stagbar', 'xcor'];
@@ -123,26 +128,25 @@ function regenerateDocs() {
 <img src="https://img.shields.io/badge/🇵🇱-Polska-1c61e7?style=for-the-badge" alt="Polska">
 <img src="https://img.shields.io/badge/📅-Od%202014-007ec6?style=for-the-badge" alt="Od 2014">
 <img src="https://img.shields.io/badge/🏭-${BRAND_ORDER.length}%20marek-1e88e5?style=for-the-badge" alt="${BRAND_ORDER.length} marek">
-<img src="https://img.shields.io/badge/📦-${products.products.length}%20produktów-0ea5e9?style=for-the-badge" alt="${products.products.length} produktów">
-<img src="https://img.shields.io/badge/📖-${guides.length}%20poradników-e05a4b?style=for-the-badge" alt="${guides.length} poradników">`;
+<img src="https://img.shields.io/badge/📦-${products.products.length}%20${encodeURIComponent(productNoun(products.products.length))}-0ea5e9?style=for-the-badge" alt="${products.products.length} ${productNoun(products.products.length)}">
+<img src="https://img.shields.io/badge/📖-${guides.length}%20${encodeURIComponent(articleNoun(guides.length))}-e05a4b?style=for-the-badge" alt="${guides.length} ${articleNoun(guides.length)}">`;
 
   // 2) 统计条（产品/品牌/文章/最低价；评价 4.4/5 为静态营销文案，不随数据变）
   const minPrice = Math.min(...products.products.map((p) => p.price));
   blocks.stats = `
 <table>
 <tr>
-<td align="center" width="20%"><div style="font-size:28px">📦</div><b>${products.products.length}</b><br>Produktów</td>
-<td align="center" width="20%"><div style="font-size:28px">🏭</div><b>${BRAND_ORDER.length}</b><br>Marek</td>
-<td align="center" width="20%"><div style="font-size:28px">📖</div><b>${guides.length}</b><br>Artykułów</td>
+<td align="center" width="20%"><div style="font-size:28px">📦</div><b>${products.products.length}</b><br>${productNoun(products.products.length)[0].toUpperCase() + productNoun(products.products.length).slice(1)}</td>
+<td align="center" width="20%"><div style="font-size:28px">🏭</div><b>${BRAND_ORDER.length}</b><br>Marki</td>
+<td align="center" width="20%"><div style="font-size:28px">📖</div><b>${guides.length}</b><br>${articleNoun(guides.length)[0].toUpperCase() + articleNoun(guides.length).slice(1)}</td>
 <td align="center" width="20%"><div style="font-size:28px">💰</div><b>od ${zl(minPrice)}</b><br>Cena od</td>
 <td align="center" width="20%"><div style="font-size:28px">⭐</div><b>4,4 / 5</b><br>Opinie</td>
 </tr>
 </table>`;
 
-  // 3) 品牌卡（每个品牌的产品数；波兰语复数：1 produkt / 2-4 produkty / 5+ produktów）
-  const brandNoun = (n) => (n === 1 ? 'produkt' : n >= 5 ? 'produktów' : 'produkty');
+  // 3) 品牌卡（每个品牌的产品数；波兰语复数见 productNoun）
   const CAT_EMOJI = { fruity: '🍓', 'menthol-ice': '🧊', 'sweet-candy': '🍬', tobacco: '🍂' };
-  const CAT_NAMES = { fruity: 'Fruity', 'menthol-ice': 'Menthol &amp; Ice', 'sweet-candy': 'Sweet &amp; Candy', tobacco: 'Tobacco' };
+  const CAT_NAMES = { fruity: 'Fruity', 'menthol-ice': 'Menthol & Ice', 'sweet-candy': 'Sweet & Candy', tobacco: 'Tobacco' };
 
   blocks.brands = `
 <table width="100%">
@@ -150,7 +154,7 @@ function regenerateDocs() {
 ${BRAND_ORDER.map((b) => `<th width="14%" align="center">${BRAND_EMOJI[b][0]} ${BRAND_EMOJI[b][1]}</th>`).join('\n')}
 </tr>
 <tr>
-${BRAND_ORDER.map((b) => `<td align="center">${productsOf(b).length} ${brandNoun(productsOf(b).length)}</td>`).join('\n')}
+${BRAND_ORDER.map((b) => `<td align="center">${productsOf(b).length} ${productNoun(productsOf(b).length)}</td>`).join('\n')}
 </tr>
 </table>`;
 
@@ -178,7 +182,7 @@ ${list
     .filter(Boolean)
     .join('\n\n---\n\n');
 
-  // 5) 畅销榜（topSellers 实时排序；Store API 不暴露销量数字，末列 = 名次而非"已卖出"）
+  // 5) 畅销榜（topSellers 实时排序；Store API 不暴露销量数字，列 = 名次而非"已卖出"）
   const top = (products.topSellers ?? [])
     .map((slug) => products.products.find((p) => p.slug === slug))
     .filter(Boolean)
@@ -187,11 +191,11 @@ ${list
 > ${top.length} najczęściej kupowanych produktów — ranking wg bieżącej popularności na WooCommerce.
 
 <table width="100%">
-<tr><th width="6%" align="center">#</th><th width="38%" align="left">Produkt</th><th width="28%" align="center">Cena</th><th width="18%" align="center">Puffs</th><th width="10%" align="center">Miejsce</th></tr>
+<tr><th width="6%" align="center">#</th><th width="42%" align="left">Produkt</th><th width="26%" align="center">Cena</th><th width="16%" align="center">Puffs</th><th width="10%" align="center">Miejsce</th></tr>
 ${top
   .map(
     (p, i) =>
-      `<tr><td align="center"><b>${i + 1}</b></td><td align="left"><a href="${esc(p.permalink)}">${esc(p.name)}</a></td><td align="center"><s>${zl(p.regularPrice)}</s> <b>${zl(p.price)}</b></td><td align="center">${puffs(p.puffs ?? 0)}</td><td align="center">${i === 0 ? '🏆 #1' : `#${i + 1}`}</td></tr>`,
+      `<tr><td align="center"><b>${i + 1}</b></td><td align="left"><a href="${esc(p.permalink)}">${esc(p.name)}</a></td><td align="center"><s>${zl(p.regularPrice)}</s> <b>${zl(p.price)}</b></td><td align="center">${puffs(p.puffs ?? 0)}</td><td align="center">${i === 0 ? '🥇 #1' : `#${i + 1}`}</td></tr>`,
   )
   .join('\n')}
 </table>`;
@@ -204,9 +208,9 @@ ${top
 ${flavorCats
   .map((c) => {
     const imgCell = c.image
-      ? `<img src="${esc(c.image)}" width="140" height="140" style="object-fit:cover;border-radius:10px" alt="${esc(c.name)}"><br>`
+      ? `<img src="${esc(c.image)}" width="140" height="140" style="object-fit:cover;border-radius:10px" alt="${esc(dec(c.name))}"><br>`
       : '';
-    return `<th width="25%" align="center">${imgCell}<b>${CAT_EMOJI[c.slug] ?? '🍃'} ${esc(CAT_NAMES[c.slug] ?? c.name)}</b><br>${c.count} produktów</th>`;
+    return `<th width="25%" align="center">${imgCell}<b>${CAT_EMOJI[c.slug] ?? '🍃'} ${esc(CAT_NAMES[c.slug] ?? dec(c.name))}</b><br>${c.count} ${productNoun(c.count)}</th>`;
   })
   .join('\n')}
 </tr>
@@ -233,22 +237,40 @@ ${flavorCats
 ${flavorRows.join('\n')}
 </table>`;
 
-  // 8) 文章列表（guides.json 全量；标题/URL 含 & 需转义）
-  blocks.guides = `
-<details>
-<summary><b>Rozwiń listę ${guides.length} poradników</b></summary>
+  // 8) 文章列表（guides.json 全量；按发布月份分组折叠，标题/URL 含 & 需转义）
+  const MONTH_PL = {
+    '01': 'Styczeń', '02': 'Luty', '03': 'Marzec', '04': 'Kwiecień',
+    '05': 'Maj', '06': 'Czerwiec', '07': 'Lipiec', '08': 'Sierpień',
+    '09': 'Wrzesień', '10': 'Październik', '11': 'Listopad', '12': 'Grudzień',
+  };
+  const byMonth = new Map();
+  for (const g of guides) {
+    const key = (g.datePublished || '0000-00').slice(0, 7);
+    if (!byMonth.has(key)) byMonth.set(key, []);
+    byMonth.get(key).push(g);
+  }
+  // 月份降序（同月内保持 guides.json 的相关性排序）
+  const monthBlocks = [...byMonth.entries()]
+    .sort((a, b) => b[0].localeCompare(a[0]))
+    .map(([key, list]) => {
+      const [y, m] = key.split('-');
+      const label = `${MONTH_PL[m] ?? m} ${y}`;
+      const items = list
+        .map((g) => `- [${esc(g.title)}](${esc(g.url)})`)
+        .join('\n');
+      return `<details>
+<summary><b>📅 ${label} — ${list.length} ${articleNoun(list.length)}</b></summary>
 
-<table width="100%">
-<tr><th width="6%" align="center">#</th><th width="82%" align="left">Artykuł</th><th width="12%" align="center">Link</th></tr>
-${guides
-  .map(
-    (g, i) =>
-      `<tr><td align="center">${i + 1}</td><td align="left"><a href="${esc(g.url)}">${esc(g.title)}</a></td><td align="center"><a href="${esc(g.url)}">📖</a></td></tr>`,
-  )
-  .join('\n')}
-</table>
+${items}
 
 </details>`;
+    })
+    .join('\n\n');
+
+  blocks.guides = `
+> Pełna biblioteka wiedzy: **${guides.length} ${articleNoun(guides.length)}** o jednorazówkach, smakach, modelach i kosztach puffs — aktualizowana przy każdym odświeżeniu danych.
+
+${monthBlocks}`;
 
   // 9) 数据日期（fetchedAt → 波兰语长日期；fetchedAt 缺失则保留现状不替换）
   let blocksDate = null;
