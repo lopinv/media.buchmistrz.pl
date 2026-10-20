@@ -4,6 +4,8 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <link rel="preconnect" href="https://cdn.jsdelivr.net">
+  <link rel="dns-prefetch" href="https://cdn.jsdelivr.net">
+  <link rel="preload" as="font" type="font/woff2" crossorigin href="../../fonts/InterVariable-latin.woff2">
   
   <title>GeekVape Aegis X: firmware update – jak to działa | VapePL.COM</title>
   <meta name="description" content="GeekVape Aegis X to mod, którego firmware aktualizuje się przez USB. Wyjaśniam krok po kroku, jak zrobić firmware update, co robić przy zawieszeniu i dlaczego… Pełna wersja poradnika na vapepl.com.">
@@ -14,22 +16,18 @@
   <meta property="og:description" content="GeekVape Aegis X to mod, którego firmware aktualizuje się przez USB. Wyjaśniam krok po kroku, jak zrobić firmware update, co robić przy zawieszeniu i dlaczego… Pełna wersja poradnika na vapepl.com.">
   <meta property="og:url" content="https://github.vapepl.com/artykul/geekvape-aegis-x-firmware-update-jak-to-dziala/">
   <meta property="og:image" content="https://cdn.jsdelivr.net/gh/lopinv/media.buchmistrz.pl@media/static/assets/uploads/9.jpg">
-  <meta property="og:image:width" content="1200">
-  <meta property="og:image:height" content="630">
-
   <meta name="twitter:card" content="summary_large_image">
   <meta name="twitter:title" content="GeekVape Aegis X: firmware update – jak to działa | VapePL.COM">
   <meta name="twitter:description" content="GeekVape Aegis X to mod, którego firmware aktualizuje się przez USB. Wyjaśniam krok po kroku, jak zrobić firmware update, co robić przy zawieszeniu i dlaczego… Pełna wersja poradnika na vapepl.com.">
   <meta name="twitter:image" content="https://cdn.jsdelivr.net/gh/lopinv/media.buchmistrz.pl@media/static/assets/uploads/9.jpg">
-
   <meta name="robots" content="index, follow">
   <meta name="theme-color" content="#070b14">
   <meta name="format-detection" content="telephone=yes">
-  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='8' fill='%2322d3ee'/><text x='16' y='22' font-family='sans-serif' font-size='18' font-weight='800' fill='%2304141a' text-anchor='middle'>V</text></svg>">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='3' fill='%2322d3ee'/><text x='16' y='22' font-family='sans-serif' font-size='18' font-weight='800' fill='%2304141a' text-anchor='middle'>V</text></svg>">
   <link rel="stylesheet" href="../../style.css">
   <script type="application/ld+json">{"@context":"https://schema.org","@type":"Organization","name":"VapePL.COM","url":"https://vapepl.com","foundingDate":"2014","description":"Sklep z jednorazówkami i e-papierosami w Polsce — 7 marek, 18 produktów.","sameAs":["https://vapepl.com","https://wa.me/48729250699","https://t.me/buch_mistrz"],"contactPoint":{"@type":"ContactPoint","telephone":"+48 729 250 699","email":"support@buchmistrz.com","contactType":"customer support","availableLanguage":["pl"]}}</script>
 <script type="application/ld+json">[{"@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Strona główna","item":"https://github.vapepl.com/"},{"@type":"ListItem","position":2,"name":"Poradniki","item":"https://github.vapepl.com/"},{"@type":"ListItem","position":3,"name":"GeekVape Aegis X: firmware update – jak to działa","item":"https://github.vapepl.com/artykul/geekvape-aegis-x-firmware-update-jak-to-dziala/"}]}]</script>
-<script type="application/ld+json">{"@context":"https://schema.org","@type":"Article","headline":"GeekVape Aegis X: firmware update – jak to działa","description":"GeekVape Aegis X to mod, którego firmware aktualizuje się przez USB. Wyjaśniam krok po kroku, jak zrobić firmware update, co robić przy zawieszeniu i dlaczego…","url":"https://github.vapepl.com/artykul/geekvape-aegis-x-firmware-update-jak-to-dziala/","mainEntityOfPage":"https://github.vapepl.com/artykul/geekvape-aegis-x-firmware-update-jak-to-dziala/","publisher":{"@type":"Organization","name":"VapePL.COM","url":"https://vapepl.com"},"datePublished":"2026-09-13"}</script>
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"Article","headline":"GeekVape Aegis X: firmware update – jak to działa","description":"GeekVape Aegis X to mod, którego firmware aktualizuje się przez USB. Wyjaśniam krok po kroku, jak zrobić firmware update, co robić przy zawieszeniu i dlaczego…","url":"https://github.vapepl.com/artykul/geekvape-aegis-x-firmware-update-jak-to-dziala/","mainEntityOfPage":"https://github.vapepl.com/artykul/geekvape-aegis-x-firmware-update-jak-to-dziala/","publisher":{"@type":"Organization","name":"VapePL.COM","url":"https://vapepl.com"},"datePublished":"2026-09-13","image":"https://cdn.jsdelivr.net/gh/lopinv/media.buchmistrz.pl@media/static/assets/uploads/9.jpg"}</script>
 <script type="application/ld+json">{"@context":"https://schema.org","@type":"Article","headline":"GeekVape Aegis X: firmware update – jak to działa","about":{"@type":"Product","name":"AiRMEZ FOX 4IN1 120000 PUFFS","url":"https://github.vapepl.com/produkt/airmez-fox-4in1-120000-puffs/","brand":{"@type":"Brand","name":"AiRMEZ"},"offers":{"@type":"Offer","price":"100","priceCurrency":"PLN","url":"https://vapepl.com/product/airmez-fox-4in1-120000-puffs/"}}}</script>
   <script src="../../script.js" defer></script>
   <script>if(!/^zh/i.test(navigator.language||navigator.userLanguage||'')){var s=document.createElement('script');s.defer=1;s.src='https://dash.cfworks.vip/script.js';s.dataset.websiteId='a1186f5a-71a5-40a2-a9c9-8ff3ed37ca3b';s.dataset.cfasync='false';document.head.appendChild(s)}</script>
@@ -128,7 +126,7 @@
     <span class="card-rank" aria-label="Pozycja 5">#5</span>
     <span class="card-badge">-17%</span>
     <a class="card-media" href="../../produkt/airmez-fox-4in1-120000-puffs/">
-      <img src="https://cdn.jsdelivr.net/gh/lopinv/media.buchmistrz.pl@media/static/assets/uploads/9.jpg" alt="AiRMEZ FOX 4IN1 120000 PUFFS" loading="lazy">
+      <img src="https://cdn.jsdelivr.net/gh/lopinv/media.buchmistrz.pl@media/static/assets/uploads/9.jpg" alt="AiRMEZ FOX 4IN1 120000 PUFFS" width="600" height="600" loading="lazy">
     </a>
     <div class="card-body">
       <p class="card-brand">AiRMEZ</p>
@@ -154,99 +152,111 @@
       <div class="article-grid">
         
   <article class="article-card">
+    <p class="article-meta"><span class="article-meta-kind">Poradnik</span> <span class="article-meta-sep" aria-hidden="true">·</span><span>25 września 2026</span></p>
     <h3 class="article-title"><a href="../../artykul/wyszukiwanie-paczki-statusy-i-zasada-72-godzin/">Wyszukiwanie paczki: statusy i zasada 72 godzin</a></h3>
     <p class="article-summary">Wyszukiwanie paczki zajmuje kilka minut, gdy wiesz, gdzie jest kod. Tłumaczę statusy, zasadę 72 godzin, restrykcje dla baterii i realny koszt 90 dni użytkowania na 17…</p>
     <div class="article-actions">
       <a class="btn btn-ghost" href="../../artykul/wyszukiwanie-paczki-statusy-i-zasada-72-godzin/">Czytaj</a>
-      <a class="btn btn-ghost" href="https://vapepl.com/wyszukiwanie-paczki-statusy-i-zasada-72-godzin/" rel="nofollow" target="_blank">Pełna wersja →</a>
+      <a class="article-external" href="https://vapepl.com/wyszukiwanie-paczki-statusy-i-zasada-72-godzin/" rel="nofollow" target="_blank">Pełna wersja na vapepl.com →</a>
     </div>
   </article>
   <article class="article-card">
+    <p class="article-meta"><span class="article-meta-kind">Poradnik</span> <span class="article-meta-sep" aria-hidden="true">·</span><span>28 września 2026</span></p>
     <h3 class="article-title"><a href="../../artykul/wzrost-wagi-po-przejsciu-na-e-papieros-co-robic/">Wzrost wagi po przejściu na e-papieros: co robić</a></h3>
     <p class="article-summary">Po przejściu na e-papierosa waga bywa wyższa. Wyjaśniamy, co za tym stoi: apetyt, słodkie smaki i moc nikotyny, plus praktyczne zasady bez moralizowania.</p>
     <div class="article-actions">
       <a class="btn btn-ghost" href="../../artykul/wzrost-wagi-po-przejsciu-na-e-papieros-co-robic/">Czytaj</a>
-      <a class="btn btn-ghost" href="https://vapepl.com/wzrost-wagi-po-przejsciu-na-e-papieros-co-robic/" rel="nofollow" target="_blank">Pełna wersja →</a>
+      <a class="article-external" href="https://vapepl.com/wzrost-wagi-po-przejsciu-na-e-papieros-co-robic/" rel="nofollow" target="_blank">Pełna wersja na vapepl.com →</a>
     </div>
   </article>
   <article class="article-card">
+    <p class="article-meta"><span class="article-meta-kind">Poradnik</span> <span class="article-meta-sep" aria-hidden="true">·</span><span>8 września 2026</span></p>
     <h3 class="article-title"><a href="../../artykul/wzrost-wagi-po-przejsciu-na-e-papierosa/">Wzrost wagi po przejściu na e-papierosa</a></h3>
     <p class="article-summary">Przejście na e-papierosa a wzrost wagi: dlaczego po odstawieniu papierosów waga rośnie, jak schodzić z nikotyny krok po kroku i jak dobrać urządzenie, żeby dodatkowe…</p>
     <div class="article-actions">
       <a class="btn btn-ghost" href="../../artykul/wzrost-wagi-po-przejsciu-na-e-papierosa/">Czytaj</a>
-      <a class="btn btn-ghost" href="https://vapepl.com/wzrost-wagi-po-przejsciu-na-e-papierosa/" rel="nofollow" target="_blank">Pełna wersja →</a>
+      <a class="article-external" href="https://vapepl.com/wzrost-wagi-po-przejsciu-na-e-papierosa/" rel="nofollow" target="_blank">Pełna wersja na vapepl.com →</a>
     </div>
   </article>
   <article class="article-card">
+    <p class="article-meta"><span class="article-meta-kind">Poradnik</span> <span class="article-meta-sep" aria-hidden="true">·</span><span>1 września 2026</span></p>
     <h3 class="article-title"><a href="../../artykul/xcor-12k-przewodnik-po-jednomrazowym-e-papierosie/">XCOR 12K – przewodnik po jednomrazowym e-papierosie</a></h3>
     <p class="article-summary">XCOR 12K to renomowany jednorazowy e-papieros o pojemności 12000 zaciągnięć, idealny dla osób szukających niezawodnego urządzenia MTL z długą żywotnością baterii i…</p>
     <div class="article-actions">
       <a class="btn btn-ghost" href="../../artykul/xcor-12k-przewodnik-po-jednomrazowym-e-papierosie/">Czytaj</a>
-      <a class="btn btn-ghost" href="https://vapepl.com/xcor-12k-przewodnik-po-jednomrazowym-e-papierosie/" rel="nofollow" target="_blank">Pełna wersja →</a>
+      <a class="article-external" href="https://vapepl.com/xcor-12k-przewodnik-po-jednomrazowym-e-papierosie/" rel="nofollow" target="_blank">Pełna wersja na vapepl.com →</a>
     </div>
   </article>
   <article class="article-card">
+    <p class="article-meta"><span class="article-meta-kind">Poradnik</span> <span class="article-meta-sep" aria-hidden="true">·</span><span>31 sierpnia 2026</span></p>
     <h3 class="article-title"><a href="../../artykul/xcor-23k-czy-warto-kupic-ten-jednorazowy-e-papieros/">XCOR 23K – czy warto kupić ten jednorazowy e-papieros?</a></h3>
     <p class="article-summary">Poznaj wszystkie zalety XCOR 23K – jednorazowego e-papierosa z 23 000 puffów. Przegląd smaków, specyfikacji oraz praktycznych porad dla polskich użytkowników.</p>
     <div class="article-actions">
       <a class="btn btn-ghost" href="../../artykul/xcor-23k-czy-warto-kupic-ten-jednorazowy-e-papieros/">Czytaj</a>
-      <a class="btn btn-ghost" href="https://vapepl.com/xcor-23k-czy-warto-kupic-ten-jednorazowy-e-papieros/" rel="nofollow" target="_blank">Pełna wersja →</a>
+      <a class="article-external" href="https://vapepl.com/xcor-23k-czy-warto-kupic-ten-jednorazowy-e-papieros/" rel="nofollow" target="_blank">Pełna wersja na vapepl.com →</a>
     </div>
   </article>
   <article class="article-card">
+    <p class="article-meta"><span class="article-meta-kind">Poradnik</span> <span class="article-meta-sep" aria-hidden="true">·</span><span>31 sierpnia 2026</span></p>
     <h3 class="article-title"><a href="../../artykul/xcor-duba-28k-nowy-gigant-pufowy-warte-uwagi/">XCOR DUBA 28K – nowy gigant pufowy warte uwagi?</a></h3>
     <p class="article-summary">Poznaj XCORA DUBA 28K – jednorazowego vaped z 28 000 pufami, duża bateria i intensywen smaki. Sprawdz czy warto po niego siegnac i jak wypada na tle konkurencji na…</p>
     <div class="article-actions">
       <a class="btn btn-ghost" href="../../artykul/xcor-duba-28k-nowy-gigant-pufowy-warte-uwagi/">Czytaj</a>
-      <a class="btn btn-ghost" href="https://vapepl.com/xcor-duba-28k-nowy-gigant-pufowy-warte-uwagi/" rel="nofollow" target="_blank">Pełna wersja →</a>
+      <a class="article-external" href="https://vapepl.com/xcor-duba-28k-nowy-gigant-pufowy-warte-uwagi/" rel="nofollow" target="_blank">Pełna wersja na vapepl.com →</a>
     </div>
   </article>
   <article class="article-card">
+    <p class="article-meta"><span class="article-meta-kind">Poradnik</span> <span class="article-meta-sep" aria-hidden="true">·</span><span>1 września 2026</span></p>
     <h3 class="article-title"><a href="../../artykul/xcor-dubai-knight-28000-opis-jednorazowego-e-papierosa/">XCOR Dubai Knight 28000 - opis jednorazowego e-papierosa</a></h3>
     <p class="article-summary">Poznaj XCOR Dubai Knight 28000 - jednorazowy e-papieros z 2800 zaciagnieciami, technologia mesh coil i bogata gama smakow. Kompletny przewodnik po urzadzeniu.</p>
     <div class="article-actions">
       <a class="btn btn-ghost" href="../../artykul/xcor-dubai-knight-28000-opis-jednorazowego-e-papierosa/">Czytaj</a>
-      <a class="btn btn-ghost" href="https://vapepl.com/xcor-dubai-knight-28000-opis-jednorazowego-e-papierosa/" rel="nofollow" target="_blank">Pełna wersja →</a>
+      <a class="article-external" href="https://vapepl.com/xcor-dubai-knight-28000-opis-jednorazowego-e-papierosa/" rel="nofollow" target="_blank">Pełna wersja na vapepl.com →</a>
     </div>
   </article>
   <article class="article-card">
+    <p class="article-meta"><span class="article-meta-kind">Poradnik</span> <span class="article-meta-sep" aria-hidden="true">·</span><span>22 września 2026</span></p>
     <h3 class="article-title"><a href="../../artykul/xcor-dubai-night-28000-co-to-za-model/">XCOR Dubai Night 28000 – co to za model?</a></h3>
     <p class="article-summary">XCOR Dubai Night 28000 nie ma u nas. Wyjaśniamy, co kryje to hasło, i pokazujemy 3 XCOR-y w stocku oraz koszt 1000 puffs w całym katalogu.</p>
     <div class="article-actions">
       <a class="btn btn-ghost" href="../../artykul/xcor-dubai-night-28000-co-to-za-model/">Czytaj</a>
-      <a class="btn btn-ghost" href="https://vapepl.com/xcor-dubai-night-28000-co-to-za-model/" rel="nofollow" target="_blank">Pełna wersja →</a>
+      <a class="article-external" href="https://vapepl.com/xcor-dubai-night-28000-co-to-za-model/" rel="nofollow" target="_blank">Pełna wersja na vapepl.com →</a>
     </div>
   </article>
   <article class="article-card">
+    <p class="article-meta"><span class="article-meta-kind">Poradnik</span> <span class="article-meta-sep" aria-hidden="true">·</span><span>31 sierpnia 2026</span></p>
     <h3 class="article-title"><a href="../../artykul/xcor-dubai-night-28000-opis-smak-i-cena-2/">XCor Dubai Night 28000 – opis, smak i cena</a></h3>
     <p class="article-summary">Poznaj XCor Dubai Night 28000 puffs – jednorazowy e papieros z duża liczba zaciagnieć, smakiem inspirowanym nocnym Dubajem i atrakcyjna cena. Kompletny przewodnik po…</p>
     <div class="article-actions">
       <a class="btn btn-ghost" href="../../artykul/xcor-dubai-night-28000-opis-smak-i-cena-2/">Czytaj</a>
-      <a class="btn btn-ghost" href="https://vapepl.com/xcor-dubai-night-28000-opis-smak-i-cena-2/" rel="nofollow" target="_blank">Pełna wersja →</a>
+      <a class="article-external" href="https://vapepl.com/xcor-dubai-night-28000-opis-smak-i-cena-2/" rel="nofollow" target="_blank">Pełna wersja na vapepl.com →</a>
     </div>
   </article>
   <article class="article-card">
+    <p class="article-meta"><span class="article-meta-kind">Poradnik</span> <span class="article-meta-sep" aria-hidden="true">·</span><span>31 sierpnia 2026</span></p>
     <h3 class="article-title"><a href="../../artykul/xcor-dubai-night-28000-opis-smak-i-cena/">XCor Dubai Night 28000 – opis, smak i cena</a></h3>
     <p class="article-summary">Poznaj XCor Dubai Night 28000 puffs – jednorazowy e papieros z duża liczba zaciagnieć, smakiem inspirowanym nocnym Dubajem i atrakcyjna cena. Kompletny przewodnik po…</p>
     <div class="article-actions">
       <a class="btn btn-ghost" href="../../artykul/xcor-dubai-night-28000-opis-smak-i-cena/">Czytaj</a>
-      <a class="btn btn-ghost" href="https://vapepl.com/xcor-dubai-night-28000-opis-smak-i-cena/" rel="nofollow" target="_blank">Pełna wersja →</a>
+      <a class="article-external" href="https://vapepl.com/xcor-dubai-night-28000-opis-smak-i-cena/" rel="nofollow" target="_blank">Pełna wersja na vapepl.com →</a>
     </div>
   </article>
   <article class="article-card">
+    <p class="article-meta"><span class="article-meta-kind">Poradnik</span> <span class="article-meta-sep" aria-hidden="true">·</span><span>14 września 2026</span></p>
     <h3 class="article-title"><a href="../../artykul/xcor-dubai-night-28k-co-to-za-jednorazowka-i-ile-realnie-kosztuje/">XCOR dubai night 28k — co to za jednorazówka i ile realnie kosztuje</a></h3>
     <p class="article-summary">DUBAI NIGHT w XCOR 28000 to nocna, owocowo-mentholowa linia smaków. Dekoduję model, liczę 85% kosztu bucha i porównuję pięć modeli MTL, od 9 do 180 tys. puffów.</p>
     <div class="article-actions">
       <a class="btn btn-ghost" href="../../artykul/xcor-dubai-night-28k-co-to-za-jednorazowka-i-ile-realnie-kosztuje/">Czytaj</a>
-      <a class="btn btn-ghost" href="https://vapepl.com/xcor-dubai-night-28k-co-to-za-jednorazowka-i-ile-realnie-kosztuje/" rel="nofollow" target="_blank">Pełna wersja →</a>
+      <a class="article-external" href="https://vapepl.com/xcor-dubai-night-28k-co-to-za-jednorazowka-i-ile-realnie-kosztuje/" rel="nofollow" target="_blank">Pełna wersja na vapepl.com →</a>
     </div>
   </article>
   <article class="article-card">
+    <p class="article-meta"><span class="article-meta-kind">Poradnik</span> <span class="article-meta-sep" aria-hidden="true">·</span><span>31 sierpnia 2026</span></p>
     <h3 class="article-title"><a href="../../artykul/xcor-e-papieros-przewodnik-po-modeli-i-poradnik-zakupu/">XCOR e-papieros – przewodnik po modeli i poradnik zakupu</a></h3>
     <p class="article-summary">Poznaj kompleksowy przewodnik po jednorazowych e-papierosach XCOR. Sprawdz modele, parametry techniczne, smaki oraz sprawdzone porady dotyczace wyboru najlepszego…</p>
     <div class="article-actions">
       <a class="btn btn-ghost" href="../../artykul/xcor-e-papieros-przewodnik-po-modeli-i-poradnik-zakupu/">Czytaj</a>
-      <a class="btn btn-ghost" href="https://vapepl.com/xcor-e-papieros-przewodnik-po-modeli-i-poradnik-zakupu/" rel="nofollow" target="_blank">Pełna wersja →</a>
+      <a class="article-external" href="https://vapepl.com/xcor-e-papieros-przewodnik-po-modeli-i-poradnik-zakupu/" rel="nofollow" target="_blank">Pełna wersja na vapepl.com →</a>
     </div>
   </article>
       </div>
