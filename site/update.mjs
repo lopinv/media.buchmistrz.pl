@@ -366,7 +366,18 @@ function commitMain(changedPages) {
     return false;
   }
   const subject = flags.message ?? `chore(site): refresh data + rebuild, ${changedPages} pages re-stamped`;
-  sh('git', ['add', ...files]);
+  // 按文件状态分流暂存，避免两类失败：
+  // - 已删除的文件在 `git add <path>` / `add -A -- <path>` 下报
+  //   "pathspec did not match any files" 而中断流水线 → 改用 `git rm --cached`
+  // - 未跟踪的新文件 `git add` 能正常加入，无需额外处理
+  const deleted = [];
+  const present = [];
+  for (const f of files) {
+    if (existsSync(join(ROOT, f))) present.push(f);
+    else deleted.push(f);
+  }
+  if (present.length) sh('git', ['add', '--', ...present]);
+  if (deleted.length) sh('git', ['rm', '--cached', '-q', '--', ...deleted]);
   sh('git', ['commit', '-m', subject]);
   console.log(`✔ main 本地提交: ${files.length} 个文件`);
   return true;

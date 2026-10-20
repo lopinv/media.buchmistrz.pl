@@ -13,13 +13,10 @@ site/
 ├── data/products.json  # 商品数据（18 模型 / 220 口味变体，全量购买链接已实测）
 ├── data/guides.json    # 文章库（全量命中：4000+ 篇中挑出与站内模型/口味相关的全部文章）
 ├── data/page-manifest.json # 每页 SHA-1 + 最后内容变更日期（构建自动回写，驱动 sitemap lastmod）
-├── data/media/image-variants.json # 图片优化变体清单（URL → 各档位 WebP/JPEG 路径）
 ├── tools/
-│   ├── subset-font.py      # 字体子集化：latin + latin-ext → 单份 InterVariable-subset.woff2
-│   ├── optimize-images.py  # 按显示尺寸生成图片 WebP/JPEG 多档变体
-│   └── sync-media.sh       # 把变体提交并推送到 media 分支（jsDelivr 分发源）
+│   └── subset-font.py      # 字体子集化：latin + latin-ext → 单份 InterVariable-subset.woff2
 └── src/
-    ├── content.js      # 静态文案与站点常量（品牌/评价/FAQ/折扣/联系）+ 图片变体解析
+    ├── content.js      # 静态文案与站点常量（品牌/评价/FAQ/折扣/联系）+ 图片标签生成
     ├── templates.js    # HTML 模板 + SEO/OGP/JSON-LD 生成
     ├── style.css       # 响应式样式（mobile-first）
     ├── fonts/          # 自托管 Inter 可变字体（仅子集产物）
@@ -45,17 +42,13 @@ node site/preview.mjs            # 本地预览 http://127.0.0.1:8080
 
 ## 性能（CWV）
 
-站内图片托管在 `media` 分支，经 jsDelivr 分发；字体自托管。三个工具维护这两类二进制资源，改动内容后按需重跑：
+站内图片托管在 `media` 分支，经 jsDelivr 分发；字体自托管。字体子集化工具维护二进制资源，改动内容后按需重跑：
 
 ```bash
 python site/tools/subset-font.py      # 字体子集化 → src/fonts/InterVariable-subset.woff2
-python site/tools/optimize-images.py  # 图片变体 → data/media/static/.../opt/ + 变体清单
-bash   site/tools/sync-media.sh       # 变体提交到 media 分支（jsDelivr 自动生效）
 ```
 
-`optimize-images.py` 只处理站内真正引用的产品图（18 张）。分类大图（2048² PNG，合计 17MB）站内并未使用——首页口味卡用 SVG 图标——仅根 README 引用，不在优化范围。
-
-`src/content.js` 的 `pictureTag()` 据变体清单输出 `<picture>`（WebP + JPEG 双档 `srcset`），`lcpPreload()` 输出与之一致的预加载（`type="image/webp"` + `imagesrcset`/`imagesizes`），保证预加载命中实际选中的那张，不重复下载。字体用度量对齐的回退字体（`ascent-override`/`descent-override`），字体到位时行盒高度不变，CLS 归零。统计脚本走 `requestIdleCallback` 延后加载，不占首屏带宽。
+图片直接引用 `media` 分支上的原图（`static/assets/uploads/`，18 张产品图，单张 70–790KB），不再生成多档变体、不输出 `<picture>` + `srcset`。`pictureTag()` 直接产出 `<img src="原图">`，`lcpPreload()` 输出与之一致的 `href` 预加载，保证预加载命中实际选中的那张，不重复下载。字体用度量对齐的回退字体（`ascent-override`/`descent-override`），字体到位时行盒高度不变，CLS 归零。统计脚本走 `requestIdleCallback` 延后加载，不占首屏带宽。
 
 **根 README.md 的 9 个数据块**（徽章/统计条/品牌卡/产品表/畅销榜/口味卡/口味榜/文章列表/数据日期）由 `update.mjs` 内置的再生成步骤（`regenerateDocs`）从 `data/` 生成，块用 `<!-- @gen:<name> -->` … `<!-- @/gen:<name> -->` 标记围住；标记外的段落（FAQ、评价、订单、关于、联系）手工维护，生成器不碰。改 `data/products.json` 或 `data/guides.json` 后跑 `node site/update.mjs`（数据不变则不写盘）。
 
