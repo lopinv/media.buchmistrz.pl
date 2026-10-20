@@ -27,6 +27,7 @@ import {
   renderScenario,
   renderPriceBand,
   renderComparison,
+  ASSET_VERSION,
 } from './src/templates.js';
 
 const ROOT = dirname(fileURLToPath(import.meta.url));
@@ -39,8 +40,28 @@ data.guides = existsSync(join(ROOT, 'data', 'guides.json'))
   ? JSON.parse(readFileSync(join(ROOT, 'data', 'guides.json'), 'utf8'))
   : [];
 
+// ---------- 静态资源：先产出内容并算出短哈希，作为 URL 版本号 ----------
+// GitHub Pages 对 CSS/JS 只给 10 分钟缓存，不带版本号时部署后老访客会继续用
+// 旧样式表（可能引用已删除的资源 → 404）。内容哈希进 URL 后，资源一变
+// URL 就变，浏览器必然重新拉取。
+const minifyCss = (css) =>
+  css
+    .replace(/\/\*[\s\S]*?\*\//g, '') // 注释
+    .replace(/\s*([{}:;,>~+])\s*/g, '$1') // 结构性符号周围空白
+    .replace(/;\}/g, '}') // 末条声明分号
+    .replace(/\s+/g, ' ') // 其余连续空白
+    .trim();
+
+const cssOut = minifyCss(readFileSync(join(ROOT, 'src', 'style.css'), 'utf8'));
+const jsOut = readFileSync(join(ROOT, 'src', 'script.js'), 'utf8');
+const shortHash = (buf) => createHash('sha1').update(buf).digest('hex').slice(0, 8);
+ASSET_VERSION.css = shortHash(cssOut);
+ASSET_VERSION.js = shortHash(jsOut);
+
 rmSync(DIST, { recursive: true, force: true });
 mkdirSync(DIST, { recursive: true });
+writeFileSync(join(DIST, 'script.js'), jsOut);
+writeFileSync(join(DIST, 'style.css'), cssOut);
 
 function out(rel, html) {
   const full = join(DIST, rel);
@@ -183,27 +204,15 @@ out(
 </html>
 `,
 );
-// CSS 压缩：样式表是渲染阻塞资源，压缩后 gzip 体积 8.9KB → 5.5KB。
-// 只做安全压缩（去注释、去多余空白），不动任何选择器语义。
-// 源文件保持可读，压缩只发生在产物里。
-const minifyCss = (css) =>
-  css
-    .replace(/\/\*[\s\S]*?\*\//g, '') // 注释
-    .replace(/\s*([{}:;,>~+])\s*/g, '$1') // 结构性符号周围空白
-    .replace(/;\}/g, '}') // 末条声明分号
-    .replace(/\s+/g, ' ') // 其余连续空白
-    .trim();
-
-for (const f of ['script.js']) {
-  writeFileSync(join(DIST, f), readFileSync(join(ROOT, 'src', f)));
-}
-writeFileSync(join(DIST, 'style.css'), minifyCss(readFileSync(join(ROOT, 'src', 'style.css'), 'utf8')));
 // 自托管 webfont（Inter 可变字重，单一子集：Latin-1 + Latin Extended-A）
-// 只拷贝子集产物——原始 latin/latin-ext 两份（合计 130KB）已由
-// site/tools/subset-font.py 合并为 InterVariable-subset.woff2（14KB）。
-// 留两份旧文件会让 dist 多出无用请求，故显式只取 subset。
+// 主产物是 InterVariable-subset.woff2（14KB）——由 site/tools/subset-font.py
+// 从原 latin(47KB) + latin-ext(83KB) 合并而来。
+// 旧的两份仍随产物发布：GitHub Pages 的 CSS 缓存长达 10 分钟，部署后
+// 仍持有旧 CSS 的访客会请求 latin/latin-ext —— 缺了它们就是 404 + 字体回退失败，
+// 反而制造一次布局位移。留着旧文件只是几十 KB 的保险，不影响新访客（不被引用）。
 const FONTS_SRC = join(ROOT, 'src', 'fonts');
 const FONT_FILES = ['InterVariable-subset.woff2'];
+const FONT_LEGACY = ['InterVariable-latin.woff2', 'InterVariable-latin-ext.woff2'];
 if (existsSync(FONTS_SRC)) {
   mkdirSync(join(DIST, 'fonts'), { recursive: true });
   for (const f of FONT_FILES) {
@@ -213,6 +222,10 @@ if (existsSync(FONTS_SRC)) {
       process.exit(1);
     }
     writeFileSync(join(DIST, 'fonts', f), readFileSync(src));
+  }
+  for (const f of FONT_LEGACY) {
+    const src = join(FONTS_SRC, f);
+    if (existsSync(src)) writeFileSync(join(DIST, 'fonts', f), readFileSync(src));
   }
 }
 writeFileSync(join(DIST, '.nojekyll'), '');
@@ -342,7 +355,8 @@ for (const file of htmlFiles) {
   // 相对化后校验：href/src 相对路径按当前页目录解析，.. 段归一化到 dist 内
   const baseDir = posix.dirname(file); // index.html→.，sklep/index.html→sklep
   for (const m of html.matchAll(/href="([^"]+)"|src="([^"]+)"/g)) {
-    const href = m[1] ?? m[2];
+    // 去掉 ?v=<hash> 版本查询串：它只是缓存击穿标记，不参与文件定位
+    const href = (m[1] ?? m[2]).split('?')[0].split('#')[0];
     if (/^(https?:|mailto:|tel:|data:|#)/.test(href)) continue;
     const norm = posix.normalize(posix.join(baseDir, href));
     if (norm === '.' || norm === './' || norm === '') {

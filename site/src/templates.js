@@ -80,6 +80,15 @@ const starRow = (filled) =>
     )
     .join('');
 
+// 静态资源版本号：build.js 计算 CSS/JS 内容的短哈希后注入这里，
+// 形如 /style.css?v=<hash>。GitHub Pages 对 CSS 只给 10 分钟缓存，
+// 不带版本号时部署后老访客会继续用旧样式表（可能引用已删除的资源 → 404）。
+// 内容哈希变了 URL 就变 → 浏览器必然重新拉取。
+export const ASSET_VERSION = { css: '', js: '' };
+
+// 字体预加载：与 CSS 中的 @font-face 保持同一份文件。
+export const FONT_FILE = '/fonts/InterVariable-subset.woff2';
+
 export const fmtPuffs = (n) => (n ? new Intl.NumberFormat('pl-PL').format(n) : null);
 export const fmtZl = (n) =>
   n === null || n === undefined
@@ -228,7 +237,7 @@ export function page({
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <link rel="preconnect" href="${IMG_CDN}">
   <link rel="dns-prefetch" href="${IMG_CDN}">
-  <link rel="preload" as="font" type="font/woff2" crossorigin href="/fonts/InterVariable-subset.woff2">
+  <link rel="preload" as="font" type="font/woff2" crossorigin href="${FONT_FILE}">
   ${lcpImage ? lcpPreload(lcpImage, lcpSizes) : ''}
   <title>${esc(title)}</title>
   <meta name="description" content="${esc(description)}">
@@ -247,9 +256,9 @@ export function page({
   <meta name="theme-color" content="#070b14">
   <meta name="format-detection" content="telephone=yes">
   <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='3' fill='%2322d3ee'/><text x='16' y='22' font-family='sans-serif' font-size='18' font-weight='800' fill='%2304141a' text-anchor='middle'>V</text></svg>">
-  <link rel="stylesheet" href="/style.css">
+  <link rel="stylesheet" href="/style.css${ASSET_VERSION.css ? "?v=" + ASSET_VERSION.css : ""}">
   ${ldScripts}
-  <script src="/script.js" defer></script>
+  <script src="/script.js${ASSET_VERSION.js ? "?v=" + ASSET_VERSION.js : ""}" defer></script>
   ${ANALYTICS_SNIPPET}
 </head>
 <body>
