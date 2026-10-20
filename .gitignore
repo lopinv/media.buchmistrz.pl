@@ -45,7 +45,3 @@ _testmain.go
 # 静态站构建产物（部署到 gh-pages，不入版本库）
 site/dist/
 .zcode/
-
-# 图片优化变体：产物只发布到 media 分支（jsDelivr 分发），
-# main 分支仅保留变体清单 site/data/media/image-variants.json
-site/data/media/static/
