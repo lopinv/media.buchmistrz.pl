@@ -25,6 +25,7 @@ import {
   flavorFaq,
   flavorGroups,
   flavorKey,
+  flavorTargets,
   pluralModels,
   pluralProducts,
   puffBandsFor,
@@ -558,7 +559,8 @@ export function relatedArticlesBlock(list, heading, intro = '') {
 
 // ---------- 首页口味陈列墙（全部口味按四种分类分组全列） ----------
 // 数据源：flavorGroups(data, 1)（站内口味频次）；分组：flavorCatFor() 关键词归类器（确定性）。
-// 有 /smak/<slug>/ 落地页（≥2 款产品）的口味渲染为链接 chip，其余为纯文本 chip。
+// 链接：≥2 款产品的口味链到 /smak/<slug>/ 落地页；只有 1 款的口味链到该产品的
+// /produkt/<产品>/<口味>/ 变体页（变体页逐个出页，必定存在）——不留死 chip。
 // 组合包商品（一个 SKU 塞多个口味）在源站被存成整串口味列表，名字长达 100+ 字符，
 // 属于"多变体包"而非单一口味名——陈列这类名字会把 chip 墙撑坏，故展示层过滤：
 // 名称 > 30 字符的组不进口味墙（它们仍保留在 /smak/ 数据流与分类页子口味导航中）。
@@ -567,8 +569,7 @@ const WALL_NAME_MAX = 30;
 
 export function flavorWall(data) {
   const groups = flavorGroups(data, 1).filter((g) => g.name.length <= WALL_NAME_MAX);
-  // 已存在落地页的 slug 集合（与 build.js 出页门槛 flavorGroups(data, 2) 一致）
-  const landingSlugs = new Set(flavorGroups(data, 2).map((g) => g.slug));
+  const targets = flavorTargets(data);
   const byCat = new Map(Object.keys(FLAVOR_CATS).map((k) => [k, []]));
   for (const g of groups) {
     const cat = flavorCatFor(g.name);
@@ -588,12 +589,12 @@ export function flavorWall(data) {
       <p class="flavor-wall-blurb">${esc(cat.blurb)}</p>
       <div class="flavor-wall-chips">
         ${list
-          .map(
-            (g) =>
-              landingSlugs.has(g.slug)
-                ? `<a class="flavor-wall-chip" href="/smak/${esc(g.slug)}/">${esc(g.name)}<span class="flavor-cnt">${g.models}</span></a>`
-                : `<span class="flavor-wall-chip is-plain">${esc(g.name)}<span class="flavor-cnt">${g.models}</span></span>`,
-          )
+          .map((g) => {
+            const href = targets.hrefFor(g.slug);
+            return href
+              ? `<a class="flavor-wall-chip" href="${esc(href)}">${esc(g.name)}<span class="flavor-cnt">${g.models}</span></a>`
+              : `<span class="flavor-wall-chip is-plain">${esc(g.name)}<span class="flavor-cnt">${g.models}</span></span>`;
+          })
           .join('')}
       </div>
     </div>`;
@@ -1005,14 +1006,16 @@ export function renderCategory(data, category) {
       ? BRANDS[category.slug] ?? { name: category.name, blurb: '' }
       : FLAVOR_CATS[category.slug] ?? { name: category.name, blurb: '' };
   // 子口味导航：flavor 类分类页内产品口味频次 Top 8，链到口味落地页（有 ≥3 款的才出页）
-  const landingSlugs = new Set(flavorGroups(data, 2).map((g) => g.slug));
+  // 单模型口味无落地页 → 退回其产品变体页；口味 key 走 flavorKey() 统一归一
+  // （旧逻辑自行 lower + 去 &，没解 &amp; 实体，会与落地页 slug 对不上）。
+  const targets = flavorTargets(data);
   const subFlavors =
     category.kind === 'flavor'
       ? (() => {
           const freq = new Map();
           for (const p of products)
             for (const f of p.flavors) {
-              const key = f.name.trim().toLowerCase().replace(/&/g, ' ');
+              const key = flavorKey(f.name);
               freq.set(key, (freq.get(key) ?? 0) + 1);
             }
           return [...freq.entries()]
@@ -1024,7 +1027,7 @@ export function renderCategory(data, category) {
                 key,
                 n,
                 slug,
-                hasLanding: landingSlugs.has(slug),
+                href: targets.hrefFor(slug),
               };
             });
         })()
@@ -1108,8 +1111,8 @@ export function renderCategory(data, category) {
         ${subFlavors
           .map(
             (s) =>
-              s.hasLanding
-                ? `<a class="flavor-chip" href="/smak/${esc(s.slug)}/">${esc(s.key.charAt(0).toUpperCase() + s.key.slice(1))}</a>`
+              s.href
+                ? `<a class="flavor-chip" href="${esc(s.href)}">${esc(s.key.charAt(0).toUpperCase() + s.key.slice(1))}</a>`
                 : `<span class="flavor-chip is-disabled">${esc(s.key.charAt(0).toUpperCase() + s.key.slice(1))}</span>`,
           )
           .join('')}

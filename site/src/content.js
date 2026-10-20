@@ -83,6 +83,31 @@ const flavorPretty = (key) =>
 // 归一化键 → URL slug
 const flavorSlug = (key) => key.replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '');
 
+// 口味落地页 / 产品口味页的链接解析器。
+// 落地页门槛是"同一口味出现在 ≥2 款产品中"；只有 1 款的产品没有 /smak/ 落地页，
+// 但它一定有自己的 /produkt/<产品>/<口味>/ 变体页（build.js 逐变体出页），
+// 所以单模型口味也必须给链接——否则墙面上就是死 chip。
+// 优先落地页（跨模型聚合），没有则退回该口味所属产品的变体页。
+export function flavorTargets(data) {
+  const landing = new Set(flavorGroups(data, 2).map((g) => g.slug));
+  const single = new Map();
+  for (const g of flavorGroups(data, 1)) {
+    if (landing.has(g.slug)) continue;
+    const first = g.products[0];
+    if (!first) continue;
+    single.set(g.slug, `/produkt/${first.product.slug}/${first.flavor.slug}/`);
+  }
+  return {
+    landing,
+    single,
+    // 返回该口味的站内目标 URL；没有落地页时退回产品变体页
+    hrefFor(slug) {
+      if (landing.has(slug)) return `/smak/${slug}/`;
+      return single.get(slug) ?? null;
+    },
+  };
+}
+
 // 口味分组：group = { key, name, slug, count（出现次数）, products（[{product, flavor}]），
 // minPrice, maxPrice, maxPuffs, models }；count >= min 才返回（落地页门槛）
 export function flavorGroups(data, min = 3) {
