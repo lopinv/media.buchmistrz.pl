@@ -302,32 +302,48 @@ writeFileSync(MANIFEST_FILE, `${JSON.stringify(manifestSorted, null, 2)}\n`);
 
 // sitemap：lastmod 逐 URL 取清单戳（内容真实变更日期），changefreq/priority 维持原有分档
 const pageLastmod = (key) => manifest[key]?.m ?? (data.fetchedAt ?? today).slice(0, 10);
-const entry = (key, { changefreq, priority }) =>
-  `  <url>\n    <loc>${SITE}${key}</loc>\n    <lastmod>${pageLastmod(key)}</lastmod>\n    <changefreq>${changefreq}</changefreq>\n    <priority>${priority}</priority>\n  </url>`;
-const entries = [
-  entry('/sklep/', { changefreq: 'weekly', priority: 0.9 }),
-  entry('/kontakt/', { changefreq: 'monthly', priority: 0.3 }),
-  entry('/zwroty/', { changefreq: 'monthly', priority: 0.3 }),
+const tuple = (key, { changefreq, priority }) => [key, changefreq, priority];
+// 按数据源顺序收集 URL key（首现优先）：WooCommerce 真实分类 slug 理论上可能
+// 撞上 puffs-*/cena-* 合成段，重复 key 只保留首个，避免 GSC 报 Duplicate URL
+const rawUrls = [
+  tuple('/sklep/', { changefreq: 'weekly', priority: 0.9 }),
+  tuple('/kontakt/', { changefreq: 'monthly', priority: 0.3 }),
+  tuple('/zwroty/', { changefreq: 'monthly', priority: 0.3 }),
   ...data.categories.map((c) =>
-    entry(`/kategoria/${c.slug}/`, { changefreq: 'weekly', priority: 0.7 })),
+    tuple(`/kategoria/${c.slug}/`, { changefreq: 'weekly', priority: 0.7 })),
   ...puffBandsFor(data).filter((b) => b.products.length).map((b) =>
-    entry(`/kategoria/puffs-${b.id}/`, { changefreq: 'weekly', priority: 0.6 })),
+    tuple(`/kategoria/puffs-${b.id}/`, { changefreq: 'weekly', priority: 0.6 })),
   ...priceBandsFor(data).filter((b) => b.products.length).map((b) =>
-    entry(`/kategoria/cena-${b.id}/`, { changefreq: 'weekly', priority: 0.6 })),
+    tuple(`/kategoria/cena-${b.id}/`, { changefreq: 'weekly', priority: 0.6 })),
   ...scenariosFor(data).map((s) =>
-    entry(`/scenariusz/${s.id}/`, { changefreq: 'weekly', priority: 0.6 })),
+    tuple(`/scenariusz/${s.id}/`, { changefreq: 'weekly', priority: 0.6 })),
   ...comparisonPairsFor(data).map((p) =>
-    entry(`/porownanie/${p.slug}/`, { changefreq: 'monthly', priority: 0.6 })),
+    tuple(`/porownanie/${p.slug}/`, { changefreq: 'monthly', priority: 0.6 })),
   ...flavorGroups(data, 2).map((g) =>
-    entry(`/smak/${g.slug}/`, { changefreq: 'weekly', priority: 0.6 })),
+    tuple(`/smak/${g.slug}/`, { changefreq: 'weekly', priority: 0.6 })),
   ...data.products.flatMap((p) => [
-    entry(`/produkt/${p.slug}/`, { changefreq: 'weekly', priority: 0.7 }),
+    tuple(`/produkt/${p.slug}/`, { changefreq: 'weekly', priority: 0.7 }),
     ...p.flavors.map((f) =>
-      entry(`/produkt/${p.slug}/${f.slug}/`, { changefreq: 'weekly', priority: 0.5 })),
+      tuple(`/produkt/${p.slug}/${f.slug}/`, { changefreq: 'weekly', priority: 0.5 })),
   ]),
   ...data.guides.map((g) =>
-    entry(`/artykul/${g.id}/`, { changefreq: 'monthly', priority: 0.4 })),
+    tuple(`/artykul/${g.id}/`, { changefreq: 'monthly', priority: 0.4 })),
 ];
+const seenUrls = new Set();
+const entries = [];
+const droppedUrls = [];
+for (const [key, changefreq, priority] of rawUrls) {
+  if (seenUrls.has(key)) {
+    droppedUrls.push(key);
+    continue;
+  }
+  seenUrls.add(key);
+  entries.push(
+    `  <url>\n    <loc>${SITE}${key}</loc>\n    <lastmod>${pageLastmod(key)}</lastmod>\n    <changefreq>${changefreq}</changefreq>\n    <priority>${priority}</priority>\n  </url>`);
+}
+if (droppedUrls.length) {
+  console.warn(`⚠ sitemap 去重丢弃 ${droppedUrls.length} 条重复 URL: ${droppedUrls.join(', ')}`);
+}
 writeFileSync(
   join(DIST, 'sitemap.xml'),
   `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap-0.9">\n${entries.join('\n')}\n</urlset>\n`,
