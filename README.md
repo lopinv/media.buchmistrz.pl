@@ -15,7 +15,7 @@
 <img src="https://img.shields.io/badge/📅-Od%202014-007ec6?style=for-the-badge" alt="Od 2014">
 <img src="https://img.shields.io/badge/🏭-7%20marek-1e88e5?style=for-the-badge" alt="7 marek">
 <img src="https://img.shields.io/badge/📦-18%20produkt%C3%B3w-0ea5e9?style=for-the-badge" alt="18 produktów">
-<img src="https://img.shields.io/badge/📖-4182%20artyku%C5%82%C3%B3w-e05a4b?style=for-the-badge" alt="4182 artykułów">
+<img src="https://img.shields.io/badge/📖-4184%20artyku%C5%82%C3%B3w-e05a4b?style=for-the-badge" alt="4184 artykułów">
 <!-- @/gen:badges -->
 
 </div>
@@ -27,7 +27,7 @@
 <tr>
 <td align="center" width="20%"><div style="font-size:28px">📦</div><b>18</b><br>Produktów</td>
 <td align="center" width="20%"><div style="font-size:28px">🏭</div><b>7</b><br>Marki</td>
-<td align="center" width="20%"><div style="font-size:28px">📖</div><b>4182</b><br>Artykułów</td>
+<td align="center" width="20%"><div style="font-size:28px">📖</div><b>4184</b><br>Artykułów</td>
 <td align="center" width="20%"><div style="font-size:28px">💰</div><b>od 55,00 zł</b><br>Cena od</td>
 <td align="center" width="20%"><div style="font-size:28px">⭐</div><b>4,4 / 5</b><br>Opinie</td>
 </tr>
@@ -138,10 +138,10 @@
 
 <table width="100%">
 <tr><th width="38%" align="left">Produkt</th><th width="14%" align="center">Puffs</th><th width="26%" align="center">Cena</th><th width="22%" align="center">Widok</th></tr>
-<tr><td align="left"><a href="https://vapepl.com/product/airmez-fox-4in1-120000-puffs/">AiRMEZ FOX 4IN1 120000 PUFFS</a></td><td align="center">120 000</td><td align="center"><s>120,00 zł</s><br><b>100,00 zł</b></td><td align="center"><img src="https://cdn.jsdelivr.net/gh/lopinv/media.buchmistrz.pl@media/static/assets/uploads/airmez-fox-4in1-120k-puffs.webp" width="90" height="90" style="object-fit:cover;border-radius:8px" alt="AiRMEZ FOX 4IN1 120000 PUFFS"></td></tr>
-<tr><td align="left"><a href="https://vapepl.com/product/airmez-lux-60000-puffs/">AiRMEZ LUX 60000 PUFFS</a></td><td align="center">60 000</td><td align="center"><s>110,00 zł</s><br><b>90,00 zł</b></td><td align="center"><img src="https://cdn.jsdelivr.net/gh/lopinv/media.buchmistrz.pl@media/static/assets/uploads/airmez-lux-60k-puffs.jpg" width="90" height="90" style="object-fit:cover;border-radius:8px" alt="AiRMEZ LUX 60000 PUFFS"></td></tr>
-<tr><td align="left"><a href="https://vapepl.com/product/airmez-matrix-pro-30000-puffs/">AiRMEZ MATRIX PRO 30000 PUFFS</a></td><td align="center">30 000</td><td align="center"><s>80,00 zł</s><br><b>70,00 zł</b></td><td align="center"><img src="https://cdn.jsdelivr.net/gh/lopinv/media.buchmistrz.pl@media/static/assets/uploads/airmez-matrix-pro-30000-puffs.webp" width="90" height="90" style="object-fit:cover;border-radius:8px" alt="AiRMEZ MATRIX PRO 30000 PUFFS"></td></tr>
-<tr><td align="left"><a href="https://vapepl.com/product/airmez-tornado-25000-puffs/">AiRMEZ TORNADO 25000 PUFFS</a></td><td align="center">25 000</td><td align="center"><s>75,00 zł</s><br><b>65,00 zł</b></td><td align="center"><img src="https://cdn.jsdelivr.net/gh/lopinv/media.buchmistrz.pl@media/static/assets/uploads/airmez-tornado-25k-puffs.webp" width="90" height="90" style="object-fit:cover;border-radius:8px" alt="AiRMEZ TORNADO 25000 PUFFS"></td></tr>
+<tr><td align="left"><a href="https://vapepl.com/product/airmez-fox-4in1-120000-puffs/">AiRMEZ FOX 4IN1 120000 PUFFS</a></td><td align="center">120 000</td><td align="center"><s>120,00 zł</s><br><b>100,00 zł</b></td><td align="center"><img src="https://res.cloudinary.com/mxxef4oi/image/fetch/q_auto/f_auto/https://cdn.jsdelivr.net/gh/lopinv/media.buchmistrz.pl@media/static/assets/uploads/airmez-fox-4in1-120k-puffs.webp" width="90" height="90" style="object-fit:cover;border-radius:8px" alt="AiRMEZ FOX 4IN1 120000 PUFFS"></td></tr>
+<tr><td align="left"><a href="https://vapepl.com/product/airmez-lux-60000-puffs/">AiRMEZ LUX 60000 PUFFS</a></td><td align="center">60 000</td><td align="center"><s>110,00 zł</s><br><b>90,00 zł</b></td><td align="center"><img src="https://res.cloudinary.com/mxxef4oi/image/fetch/q_auto/f_auto/https://cdn.jsdelivr.net/gh/lopinv/media.buchmistrz.pl@media/static/assets/uploads/airmez-lux-60k-puffs.jpg" width="90" height="90" style="object-fit:cover;border-radius:8px" alt="AiRMEZ LUX 60000 PUFFS"></td></tr>
+<tr><td align="left"><a href="https://vapepl.com/product/airmez-matrix-pro-30000-puffs/">AiRMEZ MATRIX PRO 30000 PUFFS</a></td><td align="center">30 000</td><td align="center"><s>80,00 zł</s><br><b>70,00 zł</b></td><td align="center"><img src="https://res.cloudinary.com/mxxef4oi/image/fetch/q_auto/f_auto/https://cdn.jsdelivr.net/gh/lopinv/media.buchmistrz.pl@media/static/assets/uploads/airmez-matrix-pro-30000-puffs.webp" width="90" height="90" style="object-fit:cover;border-radius:8px" alt="AiRMEZ MATRIX PRO 30000 PUFFS"></td></tr>
+<tr><td align="left"><a href="https://vapepl.com/product/airmez-tornado-25000-puffs/">AiRMEZ TORNADO 25000 PUFFS</a></td><td align="center">25 000</td><td align="center"><s>75,00 zł</s><br><b>65,00 zł</b></td><td align="center"><img src="https://res.cloudinary.com/mxxef4oi/image/fetch/q_auto/f_auto/https://cdn.jsdelivr.net/gh/lopinv/media.buchmistrz.pl@media/static/assets/uploads/airmez-tornado-25k-puffs.webp" width="90" height="90" style="object-fit:cover;border-radius:8px" alt="AiRMEZ TORNADO 25000 PUFFS"></td></tr>
 </table>
 
 ---
@@ -150,10 +150,10 @@
 
 <table width="100%">
 <tr><th width="38%" align="left">Produkt</th><th width="14%" align="center">Puffs</th><th width="26%" align="center">Cena</th><th width="22%" align="center">Widok</th></tr>
-<tr><td align="left"><a href="https://vapepl.com/product/fumot-eco-4in1-80000-puffs/">FUMOT ECO 4IN1 80000 PUFFS</a></td><td align="center">80 000</td><td align="center"><s>140,00 zł</s><br><b>125,00 zł</b></td><td align="center"><img src="https://cdn.jsdelivr.net/gh/lopinv/media.buchmistrz.pl@media/static/assets/uploads/fumot-eco-4in1-80k-specs.webp" width="90" height="90" style="object-fit:cover;border-radius:8px" alt="FUMOT ECO 4IN1 80000 PUFFS"></td></tr>
-<tr><td align="left"><a href="https://vapepl.com/product/fumot-leopard-40000-puffs/">FUMOT LEOPARD 40000 PUFFS</a></td><td align="center">40 000</td><td align="center"><s>95,00 zł</s><br><b>90,00 zł</b></td><td align="center"><img src="https://cdn.jsdelivr.net/gh/lopinv/media.buchmistrz.pl@media/static/assets/uploads/fumot-leopard-40k-puffs-main.webp" width="90" height="90" style="object-fit:cover;border-radius:8px" alt="FUMOT LEOPARD 40000 PUFFS"></td></tr>
-<tr><td align="left"><a href="https://vapepl.com/product/fumot-randm-tornado-15000-puffs/">FUMOT RANDM TORNADO 15000 PUFFS</a></td><td align="center">15 000</td><td align="center"><s>65,00 zł</s><br><b>60,00 zł</b></td><td align="center"><img src="https://cdn.jsdelivr.net/gh/lopinv/media.buchmistrz.pl@media/static/assets/uploads/fumot-randm-tornado-15k-puffs.webp" width="90" height="90" style="object-fit:cover;border-radius:8px" alt="FUMOT RANDM TORNADO 15000 PUFFS"></td></tr>
-<tr><td align="left"><a href="https://vapepl.com/product/fumot-randm-tornado-9000-puffs/">FUMOT RANDM TORNADO 9000 PUFFS</a></td><td align="center">9000</td><td align="center"><s>65,00 zł</s><br><b>60,00 zł</b></td><td align="center"><img src="https://cdn.jsdelivr.net/gh/lopinv/media.buchmistrz.pl@media/static/assets/uploads/fumot-randm-tornado-9k-puffs.webp" width="90" height="90" style="object-fit:cover;border-radius:8px" alt="FUMOT RANDM TORNADO 9000 PUFFS"></td></tr>
+<tr><td align="left"><a href="https://vapepl.com/product/fumot-eco-4in1-80000-puffs/">FUMOT ECO 4IN1 80000 PUFFS</a></td><td align="center">80 000</td><td align="center"><s>140,00 zł</s><br><b>125,00 zł</b></td><td align="center"><img src="https://res.cloudinary.com/mxxef4oi/image/fetch/q_auto/f_auto/https://cdn.jsdelivr.net/gh/lopinv/media.buchmistrz.pl@media/static/assets/uploads/fumot-eco-4in1-80k-specs.webp" width="90" height="90" style="object-fit:cover;border-radius:8px" alt="FUMOT ECO 4IN1 80000 PUFFS"></td></tr>
+<tr><td align="left"><a href="https://vapepl.com/product/fumot-leopard-40000-puffs/">FUMOT LEOPARD 40000 PUFFS</a></td><td align="center">40 000</td><td align="center"><s>95,00 zł</s><br><b>90,00 zł</b></td><td align="center"><img src="https://res.cloudinary.com/mxxef4oi/image/fetch/q_auto/f_auto/https://cdn.jsdelivr.net/gh/lopinv/media.buchmistrz.pl@media/static/assets/uploads/fumot-leopard-40k-puffs-main.webp" width="90" height="90" style="object-fit:cover;border-radius:8px" alt="FUMOT LEOPARD 40000 PUFFS"></td></tr>
+<tr><td align="left"><a href="https://vapepl.com/product/fumot-randm-tornado-15000-puffs/">FUMOT RANDM TORNADO 15000 PUFFS</a></td><td align="center">15 000</td><td align="center"><s>65,00 zł</s><br><b>60,00 zł</b></td><td align="center"><img src="https://res.cloudinary.com/mxxef4oi/image/fetch/q_auto/f_auto/https://cdn.jsdelivr.net/gh/lopinv/media.buchmistrz.pl@media/static/assets/uploads/fumot-randm-tornado-15k-puffs.webp" width="90" height="90" style="object-fit:cover;border-radius:8px" alt="FUMOT RANDM TORNADO 15000 PUFFS"></td></tr>
+<tr><td align="left"><a href="https://vapepl.com/product/fumot-randm-tornado-9000-puffs/">FUMOT RANDM TORNADO 9000 PUFFS</a></td><td align="center">9000</td><td align="center"><s>65,00 zł</s><br><b>60,00 zł</b></td><td align="center"><img src="https://res.cloudinary.com/mxxef4oi/image/fetch/q_auto/f_auto/https://cdn.jsdelivr.net/gh/lopinv/media.buchmistrz.pl@media/static/assets/uploads/fumot-randm-tornado-9k-puffs.webp" width="90" height="90" style="object-fit:cover;border-radius:8px" alt="FUMOT RANDM TORNADO 9000 PUFFS"></td></tr>
 </table>
 
 ---
@@ -162,10 +162,10 @@
 
 <table width="100%">
 <tr><th width="38%" align="left">Produkt</th><th width="14%" align="center">Puffs</th><th width="26%" align="center">Cena</th><th width="22%" align="center">Widok</th></tr>
-<tr><td align="left"><a href="https://vapepl.com/product/hifancy-clear-80000-puffs/">HIFANCY CLEAR 80000 PUFFS</a></td><td align="center">80 000</td><td align="center"><s>140,00 zł</s><br><b>125,00 zł</b></td><td align="center"><img src="https://cdn.jsdelivr.net/gh/lopinv/media.buchmistrz.pl@media/static/assets/uploads/hifancy-clear-80000-puffs.jpg" width="90" height="90" style="object-fit:cover;border-radius:8px" alt="HIFANCY CLEAR 80000 PUFFS"></td></tr>
-<tr><td align="left"><a href="https://vapepl.com/product/hifancy-super-70000-puffs/">HIFANCY SUPER 70000 PUFFS</a></td><td align="center">70 000</td><td align="center"><s>110,00 zł</s><br><b>100,00 zł</b></td><td align="center"><img src="https://cdn.jsdelivr.net/gh/lopinv/media.buchmistrz.pl@media/static/assets/uploads/HIFANCY-SUPER-70K.webp" width="90" height="90" style="object-fit:cover;border-radius:8px" alt="HIFANCY SUPER 70000 PUFFS"></td></tr>
-<tr><td align="left"><a href="https://vapepl.com/product/hifancy-space-50000-puffs/">HIFANCY SPACE 50000 PUFFS</a></td><td align="center">50 000</td><td align="center"><s>85,00 zł</s><br><b>80,00 zł</b></td><td align="center"><img src="https://cdn.jsdelivr.net/gh/lopinv/media.buchmistrz.pl@media/static/assets/uploads/5aaefa0149d9574264498fd7c5fdf37b.jpg" width="90" height="90" style="object-fit:cover;border-radius:8px" alt="HIFANCY SPACE 50000 PUFFS"></td></tr>
-<tr><td align="left"><a href="https://vapepl.com/product/hifancy-dream-45000-puffs/">HIFANCY DREAM 45000 PUFFS</a></td><td align="center">45 000</td><td align="center"><s>80,00 zł</s><br><b>70,00 zł</b></td><td align="center"><img src="https://cdn.jsdelivr.net/gh/lopinv/media.buchmistrz.pl@media/static/assets/uploads/5d9d6b6e99481cb879b8d2a95948a489.webp" width="90" height="90" style="object-fit:cover;border-radius:8px" alt="HIFANCY DREAM 45000 PUFFS"></td></tr>
+<tr><td align="left"><a href="https://vapepl.com/product/hifancy-clear-80000-puffs/">HIFANCY CLEAR 80000 PUFFS</a></td><td align="center">80 000</td><td align="center"><s>140,00 zł</s><br><b>125,00 zł</b></td><td align="center"><img src="https://res.cloudinary.com/mxxef4oi/image/fetch/q_auto/f_auto/https://cdn.jsdelivr.net/gh/lopinv/media.buchmistrz.pl@media/static/assets/uploads/hifancy-clear-80000-puffs.jpg" width="90" height="90" style="object-fit:cover;border-radius:8px" alt="HIFANCY CLEAR 80000 PUFFS"></td></tr>
+<tr><td align="left"><a href="https://vapepl.com/product/hifancy-super-70000-puffs/">HIFANCY SUPER 70000 PUFFS</a></td><td align="center">70 000</td><td align="center"><s>110,00 zł</s><br><b>100,00 zł</b></td><td align="center"><img src="https://res.cloudinary.com/mxxef4oi/image/fetch/q_auto/f_auto/https://cdn.jsdelivr.net/gh/lopinv/media.buchmistrz.pl@media/static/assets/uploads/HIFANCY-SUPER-70K.webp" width="90" height="90" style="object-fit:cover;border-radius:8px" alt="HIFANCY SUPER 70000 PUFFS"></td></tr>
+<tr><td align="left"><a href="https://vapepl.com/product/hifancy-space-50000-puffs/">HIFANCY SPACE 50000 PUFFS</a></td><td align="center">50 000</td><td align="center"><s>85,00 zł</s><br><b>80,00 zł</b></td><td align="center"><img src="https://res.cloudinary.com/mxxef4oi/image/fetch/q_auto/f_auto/https://cdn.jsdelivr.net/gh/lopinv/media.buchmistrz.pl@media/static/assets/uploads/5aaefa0149d9574264498fd7c5fdf37b.jpg" width="90" height="90" style="object-fit:cover;border-radius:8px" alt="HIFANCY SPACE 50000 PUFFS"></td></tr>
+<tr><td align="left"><a href="https://vapepl.com/product/hifancy-dream-45000-puffs/">HIFANCY DREAM 45000 PUFFS</a></td><td align="center">45 000</td><td align="center"><s>80,00 zł</s><br><b>70,00 zł</b></td><td align="center"><img src="https://res.cloudinary.com/mxxef4oi/image/fetch/q_auto/f_auto/https://cdn.jsdelivr.net/gh/lopinv/media.buchmistrz.pl@media/static/assets/uploads/5d9d6b6e99481cb879b8d2a95948a489.webp" width="90" height="90" style="object-fit:cover;border-radius:8px" alt="HIFANCY DREAM 45000 PUFFS"></td></tr>
 </table>
 
 ---
@@ -174,7 +174,7 @@
 
 <table width="100%">
 <tr><th width="38%" align="left">Produkt</th><th width="14%" align="center">Puffs</th><th width="26%" align="center">Cena</th><th width="22%" align="center">Widok</th></tr>
-<tr><td align="left"><a href="https://vapepl.com/product/maskking-icex-40000-puffs/">MASKKING ICEX 40000 PUFFS</a></td><td align="center">40 000</td><td align="center"><s>90,00 zł</s><br><b>80,00 zł</b></td><td align="center"><img src="https://cdn.jsdelivr.net/gh/lopinv/media.buchmistrz.pl@media/static/assets/uploads/cover.jpg" width="90" height="90" style="object-fit:cover;border-radius:8px" alt="MASKKING ICEX 40000 PUFFS"></td></tr>
+<tr><td align="left"><a href="https://vapepl.com/product/maskking-icex-40000-puffs/">MASKKING ICEX 40000 PUFFS</a></td><td align="center">40 000</td><td align="center"><s>90,00 zł</s><br><b>80,00 zł</b></td><td align="center"><img src="https://res.cloudinary.com/mxxef4oi/image/fetch/q_auto/f_auto/https://cdn.jsdelivr.net/gh/lopinv/media.buchmistrz.pl@media/static/assets/uploads/cover.jpg" width="90" height="90" style="object-fit:cover;border-radius:8px" alt="MASKKING ICEX 40000 PUFFS"></td></tr>
 </table>
 
 ---
@@ -183,7 +183,7 @@
 
 <table width="100%">
 <tr><th width="38%" align="left">Produkt</th><th width="14%" align="center">Puffs</th><th width="26%" align="center">Cena</th><th width="22%" align="center">Widok</th></tr>
-<tr><td align="left"><a href="https://vapepl.com/product/merrymi-blade-30000-puffs/">MERRYMI BLADE 30000 PUFFS</a></td><td align="center">30 000</td><td align="center"><s>95,00 zł</s><br><b>80,00 zł</b></td><td align="center"><img src="https://cdn.jsdelivr.net/gh/lopinv/media.buchmistrz.pl@media/static/assets/uploads/MERRYMI-BLADE-30000-PUFF.webp" width="90" height="90" style="object-fit:cover;border-radius:8px" alt="MERRYMI BLADE 30000 PUFFS"></td></tr>
+<tr><td align="left"><a href="https://vapepl.com/product/merrymi-blade-30000-puffs/">MERRYMI BLADE 30000 PUFFS</a></td><td align="center">30 000</td><td align="center"><s>95,00 zł</s><br><b>80,00 zł</b></td><td align="center"><img src="https://res.cloudinary.com/mxxef4oi/image/fetch/q_auto/f_auto/https://cdn.jsdelivr.net/gh/lopinv/media.buchmistrz.pl@media/static/assets/uploads/MERRYMI-BLADE-30000-PUFF.webp" width="90" height="90" style="object-fit:cover;border-radius:8px" alt="MERRYMI BLADE 30000 PUFFS"></td></tr>
 </table>
 
 ---
@@ -192,7 +192,7 @@
 
 <table width="100%">
 <tr><th width="38%" align="left">Produkt</th><th width="14%" align="center">Puffs</th><th width="26%" align="center">Cena</th><th width="22%" align="center">Widok</th></tr>
-<tr><td align="left"><a href="https://vapepl.com/product/stag-bar-6in1-180000-puffs/">STAG BAR 6IN1 180000 PUFFS</a></td><td align="center">180 000</td><td align="center"><s>180,00 zł</s><br><b>150,00 zł</b></td><td align="center"><img src="https://cdn.jsdelivr.net/gh/lopinv/media.buchmistrz.pl@media/static/assets/uploads/stag-bar-6in1-180000-180k-puffs.jpg" width="90" height="90" style="object-fit:cover;border-radius:8px" alt="STAG BAR 6IN1 180000 PUFFS"></td></tr>
+<tr><td align="left"><a href="https://vapepl.com/product/stag-bar-6in1-180000-puffs/">STAG BAR 6IN1 180000 PUFFS</a></td><td align="center">180 000</td><td align="center"><s>180,00 zł</s><br><b>150,00 zł</b></td><td align="center"><img src="https://res.cloudinary.com/mxxef4oi/image/fetch/q_auto/f_auto/https://cdn.jsdelivr.net/gh/lopinv/media.buchmistrz.pl@media/static/assets/uploads/stag-bar-6in1-180000-180k-puffs.jpg" width="90" height="90" style="object-fit:cover;border-radius:8px" alt="STAG BAR 6IN1 180000 PUFFS"></td></tr>
 </table>
 
 ---
@@ -201,9 +201,9 @@
 
 <table width="100%">
 <tr><th width="38%" align="left">Produkt</th><th width="14%" align="center">Puffs</th><th width="26%" align="center">Cena</th><th width="22%" align="center">Widok</th></tr>
-<tr><td align="left"><a href="https://vapepl.com/product/xcor-max-50000-puffs/">XCOR Max 50000 PUFFS</a></td><td align="center">50 000</td><td align="center"><s>100,00 zł</s><br><b>90,00 zł</b></td><td align="center"><img src="https://cdn.jsdelivr.net/gh/lopinv/media.buchmistrz.pl@media/static/assets/uploads/XCOR-MAX-50000-PUFFS.webp" width="90" height="90" style="object-fit:cover;border-radius:8px" alt="XCOR Max 50000 PUFFS"></td></tr>
-<tr><td align="left"><a href="https://vapepl.com/product/xcor-tyrant-23000-puffs/">XCOR TYRANT 23000 PUFFS</a></td><td align="center">23 000</td><td align="center"><s>60,00 zł</s><br><b>55,00 zł</b></td><td align="center"><img src="https://cdn.jsdelivr.net/gh/lopinv/media.buchmistrz.pl@media/static/assets/uploads/xcor-tyrant-23000-puffs.jpeg" width="90" height="90" style="object-fit:cover;border-radius:8px" alt="XCOR TYRANT 23000 PUFFS"></td></tr>
-<tr><td align="left"><a href="https://vapepl.com/product/xcor-hawaii-pro-23000-puffs/">XCOR Hawaii PRO 23000 PUFFS</a></td><td align="center">23 000</td><td align="center"><s>60,00 zł</s><br><b>55,00 zł</b></td><td align="center"><img src="https://cdn.jsdelivr.net/gh/lopinv/media.buchmistrz.pl@media/static/assets/uploads/85b21c9f1e31bb658d6c4ec5a830a8b3.webp" width="90" height="90" style="object-fit:cover;border-radius:8px" alt="XCOR Hawaii PRO 23000 PUFFS"></td></tr>
+<tr><td align="left"><a href="https://vapepl.com/product/xcor-max-50000-puffs/">XCOR Max 50000 PUFFS</a></td><td align="center">50 000</td><td align="center"><s>100,00 zł</s><br><b>90,00 zł</b></td><td align="center"><img src="https://res.cloudinary.com/mxxef4oi/image/fetch/q_auto/f_auto/https://cdn.jsdelivr.net/gh/lopinv/media.buchmistrz.pl@media/static/assets/uploads/XCOR-MAX-50000-PUFFS.webp" width="90" height="90" style="object-fit:cover;border-radius:8px" alt="XCOR Max 50000 PUFFS"></td></tr>
+<tr><td align="left"><a href="https://vapepl.com/product/xcor-tyrant-23000-puffs/">XCOR TYRANT 23000 PUFFS</a></td><td align="center">23 000</td><td align="center"><s>60,00 zł</s><br><b>55,00 zł</b></td><td align="center"><img src="https://res.cloudinary.com/mxxef4oi/image/fetch/q_auto/f_auto/https://cdn.jsdelivr.net/gh/lopinv/media.buchmistrz.pl@media/static/assets/uploads/xcor-tyrant-23000-puffs.jpeg" width="90" height="90" style="object-fit:cover;border-radius:8px" alt="XCOR TYRANT 23000 PUFFS"></td></tr>
+<tr><td align="left"><a href="https://vapepl.com/product/xcor-hawaii-pro-23000-puffs/">XCOR Hawaii PRO 23000 PUFFS</a></td><td align="center">23 000</td><td align="center"><s>60,00 zł</s><br><b>55,00 zł</b></td><td align="center"><img src="https://res.cloudinary.com/mxxef4oi/image/fetch/q_auto/f_auto/https://cdn.jsdelivr.net/gh/lopinv/media.buchmistrz.pl@media/static/assets/uploads/85b21c9f1e31bb658d6c4ec5a830a8b3.webp" width="90" height="90" style="object-fit:cover;border-radius:8px" alt="XCOR Hawaii PRO 23000 PUFFS"></td></tr>
 </table>
 <!-- @/gen:products -->
 ---
@@ -237,10 +237,10 @@
 <!-- @gen:flavorCats -->
 <table width="100%">
 <tr>
-<th width="25%" align="center"><img src="https://cdn.jsdelivr.net/gh/lopinv/media.buchmistrz.pl@media/static/assets/uploads/Fruity.png" width="140" height="140" style="object-fit:cover;border-radius:10px" alt="Fruity"><br><b>🍓 Fruity</b><br>18 produktów</th>
-<th width="25%" align="center"><img src="https://cdn.jsdelivr.net/gh/lopinv/media.buchmistrz.pl@media/static/assets/uploads/Menthol-Ice.png" width="140" height="140" style="object-fit:cover;border-radius:10px" alt="Menthol &amp; Ice"><br><b>🧊 Menthol &amp; Ice</b><br>18 produktów</th>
-<th width="25%" align="center"><img src="https://cdn.jsdelivr.net/gh/lopinv/media.buchmistrz.pl@media/static/assets/uploads/Sweet-Candy.png" width="140" height="140" style="object-fit:cover;border-radius:10px" alt="Sweet &amp; Candy"><br><b>🍬 Sweet &amp; Candy</b><br>17 produktów</th>
-<th width="25%" align="center"><img src="https://cdn.jsdelivr.net/gh/lopinv/media.buchmistrz.pl@media/static/assets/uploads/Tobacco.png" width="140" height="140" style="object-fit:cover;border-radius:10px" alt="Tobacco"><br><b>🍂 Tobacco</b><br>2 produkty</th>
+<th width="25%" align="center"><img src="https://res.cloudinary.com/mxxef4oi/image/fetch/q_auto/f_auto/https://cdn.jsdelivr.net/gh/lopinv/media.buchmistrz.pl@media/static/assets/uploads/Fruity.png" width="140" height="140" style="object-fit:cover;border-radius:10px" alt="Fruity"><br><b>🍓 Fruity</b><br>18 produktów</th>
+<th width="25%" align="center"><img src="https://res.cloudinary.com/mxxef4oi/image/fetch/q_auto/f_auto/https://cdn.jsdelivr.net/gh/lopinv/media.buchmistrz.pl@media/static/assets/uploads/Menthol-Ice.png" width="140" height="140" style="object-fit:cover;border-radius:10px" alt="Menthol &amp; Ice"><br><b>🧊 Menthol &amp; Ice</b><br>18 produktów</th>
+<th width="25%" align="center"><img src="https://res.cloudinary.com/mxxef4oi/image/fetch/q_auto/f_auto/https://cdn.jsdelivr.net/gh/lopinv/media.buchmistrz.pl@media/static/assets/uploads/Sweet-Candy.png" width="140" height="140" style="object-fit:cover;border-radius:10px" alt="Sweet &amp; Candy"><br><b>🍬 Sweet &amp; Candy</b><br>17 produktów</th>
+<th width="25%" align="center"><img src="https://res.cloudinary.com/mxxef4oi/image/fetch/q_auto/f_auto/https://cdn.jsdelivr.net/gh/lopinv/media.buchmistrz.pl@media/static/assets/uploads/Tobacco.png" width="140" height="140" style="object-fit:cover;border-radius:10px" alt="Tobacco"><br><b>🍂 Tobacco</b><br>2 produkty</th>
 </tr>
 </table>
 <!-- @/gen:flavorCats -->
@@ -407,10 +407,10 @@ Kupując kilka sztuk tego samego produktu, automatycznie otrzymujesz rabat progo
 ## 📰 Wiedza o E-papierosach
 
 <!-- @gen:guides -->
-> Pełna biblioteka wiedzy: **4182 artykułów** o jednorazówkach, smakach, modelach i kosztach puffs — aktualizowana przy każdym odświeżeniu danych.
+> Pełna biblioteka wiedzy: **4184 artykułów** o jednorazówkach, smakach, modelach i kosztach puffs — aktualizowana przy każdym odświeżeniu danych.
 
 <details>
-<summary><b>📅 Październik 2026 — 802 artykułów</b></summary>
+<summary><b>📅 Październik 2026 — 804 artykułów</b></summary>
 
 - [Cherry cola ice: LUX, STAG BAR i ECO 4IN1 w liczbach](https://vapepl.com/cherry-cola-ice-lux-stag-bar-i-eco-4in1-w-liczbach/)
 - [Cola jednorazówka: DREAM, STAG BAR i LUX](https://vapepl.com/cola-jednorazowka-dream-stag-bar-i-lux/)
@@ -470,6 +470,7 @@ Kupując kilka sztuk tego samego produktu, automatycznie otrzymujesz rabat progo
 - [Jednorazówka mango: TORNADO, LUX i LEOPARD w 90 sekund](https://vapepl.com/jednorazowka-mango-tornado-lux-i-leopard-w-90-sekund/)
 - [Jednorazówki cena: TORNADO, LUX i STAG BAR w liczbach](https://vapepl.com/jednorazowki-cena-tornado-lux-i-stag-bar-w-liczbach/)
 - [Jednorazówki do palenia: TYRANT, LUX i STAG BAR w 30 dniach](https://vapepl.com/jednorazowki-do-palenia-tyrant-lux-i-stag-bar-w-30-dniach/)
+- [Jednorazówki Ice Cola: DREAM, LUX i STAG BAR w liczbach](https://vapepl.com/jednorazowki-ice-cola-dream-lux-i-stag-bar-w-liczbach/)
 - [Jednorazówki smaki: STAG BAR, ECO 4IN1 i TORNADO 9K](https://vapepl.com/jednorazowki-smaki-stag-bar-eco-4in1-i-tornado-9k/)
 - [Jednorazówki zero waste: LUX, STAG BAR i koszt w roku](https://vapepl.com/jednorazowki-zero-waste-lux-stag-bar-i-koszt-w-roku/)
 - [Kiwi z bananem: LEOPARD, LUX i STAG BAR w liczbach](https://vapepl.com/kiwi-z-bananem-leopard-lux-i-stag-bar-w-liczbach/)
@@ -557,6 +558,7 @@ Kupując kilka sztuk tego samego produktu, automatycznie otrzymujesz rabat progo
 - [Jednorazówki cena: zł na dobę w TORNADO, LUX i STAG BAR](https://vapepl.com/jednorazowki-cena-zl-na-dobe-w-tornado-lux-i-stag-bar/)
 - [Jednorazówki smaki: drabina STAG, LUX, DREAM i TORNADO](https://vapepl.com/jednorazowki-smaki-drabina-stag-lux-dream-i-tornado/)
 - [Jednorazówki smaki: TORNADO 9K czy STAG 6IN1](https://vapepl.com/jednorazowki-smaki-tornado-9k-czy-stag-6in1/)
+- [Jednorazówki w Polsce: cena puffs od STAG do TORNADO](https://vapepl.com/jednorazowki-w-polsce-cena-puffs-od-stag-do-tornado/)
 - [Która jednorazówka HIFANCY się opłaca? 4 modele porównane](https://vapepl.com/ktora-jednorazowka-hifancy-sie-oplaca-4-modele-porownane/)
 - [Który tank do jednorazówek? STAG BAR vs LUX](https://vapepl.com/ktory-tank-do-jednorazowek-stag-bar-vs-lux/)
 - [Liquid do jednorazówki: STAG BAR 6IN1 i FOX 4IN1 po słojach](https://vapepl.com/liquid-do-jednorazowki-stag-bar-6in1-i-fox-4in1-po-slojach/)
@@ -4690,7 +4692,7 @@ node site/preview.mjs         # lokalny podgląd
 
 <sub>© 2014–2026 VapePL.COM · BuchMistrz · Sprzedaż wyłącznie dla osób 18+</sub><br>
 <!-- @gen:dateline -->
-<sub>• Dane zebrane: 20 października 2026 • <a href="https://vapepl.com">vapepl.com</a> · Zwroty i reklamacje: <a href="https://vapepl.com/refund_returns/">Polityka Zwrotów</a></sub>
+<sub>• Dane zebrane: 25 października 2026 • <a href="https://vapepl.com">vapepl.com</a> · Zwroty i reklamacje: <a href="https://vapepl.com/refund_returns/">Polityka Zwrotów</a></sub>
 <!-- @/gen:dateline -->
 
 </div>
